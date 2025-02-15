@@ -17,6 +17,20 @@ body {
 	margin: 0;
 }
 
+@font-face {
+    font-family: 'Pathfinder-Icons';
+    src: url('/Pathfinder-Icons.ttf') format('truetype');
+
+    font-weight: normal;
+    font-style: normal;
+}
+
+span.action {
+    font-family: 'Pathfinder-Icons';
+    font-variant: normal;
+    font-weight: normal;
+}
+
 #app {
 	display: flex;
 	flex-direction: column;
