@@ -5,6 +5,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Tooltip } from 'bootstrap';
 import { CharacterContext } from "../context/CharacterContext";
+import { getFriendlyDiceString, getFriendlyStatName, replaceDiceStats, validateDiceRoll } from "../utils/diceHelpers";
 
 
 const SpellManager = () => {
@@ -58,34 +59,10 @@ const SpellManager = () => {
 
     const [diceError, setDiceError] = useState("");
 
-    const validateDiceRoll = (diceString) => {
-        if (!diceString) {
-            setDiceError("A valid dice roll is required.");
-            return false;
-        }
-
-        try {
-            // Replace all stat references with 0 for validation
-            const testString = diceString.replace(/\[\w+\]/g, "0");
-            new DiceRoller().roll(testString);
-
-            // Check if all referenced stats exist
-            const statMatches = diceString.match(/\[(\w+)\]/g) || [];
-            const unknownStats = statMatches
-                .map(match => match.slice(1, -1))
-                .filter(stat => characterStats[stat] === undefined);
-
-            if (unknownStats.length > 0) {
-                setDiceError(`Unknown stats: ${unknownStats.join(", ")}`);
-                return false;
-            }
-
-            setDiceError("");
-            return true;
-        } catch (error) {
-            setDiceError("Invalid dice format. Use format like '1d6+[spellAttackModifier]' or '2d8+3'");
-            return false;
-        }
+    const validateDiceString = (diceString) => {
+        const result = validateDiceRoll(diceString, characterStats);
+        setDiceError(result.error || "");
+        return result.isValid;
     };
 
     const saveSpell = () => {
@@ -103,28 +80,14 @@ const SpellManager = () => {
         }
     };
 
-    const replaceDiceStats = (diceString, stats) => {
-        // Replace any [statName] with the actual stat value, handling plus signs
-        return diceString.replace(/\[(\w+)\]/g, (match, stat) => {
-            const value = stats[stat];
-            if (value === undefined) {
-                throw new Error(`Unknown stat: ${stat}`);
-            }
-            // If value is positive and there's a + before the [stat], don't add another +
-            const hasLeadingPlus = diceString.indexOf(match) > 0 &&
-                diceString[diceString.indexOf(match) - 1] === '+';
-            return value >= 0 && !hasLeadingPlus ? `+${value}` : value.toString();
-        });
-    };
-
     const rollSpellDamage = (spell) => {
         const roller = new DiceRoller();
         if (spell.quantity > 0 && spell.dice) {
             try {
-                // Replace stats with their values
                 const diceWithStats = replaceDiceStats(spell.dice, characterStats);
+                const friendlyDice = getFriendlyDiceString(spell.dice)
                 const result = roller.roll(diceWithStats);
-                alert(`Spell cast! Rolled ${spell.dice} (${diceWithStats}): ${result.value}`);
+                alert(`Spell cast!\nFormula: ${friendlyDice}\nRoll: ${diceWithStats}\nResult: ${result.value}`);
                 updateSpell(spell.id, "quantity", spell.quantity - 1);
             } catch (error) {
                 alert(error.message || "Invalid dice format!");
@@ -133,7 +96,7 @@ const SpellManager = () => {
             alert("No more charges of this spell remaining!");
         }
     };
-
+    
     const updateSpell = (id, key, value) => {
         setSpells(spells.map(spell => spell.id === id ? { ...spell, [key]: value } : spell));
     };
@@ -237,10 +200,13 @@ const SpellManager = () => {
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
 
-                {/* Test button */}
-                <button className="btn btn-primary mb-3" onClick={() => console.log(characterStats.spellAttackModifier)} >
-                    Test
-                </button>
+                <div className="mb-3">
+                    {Object.entries(characterStats).map(([key, value]) => (
+                        <span key={key} className="badge bg-secondary me-2">
+                            {key}: {value}
+                        </span>
+                    ))}
+                </div>
 
                 <ul className="list-group">
                     {spells.map((spell, index) => (
@@ -270,7 +236,7 @@ const SpellManager = () => {
                                     data-bs-placement="top"
                                     title="Roll Damage">
                                     <i className="fas fa-dice-d20 me-2"></i>
-                                    {spell.dice}
+                                    {getFriendlyDiceString(spell.dice)}
                                 </button>
 
                                 <button className="btn btn-outline-primary btn-sm me-2"
