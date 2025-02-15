@@ -7,11 +7,11 @@ export function Header() {
 		<header>
 			<nav>
 				<a href="/" class={url == '/' && 'active'}>
-					Home
+					Stats
 				</a>
-				<a href="/404" class={url == '/404' && 'active'}>
-					404
-				</a>
+                <a href="/spells" class={url == '/spells' && 'active'}>
+                    Spells
+                </a>
 			</nav>
 		</header>
 	);

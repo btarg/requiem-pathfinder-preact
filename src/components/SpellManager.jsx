@@ -1,11 +1,15 @@
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useContext } from "preact/hooks";
 import { DiceRoller } from "dice-roller-parser";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Tooltip } from 'bootstrap';
+import { CharacterContext } from "../context/CharacterContext";
+
 
 const SpellManager = () => {
+    const { characterStats } = useContext(CharacterContext);
+
     const [spells, setSpells] = useState(() => {
         const savedSpells = localStorage.getItem('spells');
         return savedSpells ? JSON.parse(savedSpells) : [];
@@ -61,11 +65,25 @@ const SpellManager = () => {
         }
 
         try {
-            new DiceRoller().roll(diceString);
+            // Replace all stat references with 0 for validation
+            const testString = diceString.replace(/\[\w+\]/g, "0");
+            new DiceRoller().roll(testString);
+
+            // Check if all referenced stats exist
+            const statMatches = diceString.match(/\[(\w+)\]/g) || [];
+            const unknownStats = statMatches
+                .map(match => match.slice(1, -1))
+                .filter(stat => characterStats[stat] === undefined);
+
+            if (unknownStats.length > 0) {
+                setDiceError(`Unknown stats: ${unknownStats.join(", ")}`);
+                return false;
+            }
+
             setDiceError("");
             return true;
         } catch (error) {
-            setDiceError("Invalid dice format. Use format like '1d6' or '2d8+3'");
+            setDiceError("Invalid dice format. Use format like '1d6+[spellAttackModifier]' or '2d8+3'");
             return false;
         }
     };
@@ -85,15 +103,31 @@ const SpellManager = () => {
         }
     };
 
+    const replaceDiceStats = (diceString, stats) => {
+        // Replace any [statName] with the actual stat value, handling plus signs
+        return diceString.replace(/\[(\w+)\]/g, (match, stat) => {
+            const value = stats[stat];
+            if (value === undefined) {
+                throw new Error(`Unknown stat: ${stat}`);
+            }
+            // If value is positive and there's a + before the [stat], don't add another +
+            const hasLeadingPlus = diceString.indexOf(match) > 0 &&
+                diceString[diceString.indexOf(match) - 1] === '+';
+            return value >= 0 && !hasLeadingPlus ? `+${value}` : value.toString();
+        });
+    };
+
     const rollSpellDamage = (spell) => {
         const roller = new DiceRoller();
         if (spell.quantity > 0 && spell.dice) {
             try {
-                const result = roller.roll(spell.dice);
-                alert(`Spell cast! Rolled ${spell.dice}: ${result.value}`);
+                // Replace stats with their values
+                const diceWithStats = replaceDiceStats(spell.dice, characterStats);
+                const result = roller.roll(diceWithStats);
+                alert(`Spell cast! Rolled ${spell.dice} (${diceWithStats}): ${result.value}`);
                 updateSpell(spell.id, "quantity", spell.quantity - 1);
             } catch (error) {
-                alert("Invalid dice format!");
+                alert(error.message || "Invalid dice format!");
             }
         } else {
             alert("No more charges of this spell remaining!");
@@ -202,6 +236,12 @@ const SpellManager = () => {
                 <button className="btn btn-primary mb-3" onClick={() => openModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
+
+                {/* Test button */}
+                <button className="btn btn-primary mb-3" onClick={() => console.log(characterStats.spellAttackModifier)} >
+                    Test
+                </button>
+
                 <ul className="list-group">
                     {spells.map((spell, index) => (
                         <li key={spell.id}
@@ -264,7 +304,7 @@ const SpellManager = () => {
                                         title="Move Spell Up">
                                         <i className="fas fa-chevron-up"></i>
                                     </button>
-                                    
+
                                 </div>
                             </div>
                         </li>
@@ -372,8 +412,7 @@ const SpellManager = () => {
 
                 {/* Delete Confirmation Modal */}
                 <div className={`modal fade ${spellToDelete ? 'show' : ''}`}
-                    style={{ display: spellToDelete ? 'block' : 'none' }}
-                    tabIndex="-1">
+                    style={{ display: spellToDelete ? 'block' : 'none' }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">

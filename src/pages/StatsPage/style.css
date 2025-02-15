@@ -1,0 +1,41 @@
+.spell-inventory {
+    max-width: 1400px;
+    /* Increased from default bootstrap container width */
+    width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.spell-item {
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem !important;
+    width: 100%;
+}
+
+.list-group {
+    width: 100%;
+}
+
+/* Make the spell name take up more space */
+.spell-info {
+    flex: 1;
+    min-width: 0;
+    /* Prevents flex items from overflowing */
+}
+
+/* Keep the action buttons from shrinking */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.character-stats {
+    max-width: 300px;
+    margin-bottom: 1rem;
+}
+
+.character-stats .input-group-text {
+    min-width: 40px;
+}

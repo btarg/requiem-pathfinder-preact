@@ -30,3 +30,12 @@
     gap: 0.5rem;
     flex-shrink: 0;
 }
+
+.character-stats {
+    max-width: 300px;
+    margin-bottom: 1rem;
+}
+
+.character-stats .input-group-text {
+    min-width: 40px;
+}
