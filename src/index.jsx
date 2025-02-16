@@ -16,9 +16,9 @@ export function App() {
                 <LocationProvider>
                     <Header />
                     <main>
-                        <Router base="/requiem-pathfinder-preact">
-                            <Route path="/" component={Stats} />
-                            <Route path="/spells" component={SpellInventory} />
+                        <Router>
+                            <Route path="/requiem-pathfinder-preact/" component={Stats} />
+                            <Route path="/requiem-pathfinder-preact/spells" component={SpellInventory} />
                             <Route default component={NotFound} />
                         </Router>
                     </main>
