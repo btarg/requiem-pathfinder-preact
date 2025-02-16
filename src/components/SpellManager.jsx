@@ -210,6 +210,24 @@ const SpellManager = () => {
         setIncrementAmount(1); // Reset after use
     };
 
+    const getElementIcon = (element) => {
+        switch (element) {
+            case ElementType.Acid:
+                return '🧪';
+            case ElementType.Cold:
+                return '❄️';
+            case ElementType.Electricity:
+                return '⚡';
+            case ElementType.Fire:
+                return '🔥';
+            case ElementType.Sonic:
+                return '🔊';
+            default:
+                return '⚔️';
+        }
+
+    };
+
     const getActionLabel = (actions) => {
         let label = "";
         let title = "";
@@ -284,26 +302,30 @@ const SpellManager = () => {
                 <ul className="list-group">
                     {spells.map((spell, index) => (
                         <li key={spell.id}
-                            className="list-group-item"
+                            className="list-group-item spell-item"
                             style={{ transition: 'background-color 0.3s' }}
                             onMouseOver={e => e.currentTarget.style.backgroundColor = '#2c3034'}
                             onMouseOut={e => e.currentTarget.style.backgroundColor = ''}
-                            onClick={() => toggleExpandSpell(spell.id)}>
-                            <div class="d-flex justify-content-between py-3 spell-item">
-                                <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}>
+                        >
+                            <div class="d-flex justify-content-between">
+                                <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}
+                                    onClick={() => toggleExpandSpell(spell.id)}>
                                     <span className="badge bg-primary me-3" style={{ minWidth: '3rem', flexShrink: 0 }}>
                                         {spell.quantity}
                                     </span>
-                                    <span className="me-2" style={{ flexShrink: 0 }}>{getActionLabel(spell.actions)}</span>
 
-                                    {/* Spell name */}
-                                    <span className="text-truncate">{spell.name}</span>
+                                    {/* Name and action count */}
+
+                                    {getElementIcon(spell.element)}
+                                    <span className="text-truncate me-2">{spell.name}</span>
+                                    <span className="me-2" style={{ flexShrink: 0 }}>{getActionLabel(spell.actions)}</span>
 
                                     {/* Link badge */}
                                     <span
                                         className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'} ms-2`}
                                         data-bs-toggle="tooltip"
-                                        title={spell.isLinked ? STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
+                                        data-bs-original-title=""
+                                        title={spell.isLinked ? "Linked to " + STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
                                         onClick={() => handleBadgeClick(spell)}
                                         style={{ cursor: 'pointer' }}
                                     >
@@ -369,11 +391,27 @@ const SpellManager = () => {
                                     </div>
                                 </div>
                                 <br />
-                                
+
                             </div>
                             {expandedSpellId === spell.id && (
-                                <div className="mt-2">
-                                    <p className="text-truncate" style={{ maxWidth: '100%' }}>{spell.description}</p>
+                                <div className="mt-3 border-top">
+                                    <p className="py-1 border-bottom h5">Spell details</p>
+                                    {/* Based on the element, use an emoji */}
+                                    {getElementIcon(spell.element)}
+
+
+                                    <p className="py-1 border-bottom border-top h5">Description</p>
+                                    <div
+                                        className="mb-0 spell-description"
+                                        style={{
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: '3',
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}
+                                        dangerouslySetInnerHTML={{ __html: spell.description }}
+                                    />
                                 </div>
                             )}
                         </li>

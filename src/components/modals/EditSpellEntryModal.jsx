@@ -106,7 +106,7 @@ const EditSpellEntryModal = ({
                                 value={currentSpell.element}
                                 onChange={(e) => setCurrentSpell({
                                     ...currentSpell,
-                                    element: ElementType[e.currentTarget.value]
+                                    element: e.currentTarget.value
                                 })}
                             >
                                 {Object.entries(ElementType).map(([key, value]) => (
