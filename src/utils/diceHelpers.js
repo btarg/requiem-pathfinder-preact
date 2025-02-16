@@ -42,7 +42,7 @@ export const getFriendlyDiceString = (diceString) => {
 export const validateSpellFields = (spell) => {
     const errors = [];
     if (!spell.name) errors.push("Spell name is required");
-    if (spell.quantity <= 0) errors.push("Quantity must be greater than 0");
+    if (spell.quantity < 0) errors.push("Quantity must be 0 or higher");
     if (spell.quantity > 100) errors.push("Quantity must be 100 max");
     if (spell.power <= 0) errors.push("Spell level must be greater than 0");
     if (!spell.dice) errors.push("Damage roll is required");
