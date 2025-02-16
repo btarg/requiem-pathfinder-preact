@@ -7,6 +7,10 @@ export const getFriendlyStatName = (stat) => {
         .trim();
 };
 
+const calculateStatBonus = (stock, spellRank) => {
+    return Math.floor((spellRank * 2) * Math.sqrt(stock / 2));
+};
+
 export const rollDrawDice = (luck, hasMastery) => {
     const baseDice = hasMastery ? "2d6" : "1d6";
     const maxExtraDice = Math.min(Math.floor(luck), 4);
@@ -34,6 +38,16 @@ export const getFriendlyDiceString = (diceString) => {
         `(${getFriendlyStatName(stat)})`
     );
 }
+
+export const validateSpellFields = (spell) => {
+    const errors = [];
+    if (!spell.name) errors.push("Spell name is required");
+    if (spell.quantity <= 0) errors.push("Quantity must be greater than 0");
+    if (spell.quantity > 100) errors.push("Quantity must be 100 max");
+    if (spell.power <= 0) errors.push("Spell level must be greater than 0");
+    if (!spell.dice) errors.push("Damage roll is required");
+    return errors;
+};
 
 export const validateDiceRoll = (diceString, characterStats) => {
     if (!diceString) {

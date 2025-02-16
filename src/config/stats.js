@@ -4,6 +4,7 @@ export const STATS_CONFIG = {
     strength: {
         name: "Strength",
         icon: "fa-fist-raised",
+        color: "danger",
         description: "Increases physical attack damage unless resisted/absorbed/immune. Applied as flat bonus to Physical damage rolls.",
         category: STAT_CATEGORIES.PHYSICAL,
         type: STAT_TYPES.OFFENSIVE,
@@ -15,6 +16,7 @@ export const STATS_CONFIG = {
     vitality: {
         name: "Vitality",
         icon: "fa-shield-alt",
+        color: "primary-emphasis",
         description: "Reduces incoming Physical damage when attack is resisted. Does not affect neutral or absorbed damage.",
         category: STAT_CATEGORIES.PHYSICAL,
         type: STAT_TYPES.DEFENSIVE,
@@ -26,6 +28,7 @@ export const STATS_CONFIG = {
     magic: {
         name: "Magic",
         icon: "fa-hand-sparkles",
+        color: "success-emphasis",
         description: "Increases magical attack damage unless resisted/absorbed/immune. Applied as flat bonus.",
         category: STAT_CATEGORIES.MAGICAL,
         type: STAT_TYPES.OFFENSIVE,
@@ -37,6 +40,7 @@ export const STATS_CONFIG = {
     spirit: {
         name: "Spirit",
         icon: "fa-shield-heart",
+        color: "info",
         description: "Reduces incoming magical damage when attack is resisted. Does not affect neutral or absorbed damage.",
         category: STAT_CATEGORIES.MAGICAL,
         type: STAT_TYPES.DEFENSIVE,
@@ -48,6 +52,7 @@ export const STATS_CONFIG = {
     speed: {
         name: "Speed",
         icon: "fa-running",
+        color: "secondary-emphasis",
         description: "Bonus to Initiative and movement distance per turn",
         category: STAT_CATEGORIES.UTILITY,
         type: STAT_TYPES.UTILITY,
@@ -60,7 +65,8 @@ export const STATS_CONFIG = {
     },
     luck: {
         name: "Luck",
-        icon: "fa-dice",
+        icon: "fa-clover",
+        color: "success",
         description: "Affects spell draws and knockdown resistance",
         category: STAT_CATEGORIES.UTILITY,
         type: STAT_TYPES.UTILITY,

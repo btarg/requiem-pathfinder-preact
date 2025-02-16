@@ -5,7 +5,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Tooltip } from 'bootstrap';
 import { CharacterContext } from "../context/CharacterContext";
-import { getFriendlyDiceString, getFriendlyStatName, replaceDiceStats, validateDiceRoll } from "../utils/diceHelpers";
+import { getFriendlyDiceString, getFriendlyStatName, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
+import { getSpellRank } from "../config/stats";
 
 
 const SpellManager = () => {
@@ -15,14 +16,19 @@ const SpellManager = () => {
         const savedSpells = localStorage.getItem('spells');
         return savedSpells ? JSON.parse(savedSpells) : [];
     });
-    const [currentSpell, setCurrentSpell] = useState({
+    const defaultSpell = {
         name: "",
         quantity: 1,
         power: 1,
         dice: "",
         description: "",
-        actions: 1
-    });
+        actions: 1,
+        rank: 1,
+        isLinked: false,
+        linkedStat: "strength" // Default linked stat
+    };
+
+    const [currentSpell, setCurrentSpell] = useState(defaultSpell);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [spellBeingEdited, setSpellBeingEdited] = useState(null);
 
@@ -41,14 +47,7 @@ const SpellManager = () => {
 
     const openModal = (spell = null) => {
         setSpellBeingEdited(spell);
-        setCurrentSpell(spell || {
-            name: "",
-            quantity: 1,
-            power: 1,
-            dice: "",
-            description: "",
-            actions: 1
-        });
+        setCurrentSpell(spell || defaultSpell);
         setIsModalOpen(true);
     };
 
@@ -65,8 +64,17 @@ const SpellManager = () => {
         return result.isValid;
     };
 
+
+
     const saveSpell = () => {
-        if (currentSpell.name && validateDiceRoll(currentSpell.dice)) {
+        const errors = validateSpellFields(currentSpell);
+
+        if (errors.length > 0) {
+            alert(`Please fix the following:\n${errors.join('\n')}`);
+            return;
+        }
+
+        if (validateDiceString(currentSpell.dice)) {
             if (spellBeingEdited) {
                 setSpells(spells.map(spell =>
                     spell.id === spellBeingEdited.id ?
@@ -96,7 +104,7 @@ const SpellManager = () => {
             alert("No more charges of this spell remaining!");
         }
     };
-    
+
     const updateSpell = (id, key, value) => {
         setSpells(spells.map(spell => spell.id === id ? { ...spell, [key]: value } : spell));
     };
@@ -124,35 +132,41 @@ const SpellManager = () => {
         }
     };
 
-    const incrementQuantity = () => {
-        setCurrentSpell({ ...currentSpell, quantity: currentSpell.quantity + 1 });
-    };
-
-    const decrementQuantity = () => {
-        if (currentSpell.quantity > 0) {
-            setCurrentSpell({ ...currentSpell, quantity: currentSpell.quantity - 1 });
-        }
-    };
 
     const incrementPower = () => {
-        setCurrentSpell({ ...currentSpell, power: currentSpell.power + 1 });
+        const newPower = currentSpell.power + 1;
+        setCurrentSpell({
+            ...currentSpell,
+            power: newPower,
+            rank: getSpellRank(newPower)
+        });
     };
 
     const decrementPower = () => {
         if (currentSpell.power > 1) {
-            setCurrentSpell({ ...currentSpell, power: currentSpell.power - 1 });
+            const newPower = currentSpell.power - 1;
+            setCurrentSpell({
+                ...currentSpell,
+                power: newPower,
+                rank: getSpellRank(newPower)
+            });
         }
     };
 
+    const [incrementAmount, setIncrementAmount] = useState(1);
+
     const incrementSpellQuantity = (id) => {
-        updateSpell(id, "quantity", spells.find(spell => spell.id === id).quantity + 1);
+        const spell = spells.find(spell => spell.id === id);
+        const newQuantity = Math.min(100, spell.quantity + incrementAmount);
+        updateSpell(id, "quantity", newQuantity);
+        setIncrementAmount(1); // Reset after use
     };
 
     const decrementSpellQuantity = (id) => {
         const spell = spells.find(spell => spell.id === id);
-        if (spell.quantity > 1) {
-            updateSpell(id, "quantity", spell.quantity - 1);
-        }
+        const newQuantity = Math.max(0, spell.quantity - incrementAmount);
+        updateSpell(id, "quantity", newQuantity);
+        setIncrementAmount(1); // Reset after use
     };
 
     const getActionLabel = (actions) => {
@@ -183,6 +197,7 @@ const SpellManager = () => {
                 className="action"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
+                data-bs-original-title={title}
                 title={title}
                 role="img"
                 aria-label={title}
@@ -212,21 +227,25 @@ const SpellManager = () => {
                     {spells.map((spell, index) => (
                         <li key={spell.id}
                             className="list-group-item d-flex justify-content-between align-items-center py-3 spell-item"
-                            onClick={_ => rollSpellDamage(spell)}
-                            style={{ cursor: 'pointer', transition: 'background-color 0.3s' }}
+                            style={{ transition: 'background-color 0.3s' }}
                             onMouseOver={e => e.currentTarget.style.backgroundColor = '#2c3034'}
                             onMouseOut={e => e.currentTarget.style.backgroundColor = ''}>
-                            <div className="d-flex align-items-center me-2">
-                                <span className="me-2">{getActionLabel(spell.actions)}</span><span className="me-2">{spell.name}</span>
-                                <i className="fas fa-edit text-primary me-2"
+                            
+                            <div className="d-flex align-items-center">
+                                <span className="badge bg-primary rounded-pill me-3" style={{ minWidth: '3rem', textAlign: 'center' }}>
+                                    {spell.quantity}
+                                </span>
+                                <span className="me-2">{getActionLabel(spell.actions)}</span>
+                                <span className="me-2 text-truncate">{spell.name}</span>
+                                <i className="fas fa-edit text-primary me-4"
                                     onClick={(e) => { e.stopPropagation(); openModal(spell); }}
                                     style={{ cursor: 'pointer', transition: 'opacity 0.3s', opacity: 0.6 }}
                                     onMouseOver={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "1" }}
                                     onMouseOut={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "0.6" }}
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
-                                    title="Edit Spell">
-                                </i>
+                                    title="Edit Spell"
+                                />
                             </div>
                             <div className="d-flex align-items-center">
                                 {/* Button to roll the damage with a d20 icon (red outline) */}
@@ -239,21 +258,38 @@ const SpellManager = () => {
                                     {getFriendlyDiceString(spell.dice)}
                                 </button>
 
-                                <button className="btn btn-outline-primary btn-sm me-2"
-                                    onClick={(e) => { e.stopPropagation(); decrementSpellQuantity(spell.id); }}
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Decrease Spell Charges">
-                                    <i className="fas fa-minus"></i>
-                                </button>
-                                <span className="badge bg-primary rounded-pill me-2">{spell.quantity}</span>
-                                <button className="btn btn-outline-primary btn-sm me-2"
-                                    onClick={(e) => { e.stopPropagation(); incrementSpellQuantity(spell.id); }}
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Increase Spell Charges">
-                                    <i className="fas fa-plus"></i>
-                                </button>
+                                {/* Quantity buttons */}
+                                <div className="input-group input-group-sm me-2" style={{ width: "140px" }}>
+                                    <button
+                                        className="btn btn-outline-primary btn-sm"
+                                        onClick={(e) => { e.stopPropagation(); decrementSpellQuantity(spell.id); }}
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Decrease Spell Charges"
+                                    >
+                                        <i className="fas fa-minus"></i>
+                                    </button>
+                                    <input
+                                        type="number"
+                                        className="form-control form-control-sm"
+                                        min="1"
+                                        max="100"
+                                        value={incrementAmount}
+                                        onChange={(e) => setIncrementAmount(Math.max(1, Math.min(100, parseInt(e.currentTarget.value) || 1)))}
+                                        onClick={(e) => e.stopPropagation()}
+                                        style={{ width: "60px" }}
+                                    />
+                                    <button
+                                        className="btn btn-outline-primary btn-sm"
+                                        onClick={(e) => { e.stopPropagation(); incrementSpellQuantity(spell.id); }}
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Increase Spell Charges"
+                                    >
+                                        <i className="fas fa-plus"></i>
+                                    </button>
+                                    
+                                </div>
 
                                 <div className="btn-group me-2">
                                     <button className="btn btn-outline-secondary btn-sm"
@@ -287,37 +323,83 @@ const SpellManager = () => {
                             <div className="modal-body">
                                 <div className="mb-2">
                                     <label className="form-label">Spell Name</label>
-                                    <input type="text" className="form-control" placeholder="Spell Name" value={currentSpell.name}
-                                        onInput={(e) => setCurrentSpell({ ...currentSpell, name: e.currentTarget.value })} />
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Spell Name"
+                                        value={currentSpell.name}
+                                        onInput={(e) => setCurrentSpell({
+                                            ...currentSpell,
+                                            name: e.currentTarget.value
+                                        })}
+                                    />
                                 </div>
+
+
                                 <div className="mb-2">
-                                    <label className="form-label">Quantity</label>
+                                    <label className="form-label">Spell Level</label>
                                     <div className="input-group">
-                                        <button className="btn btn-outline-secondary" type="button" onClick={decrementQuantity}>
+                                        <button
+                                            className="btn btn-outline-secondary"
+                                            type="button"
+                                            onClick={decrementPower}
+                                            disabled={currentSpell.power <= 1}
+                                        >
                                             <i className="fas fa-minus"></i>
                                         </button>
-                                        <input type="number" className="form-control" placeholder="Quantity" min="0" value={currentSpell.quantity}
-                                            onInput={(e) => setCurrentSpell({ ...currentSpell, quantity: parseInt(e.currentTarget.value, 10) })} />
-                                        <button className="btn btn-outline-secondary" type="button" onClick={incrementQuantity}>
+                                        <input
+                                            type="number"
+                                            className={`form-control ${currentSpell.power <= 0 ? 'is-invalid' : ''}`}
+                                            placeholder="Spell Level"
+                                            min="1"
+                                            value={currentSpell.power}
+                                            onInput={(e) => {
+                                                const value = Math.max(1, parseInt(e.currentTarget.value, 10) || 1);
+                                                setCurrentSpell({
+                                                    ...currentSpell,
+                                                    power: value,
+                                                    rank: getSpellRank(value)
+                                                });
+                                            }}
+                                        />
+                                        <button className="btn btn-outline-secondary" type="button"
+                                            onClick={incrementPower}>
                                             <i className="fas fa-plus"></i>
                                         </button>
+                                        {currentSpell.power <= 0 && (
+                                            <div className="invalid-feedback">
+                                                Spell level must be at least 1
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                                <div className="mb-2">
-                                    <label className="form-label">Power Level</label>
-                                    <div className="input-group">
-                                        <button className="btn btn-outline-secondary" type="button" onClick={decrementPower}>
-                                            <i className="fas fa-minus"></i>
-                                        </button>
-                                        <input type="number" className="form-control" placeholder="Power Level" min="0" value={currentSpell.power}
-                                            onInput={(e) => setCurrentSpell({ ...currentSpell, power: parseInt(e.currentTarget.value, 10) })} />
-                                        <button className="btn btn-outline-secondary" type="button" onClick={incrementPower}>
-                                            <i className="fas fa-plus"></i>
-                                        </button>
+                                    <div className="alert alert-info py-1 mb-2">
+                                        <i className="fas fa-link me-2"></i>
+                                        <small className="text-muted d-block mt-1">
+                                            This spell's <a href="https://docs.google.com/document/d/1ZTxCemR8j6GhIMqhvmBd7kOo8wNsOisO_vOutlQBYv0/edit?tab=t.0" target="_blank">Soul Link Rank</a> will be <b>{getSpellRank(currentSpell.power)}.</b>
+                                        </small>
                                     </div>
                                 </div>
 
+
+                                <label className="form-label">Actions to Cast</label>
+                                <div className="input-group mb-2">
+                                    <span className="input-group-text">
+                                        {getActionLabel(currentSpell.actions)}
+                                    </span>
+                                    <select className="form-select" value={currentSpell.actions}
+                                        onChange={(e) => setCurrentSpell({ ...currentSpell, actions: parseInt(e.currentTarget.value) })}>
+                                        <option value="1">1 Action</option>
+                                        <option value="2">2 Actions</option>
+                                        <option value="3">3 Actions</option>
+                                        <option value="0">Free Action</option>
+                                    </select>
+                                </div>
+
                                 <label className="form-label">Damage Roll(s)</label>
+                                <div className="alert alert-info py-1 mb-2">
+                                    <i className="fas fa-info-circle me-2"></i>
+                                    <small>Use [stat] to include a stat's value (e.g., [strength] + 1d6)</small>
+                                </div>
                                 <div className="input-group mb-2">
                                     <span className="input-group-text">
                                         <i className="fas fa-dice-d20"></i>
@@ -346,16 +428,53 @@ const SpellManager = () => {
                                     <textarea className="form-control" placeholder="Spell Description" value={currentSpell.description}
                                         onInput={(e) => setCurrentSpell({ ...currentSpell, description: e.currentTarget.value })} />
                                 </div>
+
+                                {/* Quantity input */}
                                 <div className="mb-2">
-                                    <label className="form-label">Actions to Cast</label>
-                                    <select className="form-select" value={currentSpell.actions}
-                                        onChange={(e) => setCurrentSpell({ ...currentSpell, actions: parseInt(e.currentTarget.value, 10) })}>
-                                        <option value="1">1 Action</option>
-                                        <option value="2">2 Actions</option>
-                                        <option value="3">3 Actions</option>
-                                    </select>
+                                    <label className="form-label">Amount currently stocked <i>("Spell Charges")</i></label>
+                                    <div className="input-group">
+                                        <button
+                                            className="btn btn-outline-secondary"
+                                            type="button"
+                                            onClick={decrementSpellQuantity}
+                                            disabled={currentSpell.quantity <= 1}
+                                        >
+                                            <i className="fas fa-minus"></i>
+                                        </button>
+                                        <input
+                                            type="number"
+                                            className={`form-control ${currentSpell.quantity <= 0 || currentSpell.quantity > 100 ? 'is-invalid' : ''}`}
+                                            placeholder="Quantity"
+                                            min="1"
+                                            max="100"
+                                            value={currentSpell.quantity}
+                                            onInput={(e) => {
+                                                const value = parseInt(e.currentTarget.value, 10) || 0;
+                                                if (value > 100) {
+                                                    setCurrentSpell({ ...currentSpell, quantity: 100 });
+                                                } else {
+                                                    setCurrentSpell({ ...currentSpell, quantity: Math.max(0, value) });
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            className="btn btn-outline-secondary"
+                                            type="button"
+                                            onClick={incrementSpellQuantity}
+                                            disabled={currentSpell.quantity >= 100}
+                                        >
+                                            <i className="fas fa-plus"></i>
+                                        </button>
+                                        {(currentSpell.quantity <= 0 || currentSpell.quantity > 100) && (
+                                            <div className="invalid-feedback d-block">
+                                                Quantity must be between 1 and 100
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
+
                             </div>
+
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={closeModal}>
                                     <i className="fas fa-times me-1"></i>Close

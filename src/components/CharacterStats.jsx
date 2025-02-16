@@ -39,7 +39,7 @@ const CharacterStats = () => {
                             </label>
                             <div className="input-group">
                                 <span className="input-group-text">
-                                    <i className={`fas ${config.icon}`}></i>
+                                    <i className={`fas ${config.icon} text-${config.color || "secondary"}`}></i>
                                 </span>
                                 <input
                                     type="number"
@@ -47,11 +47,6 @@ const CharacterStats = () => {
                                     value={characterStats[statKey] || 0}
                                     onChange={(e) => updateStat(statKey, e.currentTarget.value)}
                                 />
-                                {config.displayModifier && (
-                                    <span className="input-group-text">
-                                        {characterStats[statKey] >= 0 ? '+' : ''}{characterStats[statKey] || 0}
-                                    </span>
-                                )}
                             </div>
                         </div>
                     ))}
