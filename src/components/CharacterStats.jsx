@@ -1,16 +1,24 @@
-import { useContext, useEffect } from 'preact/hooks';
+import { useContext } from 'preact/hooks';
 import { CharacterContext } from '../context/CharacterContext';
 import { STATS_CONFIG } from '../config/stats';
 import { STAT_CATEGORIES } from '../types/statTypes';
+import { useSpellContext } from '../context/SpellContext';
+import { calculateStatBonus } from '../utils/diceHelpers';
 
 const CharacterStats = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
+    const { spells } = useSpellContext();
 
     const updateStat = (statName, value) => {
         setCharacterStats(prev => ({
             ...prev,
             [statName]: parseInt(value, 10) || 0
         }));
+    };
+
+    const getStatBonus = (statKey) => {
+        const linkedSpell = spells.find(spell => spell.isLinked && spell.linkedStat === statKey);
+        return linkedSpell ? calculateStatBonus(linkedSpell.quantity, linkedSpell.rank) : 0;
     };
 
     const renderStatGroup = (category) => {
@@ -25,7 +33,7 @@ const CharacterStats = () => {
                 <div className="stat-grid">
                     {statsInCategory.map(([statKey, config]) => (
                         <div key={statKey} className="stat-group mb-3">
-                            <label 
+                            <label
                                 className="form-label d-flex justify-content-between align-items-center"
                                 title={config.description}
                                 data-bs-toggle="tooltip"
@@ -43,6 +51,10 @@ const CharacterStats = () => {
                                     value={characterStats[statKey] || 0}
                                     onChange={(e) => updateStat(statKey, e.currentTarget.value)}
                                 />
+                                <span className="input-group-text">
+                                    <i className={`fas fa-${getStatBonus(statKey) ? 'link' : 'link-slash'} text-muted`}></i>
+                                    {getStatBonus(statKey) ? `+${getStatBonus(statKey)}` : ''}
+                                </span>
                             </div>
                         </div>
                     ))}
@@ -53,7 +65,7 @@ const CharacterStats = () => {
 
     return (
         <div className="character-stats p-4 bg-dark text-light rounded">
-            <h3 className="mb-4">Character Stats</h3>
+            <h3 className="mb-4">Stats</h3>
             {renderStatGroup(STAT_CATEGORIES.PHYSICAL)}
             {renderStatGroup(STAT_CATEGORIES.MAGICAL)}
             {renderStatGroup(STAT_CATEGORIES.UTILITY)}

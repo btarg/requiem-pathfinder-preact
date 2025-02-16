@@ -9,10 +9,10 @@ export function SpellInventory() {
     return (
         <div className="spell-inventory container-fluid">
             <div className="row vh-100">
-                <div className="col-4 p-3" style={{ height: '100vh', overflowY: 'auto' }}>
+                <div className="col-3 p-3" style={{ height: '100vh', overflowY: 'auto' }}>
                     <Stats />
                 </div>
-                <div className="col-8 p-3" style={{ height: '100vh', overflowY: 'auto' }}>
+                <div className="col-9 p-3" style={{ height: '100vh', overflowY: 'auto' }}>
                     <SpellManager />
                 </div>
             </div>

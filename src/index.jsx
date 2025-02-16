@@ -7,20 +7,23 @@ import { SpellInventory } from './pages/SpellInventory/index.jsx';
 import { NotFound } from './pages/_404.jsx';
 import './style.css';
 import { Stats } from './pages/StatsPage';
+import { SpellProvider } from './context/SpellContext';
 
 export function App() {
     return (
         <CharacterProvider>
-            <LocationProvider>
-                <Header />
-                <main>
-                    <Router>
-                        <Route path="/" component={Stats} />
-                        <Route path="/spells" component={SpellInventory} />
-                        <Route default component={NotFound} />
-                    </Router>
-                </main>
-            </LocationProvider>
+            <SpellProvider>
+                <LocationProvider>
+                    <Header />
+                    <main>
+                        <Router>
+                            <Route path="/" component={Stats} />
+                            <Route path="/spells" component={SpellInventory} />
+                            <Route default component={NotFound} />
+                        </Router>
+                    </main>
+                </LocationProvider>
+            </SpellProvider>
         </CharacterProvider>
     );
 }

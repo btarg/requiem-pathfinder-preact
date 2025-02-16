@@ -8,15 +8,14 @@ import { CharacterContext } from "../context/CharacterContext";
 import { calculateStatBonus, getFriendlyDiceString, getFriendlyStatName, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
 import { getSpellRank, STATS_CONFIG } from "../config/stats";
 import Toast from "./Toast";
+import { ElementType } from "../config/enums"
+import { useSpellContext } from "../context/SpellContext";
 
 
 const SpellManager = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
-
-    const [spells, setSpells] = useState(() => {
-        const savedSpells = localStorage.getItem('spells');
-        return savedSpells ? JSON.parse(savedSpells) : [];
-    });
+    const { spells, setSpells, getLinkedStats } = useSpellContext();
+    
     const defaultSpell = {
         name: "",
         quantity: 1,
@@ -26,7 +25,8 @@ const SpellManager = () => {
         actions: 1,
         rank: 1,
         isLinked: false,
-        linkedStat: "strength" // Default linked stat
+        linkedStat: "None", // See stats.js for the definitions
+        element: ElementType.Acid
     };
 
     const [currentSpell, setCurrentSpell] = useState(defaultSpell);
@@ -65,27 +65,6 @@ const SpellManager = () => {
         return result.isValid;
     };
 
-    const updateLinkedStats = (spell, isDeleting = false) => {
-        if (spell.isLinked) {
-            const stats = { ...characterStats };
-            const currentBonus = stats[spell.linkedStat] || 0;
-
-            if (isDeleting) {
-                // Remove the spell's power from the stat bonus
-                stats[spell.linkedStat] = currentBonus - spell.power;
-            } else {
-                // Add the spell's power to the stat bonus
-                stats[spell.linkedStat] = currentBonus + spell.power;
-            }
-
-            // Ensure bonus doesn't go below 0
-            stats[spell.linkedStat] = Math.max(0, stats[spell.linkedStat]);
-
-            setCharacterStats(stats);
-            console.log(`Updated ${spell.linkedStat} bonus:`, stats[spell.linkedStat]);
-        }
-    };
-
     const saveSpell = () => {
         const errors = validateSpellFields(currentSpell);
 
@@ -96,26 +75,12 @@ const SpellManager = () => {
 
         if (validateDiceString(currentSpell.dice)) {
             if (spellBeingEdited) {
-                // If editing, first remove old link
-                if (spellBeingEdited.isLinked) {
-                    updateLinkedStats(spellBeingEdited, true);
-                }
-                // Then add new link if needed
-                if (currentSpell.isLinked) {
-                    updateLinkedStats(currentSpell);
-                }
-
                 setSpells(spells.map(spell =>
                     spell.id === spellBeingEdited.id ?
                         { ...currentSpell, id: spellBeingEdited.id } :
                         spell
                 ));
             } else {
-                // If new spell, just add link if needed
-                if (currentSpell.isLinked) {
-                    updateLinkedStats(currentSpell);
-                }
-
                 setSpells([...spells, { ...currentSpell, id: Date.now() }]);
             }
             closeModal();
@@ -150,13 +115,13 @@ const SpellManager = () => {
     };
 
     const updateSpell = (id, key, value) => {
-        if (key === "quantity") {
-            const spell = spells.find(s => s.id === id);
-            if (spell && spell.quantity !== value) {
+        const spell = spells.find(s => s.id === id);
+        if (spell) {
+            if (key === "quantity" && spell.quantity !== value) {
                 notifySpellQuantityChange(spell, value, spell.quantity);
             }
+            setSpells(spells.map(spell => spell.id === id ? { ...spell, [key]: value } : spell));
         }
-        setSpells(spells.map(spell => spell.id === id ? { ...spell, [key]: value } : spell));
     };
 
     const [spellToDelete, setSpellToDelete] = useState(null);
@@ -168,9 +133,6 @@ const SpellManager = () => {
     const confirmDelete = () => {
         if (spellToDelete) {
             const spellToRemove = spells.find(s => s.id === spellToDelete);
-            if (spellToRemove && spellToRemove.isLinked) {
-                updateLinkedStats(spellToRemove, true);
-            }
 
             setSpells(spells.filter(spell => spell.id !== spellToDelete));
             setSpellToDelete(null);
@@ -214,14 +176,14 @@ const SpellManager = () => {
         const spell = spells.find(spell => spell.id === id);
         const newQuantity = Math.min(100, spell.quantity + incrementAmount);
         updateSpell(id, "quantity", newQuantity);
-        setIncrementAmount(1); // Reset after use
+        // setIncrementAmount(1); // Reset after use
     };
 
     const decrementSpellQuantity = (id) => {
         const spell = spells.find(spell => spell.id === id);
         const newQuantity = Math.max(0, spell.quantity - incrementAmount);
         updateSpell(id, "quantity", newQuantity);
-        setIncrementAmount(1); // Reset after use
+        // setIncrementAmount(1); // Reset after use
     };
 
     const getActionLabel = (actions) => {
@@ -300,12 +262,19 @@ const SpellManager = () => {
                                     {spell.quantity}
                                 </span>
                                 <span className="me-2" style={{ flexShrink: 0 }}>{getActionLabel(spell.actions)}</span>
+
                                 {/* Spell name */}
                                 <span className="text-truncate">{spell.name}</span>
+
+                                {/* Link badge */}
                                 {spell.isLinked && (
-                                    <span className={`badge text-${STATS_CONFIG[spell.linkedStat].color || `primary`} ms-2`}>
+                                    <span
+                                        className={`badge bg-dark border text-${STATS_CONFIG[spell.linkedStat].color || `primary`} ms-2`}
+                                        data-bs-toggle="tooltip"
+                                        title={STATS_CONFIG[spell.linkedStat].name}
+                                    >
                                         <i className={`fas ${STATS_CONFIG[spell.linkedStat].icon} me-1`}></i>
-                                        {STATS_CONFIG[spell.linkedStat].name} +{calculateStatBonus(spell.quantity, spell.rank)}
+                                        +{calculateStatBonus(spell.quantity, spell.rank)}
                                     </span>
                                 )}
                                 {/* Edit button */}
@@ -452,6 +421,27 @@ const SpellManager = () => {
                                     </select>
                                 </div>
 
+                                <label className="form-label">Spell Affinity</label>
+                                <div className="input-group mb-2">
+                                    <span className="input-group-text">
+                                        <i className="fas fa-magic"></i>
+                                    </span>
+                                    <select
+                                        className="form-select"
+                                        value={currentSpell.element}
+                                        onChange={(e) => setCurrentSpell({
+                                            ...currentSpell,
+                                            element: ElementType[e.currentTarget.value]
+                                        })}
+                                    >
+                                        {Object.entries(ElementType).map(([key, value]) => (
+                                            <option key={value} value={value}>
+                                                {key}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
                                 {/* Junction selector */}
                                 <label className="form-label">Linked Stat</label>
                                 <div className="input-group mb-2">
@@ -464,13 +454,16 @@ const SpellManager = () => {
                                         onChange={(e) => setCurrentSpell({
                                             ...currentSpell,
                                             linkedStat: e.currentTarget.value,
-                                            isLinked: true
+                                            isLinked: e.currentTarget.value !== "None"
                                         })}
                                     >
+                                        <option value="None">None</option>
                                         {Object.entries(STATS_CONFIG).map(([statKey, config]) => (
-                                            <option key={statKey} value={statKey}>
-                                                {config.name}
-                                            </option>
+                                            !getLinkedStats().includes(statKey) || statKey === currentSpell.linkedStat ? (
+                                                <option key={statKey} value={statKey}>
+                                                    {config.name}
+                                                </option>
+                                            ) : null
                                         ))}
                                     </select>
                                 </div>
