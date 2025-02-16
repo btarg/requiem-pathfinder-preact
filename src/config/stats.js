@@ -79,7 +79,6 @@ export const STATS_CONFIG = {
     }
 };
 
-// Add calculations for Soul Link bonuses
 export const calculateSoulLinkBonus = (spellStock, spellRank) => {
     return Math.floor((spellStock * spellRank) / 5);
 };

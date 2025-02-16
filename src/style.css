@@ -3,18 +3,11 @@
 	line-height: 1.5;
 	font-weight: 400;
 
-	color: #222;
-	background-color: #ffffff;
-
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-text-size-adjust: 100%;
-}
-
-body {
-	margin: 0;
 }
 
 @font-face {
@@ -39,8 +32,10 @@ span.action {
 
 header {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: center;
 	background-color: #673ab8;
+    padding: 1rem 0;
+    font-size: larger;
 }
 
 header nav {

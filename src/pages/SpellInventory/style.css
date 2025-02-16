@@ -6,29 +6,53 @@
     padding: 1rem;
 }
 
-.spell-item {
-    font-size: 1.2rem;
-    padding: 0.5rem 1rem !important;
-    width: 100%;
+.spell-inventory .row > div {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-.list-group {
-    width: 100%;
+.spell-inventory .row > div::-webkit-scrollbar {
+    width: 8px;
 }
 
-/* Make the spell name take up more space */
-.spell-info {
-    flex: 1;
-    min-width: 0;
-    /* Prevents flex items from overflowing */
+.spell-inventory .row > div::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-/* Keep the action buttons from shrinking */
-.action-buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
+.spell-inventory .row > div::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+/* Spell item layout fixes */
+.spell-item .btn-outline-danger {
+    width: 80px !important; /* Roll button width reduced */
+    min-width: 80px;
+    padding: 0.25rem 0.5rem;
+}
+
+.spell-item .input-group {
+    width: 120px !important;
+}
+
+.spell-item .input-group .form-control {
+    width: 40px !important;
+    padding: 0.25rem;
+    text-align: center;
+}
+
+.spell-item .input-group .form-control::-webkit-inner-spin-button,
+.spell-item .input-group .form-control::-webkit-outer-spin-button {
+    opacity: 1;
+    margin: 0;
+}
+.spell-item .d-flex:last-child {
+    gap: 0.25rem;
+}
+
+.spell-item .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
 }
 
 .character-stats {

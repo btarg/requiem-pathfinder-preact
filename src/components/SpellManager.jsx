@@ -7,6 +7,7 @@ import { Tooltip } from 'bootstrap';
 import { CharacterContext } from "../context/CharacterContext";
 import { getFriendlyDiceString, getFriendlyStatName, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
 import { getSpellRank } from "../config/stats";
+import Toast from "./Toast";
 
 
 const SpellManager = () => {
@@ -105,7 +106,22 @@ const SpellManager = () => {
         }
     };
 
+    const [lastUpdate, setLastUpdate] = useState(null);
+
+    const notifySpellQuantityChange = (spell, newQuantity, oldQuantity) => {
+        const change = newQuantity - oldQuantity;
+        const message = `${spell.name}: ${oldQuantity} → ${newQuantity} (${change >= 0 ? '+' : ''}${change})`;
+        console.log(message);
+        setLastUpdate(message);
+    };
+
     const updateSpell = (id, key, value) => {
+        if (key === "quantity") {
+            const spell = spells.find(s => s.id === id);
+            if (spell && spell.quantity !== value) {
+                notifySpellQuantityChange(spell, value, spell.quantity);
+            }
+        }
         setSpells(spells.map(spell => spell.id === id ? { ...spell, [key]: value } : spell));
     };
 
@@ -211,18 +227,27 @@ const SpellManager = () => {
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container mt-4">
                 <h2>Spell Inventory</h2>
-                <button className="btn btn-primary mb-3" onClick={() => openModal()}>
+                <button className="btn bt</div>n-primary mb-3" onClick={() => openModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
 
+                {lastUpdate && (
+                    <Toast
+                        message={lastUpdate}
+                        onClose={() => setLastUpdate(null)}
+                    />
+                )}
+
+                {/* // Debug display for stats
                 <div className="mb-3">
                     {Object.entries(characterStats).map(([key, value]) => (
                         <span key={key} className="badge bg-secondary me-2">
                             {key}: {value}
                         </span>
                     ))}
-                </div>
+                </div> */}
 
+                {/* Spell list */}
                 <ul className="list-group">
                     {spells.map((spell, index) => (
                         <li key={spell.id}
@@ -231,15 +256,15 @@ const SpellManager = () => {
                             onMouseOver={e => e.currentTarget.style.backgroundColor = '#2c3034'}
                             onMouseOut={e => e.currentTarget.style.backgroundColor = ''}>
                             
-                            <div className="d-flex align-items-center">
-                                <span className="badge bg-primary rounded-pill me-3" style={{ minWidth: '3rem', textAlign: 'center' }}>
+                            <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}>
+                                <span className="badge bg-primary rounded-pill me-3" style={{ minWidth: '3rem', flexShrink: 0 }}>
                                     {spell.quantity}
                                 </span>
-                                <span className="me-2">{getActionLabel(spell.actions)}</span>
-                                <span className="me-2 text-truncate">{spell.name}</span>
-                                <i className="fas fa-edit text-primary me-4"
+                                <span className="me-2" style={{ flexShrink: 0 }}>{getActionLabel(spell.actions)}</span>
+                                <span className="text-truncate">{spell.name}</span>
+                                <i className="fas fa-edit text-primary ms-2"
                                     onClick={(e) => { e.stopPropagation(); openModal(spell); }}
-                                    style={{ cursor: 'pointer', transition: 'opacity 0.3s', opacity: 0.6 }}
+                                    style={{ cursor: 'pointer', transition: 'opacity 0.3s', opacity: 0.6, flexShrink: 0 }}
                                     onMouseOver={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "1" }}
                                     onMouseOut={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "0.6" }}
                                     data-bs-toggle="tooltip"
@@ -247,66 +272,51 @@ const SpellManager = () => {
                                     title="Edit Spell"
                                 />
                             </div>
-                            <div className="d-flex align-items-center">
-                                {/* Button to roll the damage with a d20 icon (red outline) */}
-                                <button className="btn btn-outline-danger btn-sm me-2"
+                        
+                            <div className="d-flex align-items-center" style={{ flexShrink: 0, marginLeft: '1rem', gap: '0.5rem' }}>
+                                {/* Roll button with fixed width */}
+                                <button className="btn btn-outline-danger btn-sm"
+                                    style={{ width: '120px', whiteSpace: 'nowrap', overflow: 'hidden' }}
                                     onClick={(e) => { e.stopPropagation(); rollSpellDamage(spell); }}
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     title="Roll Damage">
-                                    <i className="fas fa-dice-d20 me-2"></i>
-                                    {getFriendlyDiceString(spell.dice)}
+                                    <i className="fas fa-dice-d20"></i>
+                                    <span className="ms-1 text-truncate">{getFriendlyDiceString(spell.dice)}</span>
                                 </button>
-
-                                {/* Quantity buttons */}
-                                <div className="input-group input-group-sm me-2" style={{ width: "140px" }}>
+                        
+                                {/* Quantity controls with fixed width */}
+                                <div className="input-group input-group-sm" style={{ width: '140px', flexShrink: 0 }}>
                                     <button
                                         className="btn btn-outline-primary btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); decrementSpellQuantity(spell.id); }}
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Decrease Spell Charges"
-                                    >
+                                        onClick={(e) => { e.stopPropagation(); decrementSpellQuantity(spell.id); }}>
                                         <i className="fas fa-minus"></i>
                                     </button>
                                     <input
                                         type="number"
-                                        className="form-control form-control-sm"
-                                        min="1"
-                                        max="100"
+                                        className="form-control form-control-sm text-center"
+                                        style={{ width: '60px' }}
                                         value={incrementAmount}
                                         onChange={(e) => setIncrementAmount(Math.max(1, Math.min(100, parseInt(e.currentTarget.value) || 1)))}
                                         onClick={(e) => e.stopPropagation()}
-                                        style={{ width: "60px" }}
                                     />
                                     <button
                                         className="btn btn-outline-primary btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); incrementSpellQuantity(spell.id); }}
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Increase Spell Charges"
-                                    >
+                                        onClick={(e) => { e.stopPropagation(); incrementSpellQuantity(spell.id); }}>
                                         <i className="fas fa-plus"></i>
                                     </button>
-                                    
                                 </div>
-
-                                <div className="btn-group me-2">
+                        
+                                {/* Move buttons with fixed width */}
+                                <div className="btn-group" style={{ flexShrink: 0 }}>
                                     <button className="btn btn-outline-secondary btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); moveSpell(index, 1); }}
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Move Spell Down">
+                                        onClick={(e) => { e.stopPropagation(); moveSpell(index, 1); }}>
                                         <i className="fas fa-chevron-down"></i>
                                     </button>
                                     <button className="btn btn-outline-secondary btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); moveSpell(index, -1); }}
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Move Spell Up">
+                                        onClick={(e) => { e.stopPropagation(); moveSpell(index, -1); }}>
                                         <i className="fas fa-chevron-up"></i>
                                     </button>
-
                                 </div>
                             </div>
                         </li>
@@ -372,14 +382,14 @@ const SpellManager = () => {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="alert alert-info py-1 mb-2">
-                                        <i className="fas fa-link me-2"></i>
-                                        <small className="text-muted d-block mt-1">
-                                            This spell's <a href="https://docs.google.com/document/d/1ZTxCemR8j6GhIMqhvmBd7kOo8wNsOisO_vOutlQBYv0/edit?tab=t.0" target="_blank">Soul Link Rank</a> will be <b>{getSpellRank(currentSpell.power)}.</b>
-                                        </small>
-                                    </div>
+                                    
                                 </div>
-
+                                <div className="alert alert-info py-1 mb-2">
+                                    <i className="fas fa-link me-2"></i>
+                                    <small className="text-muted d-block mt-1">
+                                        This spell's <a href="https://docs.google.com/document/d/1ZTxCemR8j6GhIMqhvmBd7kOo8wNsOisO_vOutlQBYv0/edit?tab=t.0" target="_blank">Soul Link Rank</a> will be <b>{getSpellRank(currentSpell.power)}.</b>
+                                    </small>
+                                </div>
 
                                 <label className="form-label">Actions to Cast</label>
                                 <div className="input-group mb-2">
@@ -396,10 +406,6 @@ const SpellManager = () => {
                                 </div>
 
                                 <label className="form-label">Damage Roll(s)</label>
-                                <div className="alert alert-info py-1 mb-2">
-                                    <i className="fas fa-info-circle me-2"></i>
-                                    <small>Use [stat] to include a stat's value (e.g., [strength] + 1d6)</small>
-                                </div>
                                 <div className="input-group mb-2">
                                     <span className="input-group-text">
                                         <i className="fas fa-dice-d20"></i>
@@ -420,6 +426,10 @@ const SpellManager = () => {
                                             {diceError}
                                         </div>
                                     )}
+                                </div>
+                                <div className="alert alert-info py-1 mb-2">
+                                    <i className="fas fa-info-circle me-2"></i>
+                                    <small>Use [stat] to include a stat's value (e.g., [strength] + 1d6)</small>
                                 </div>
 
 
