@@ -13,6 +13,7 @@ import { useSpellContext } from "../context/SpellContext";
 import DeleteSpellModal from "./modals/DeleteSpellModal";
 import EditSpellEntryModal from "./modals/EditSpellEntryModal";
 import LinkSpellModal from "./modals/LinkSpellModal";
+import { capitalizeFirstLetter } from "../utils/commonUtils";
 
 
 const SpellManager = () => {
@@ -277,7 +278,7 @@ const SpellManager = () => {
 
     return (
         <div className="spell-inventory" data-bs-theme="dark">
-            <div className="container mt-4">
+            <div className="container">
                 <h2>Spell Inventory</h2>
                 <button className="btn bt</div>n-primary mb-3" onClick={() => openEditModal()}>
                     <i className="fas fa-plus"></i> Add Spell
@@ -307,22 +308,25 @@ const SpellManager = () => {
                             onMouseOver={e => e.currentTarget.style.backgroundColor = '#2c3034'}
                             onMouseOut={e => e.currentTarget.style.backgroundColor = ''}
                         >
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-left">
                                 <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}
                                     onClick={() => toggleExpandSpell(spell.id)}>
                                     <span className="badge bg-primary me-2" style={{ width: '2.5rem', flexShrink: 0 }}>
                                         <small>{spell.quantity}</small>
                                     </span>
-
-                                    <div class="text-truncate me-2">
-                                        <span style={{ width: '40px', display: 'inline-block' }}>{getActionLabel(spell.actions)}</span>
-                                        <span style={{ width: '40px', display: 'inline-block', textAlign: 'center' }}>{getElementIcon(spell.element)}</span>
+                                    {/* Action Label */}
+                                    <div class="text-truncate">
+                                        <span className="action-label hide-on-small me-2" style={{
+                                            width: window.innerWidth <= 750 ? '0px' : '50px',
+                                        }}>
+                                            {getActionLabel(spell.actions)}
+                                        </span>
                                         <span>{spell.name}</span>
                                     </div>
 
                                 </div>
 
-                                <div className="d-flex align-items-center" style={{ flexShrink: 0, marginLeft: '1rem', gap: '0.5rem' }}>
+                                <div className="d-flex align-items-center justify-content-right" style={{ gap: '0.5rem' }}>
                                     {/* Edit button */}
                                     <i className="fas fa-edit text-primary"
                                         onClick={(e) => { e.stopPropagation(); openEditModal(spell); }}
@@ -336,7 +340,7 @@ const SpellManager = () => {
 
                                     {/* Link badge */}
                                     <span
-                                        className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'} ms-2 d-flex justify-content-between align-items-center`}
+                                        className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'} ms-2 d-flex justify-content-between align-items-center link-badge-normal`}
                                         data-bs-toggle="tooltip"
                                         data-bs-original-title=""
                                         title={spell.isLinked ? "Linked to " + STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
@@ -354,7 +358,7 @@ const SpellManager = () => {
                                     </span>
 
                                     {/* Roll button with fixed width */}
-                                    <button className="btn btn-outline-danger btn-sm"
+                                    <button className="btn btn-outline-danger btn-sm roll-button"
                                         style={{ width: '120px', whiteSpace: 'nowrap', overflow: 'hidden' }}
                                         onClick={(e) => { e.stopPropagation(); rollSpellDamage(spell); }}
                                         data-bs-toggle="tooltip"
@@ -387,7 +391,8 @@ const SpellManager = () => {
                                     </div>
 
                                     {/* Up and down buttons */}
-                                    <div className="btn-group" style={{ flexShrink: 0 }}>
+                                    
+                                    <div className="btn-group hide-on-small" style={{ flexShrink: 0 }}>
                                         <button className="btn btn-outline-secondary btn-sm"
                                             onClick={(e) => { e.stopPropagation(); moveSpell(index, 1); }}>
                                             <i className="fas fa-chevron-down"></i>
@@ -403,26 +408,48 @@ const SpellManager = () => {
 
                             </div>
                             {expandedSpellId === spell.id && (
-                                <div className="mt-3 border-top">
-                                    <p className="py-1 border-bottom h5">Spell details</p>
-                                    {/* Badges for spell info */}
-                                    <div className="d-flex justify-content-center mb-2">
-                                        <span className="badge bg-secondary me-2">
-                                            <small>{spell.element} {getElementIcon(currentSpell.element)}</small>
+                                <div className="mt-3">
+                                                                        {/* Badges for spell info */}
+                                    <div className="d-flex flex-wrap justify-content-center mb-2" style={{ gap: '0.5rem' }}>
+                                        <span
+                                            className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'}
+                                                link-badge-responsive`}
+                                            data-bs-toggle="tooltip"
+                                            data-bs-original-title=""
+                                            title={spell.isLinked ? "Linked to " + STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBadgeClick(spell);
+                                            }}
+                                            style={{
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <i className={`fas ${spell.isLinked ? STATS_CONFIG[spell.linkedStat].icon : 'fa-link-slash'}`}></i>
+                                            <span>{spell.isLinked ? (
+                                                <>
+                                                    {`${STATS_CONFIG[spell.linkedStat].name}`}
+                                                    <span className="ms-2">{`+${calculateStatBonus(spell.quantity, spell.rank)}`}</span>
+                                                </>
+                                            ) : ''}</span>
                                         </span>
-                                        <span className="badge bg-secondary me-2">
+                                    
+                                        <span className="badge bg-dark border">
+                                            <small>{getActionLabel(spell.actions)} {spell.actions} Actions</small>
+                                        </span>
+                                        <span className="badge bg-dark border">
+                                            <small>{getElementIcon(spell.element)} {capitalizeFirstLetter(spell.element)}</small>
+                                        </span>
+                                        <span className="badge bg-dark border">
                                             <small>Power: {spell.power}</small>
                                         </span>
-                                        <span className="badge bg-secondary me-2">
+                                        <span className="badge bg-dark border">
                                             <small>Rank: {spell.rank}</small>
                                         </span>
-                                        <span className="badge bg-secondary me-2">
-                                            <small>Actions: {spell.actions}</small>
-                                        </span>
+                                        
                                     </div>
 
-
-                                    <p className="py-1 border-bottom border-top h5">Description</p>
+                                    <p className="py-1 border-bottom h5">Description</p>
                                     <div
                                         className="mb-0 spell-description"
                                         style={{

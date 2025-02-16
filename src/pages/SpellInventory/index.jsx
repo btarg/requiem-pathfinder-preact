@@ -7,13 +7,15 @@ import { Stats } from '../StatsPage';
 
 export function SpellInventory() {
     return (
-        <div className="spell-inventory container-fluid">
-            <div className="row vh-100">
-                <div className="col-3 p-3" style={{ height: '100vh', overflowY: 'auto' }}>
-                    <Stats />
-                </div>
-                <div className="col-9 p-3" style={{ height: '100vh', overflowY: 'auto' }}>
+        <div className="spell-inventory container-fluid p-0">
+            <div className="row g-0">
+                {/* SpellManager - full width on mobile, 9 columns on desktop */}
+                <div className="col-12 col-md-9 order-1 order-md-2" style={{ minHeight: '50vh', overflowY: 'auto' }}>
                     <SpellManager />
+                </div>
+                {/* Stats - full width on mobile, 3 columns on desktop */}
+                <div className="col-12 col-md-3 order-2 order-md-1" style={{ minHeight: '50vh', overflowY: 'auto' }}>
+                    <Stats />
                 </div>
             </div>
         </div>

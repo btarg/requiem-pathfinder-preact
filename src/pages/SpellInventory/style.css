@@ -1,65 +1,151 @@
-.spell-inventory {
-    max-width: 1400px;
-    /* Increased from default bootstrap container width */
+.spell-inventory .container {
+    padding: 0.25rem;
     width: 100%;
-    margin: 0 auto;
-    padding: 1rem;
 }
 
-.spell-inventory .row > div {
+/* Scrollbar styling */
+.spell-inventory .row>div {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-.spell-inventory .row > div::-webkit-scrollbar {
+.spell-inventory .row>div::-webkit-scrollbar {
     width: 8px;
 }
 
-.spell-inventory .row > div::-webkit-scrollbar-track {
+.spell-inventory .row>div::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.spell-inventory .row > div::-webkit-scrollbar-thumb {
+.spell-inventory .row>div::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
 }
 
-/* Spell item layout fixes */
+/* Spell item components */
+.spell-item {
+    padding: 0.25rem !important;
+}
+
+.spell-item .text-truncate {
+    max-width: 200px;
+    min-width: 0;
+}
+
 .spell-item .roll-button {
-    width: 80px !important; /* Roll button width reduced */
-    min-width: 80px;
-    padding: 0.25rem 0.5rem;
+    width: 100px !important;
+    padding: 0.25rem;
+    font-size: 0.875rem;
 }
 
 .spell-item .input-group {
-    width: 90px !important;
+    width: 120px !important;
 }
 
 .spell-item .input-group .form-control {
-    width: 40px !important;
+    width: 3rem;
     padding: 0.25rem;
     text-align: center;
 }
 
-.spell-item .input-group .form-control::-webkit-inner-spin-button,
-.spell-item .input-group .form-control::-webkit-outer-spin-button {
-    opacity: 1;
-    margin: 0;
-}
-.spell-item .d-flex:last-child {
-    gap: 0.25rem;
-}
-
 .spell-item .btn-sm {
-    padding: 0.25rem 0.25rem;
-    font-size: 0.875rem;
+    padding: 0.25rem;
+    font-size: small;
 }
 
-.character-stats {
-    max-width: 300px;
-    margin-bottom: 1rem;
+/* Link badge responsiveness */
+@media screen and (max-width: 1200px) {
+    .link-badge-normal {
+        display: none !important;
+    }
+
+    .link-badge-responsive {
+        display: flex !important;
+    }
 }
 
-.character-stats .input-group-text {
-    min-width: 40px;
+@media screen and (min-width: 1201px) {
+    .link-badge-normal {
+        display: flex !important;
+    }
+
+    .link-badge-responsive {
+        display: none !important;
+    }
+}
+
+/* Small screen adjustments */
+@media screen and (max-width: 750px) {
+    .hide-on-small {
+        display: none !important;
+    }
+
+    .list-group-item {
+        padding: 0.5rem 0.25rem !important;
+    }
+
+    /* Prioritize name and roll button */
+    .spell-item .d-flex.align-items-center {
+        gap: 0.25rem !important;
+    }
+
+    /* Make name take less space on mobile */
+    .spell-item .text-truncate {
+        max-width: 150px;
+        flex: 0 1 auto;
+    }
+
+    /* Keep controls on the right */
+    .spell-item .d-flex.justify-content-between {
+        justify-content: space-between !important;
+    }
+
+    /* Right-aligned controls container */
+    .spell-item .d-flex.align-items-center.ms-auto {
+        margin-left: auto !important;
+        flex-shrink: 0;
+    }
+
+    /* Hide quantity input on mobile */
+    .spell-item .input-group .form-control {
+        display: none;
+    }
+
+    /* Keep edit button small */
+    .spell-item .fa-edit {
+        font-size: 0.875rem;
+    }
+
+    /* Ensure roll button stays visible */
+    .spell-item .roll-button {
+        width: auto !important;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Make badges more compact */
+    .spell-item .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Adjust quantity badge */
+    .spell-item .badge.bg-primary {
+        width: 2rem !important;
+        padding: 0.25rem !important;
+    }
+
+    /* Make expanded content more compact */
+    .spell-item .mt-3 {
+        margin-top: 0.5rem !important;
+    }
+
+    /* Compact buttons */
+    .spell-item .btn-sm {
+        padding: 0.25rem;
+    }
+
+    /* Adjust input group width */
+    .spell-item .input-group {
+        width: auto !important;
+    }
 }
