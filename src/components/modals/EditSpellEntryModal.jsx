@@ -3,6 +3,7 @@ import { ElementType } from "../../config/enums"
 const EditSpellEntryModal = ({
     isModalOpen,
     closeModal,
+    spellBeingEdited,
     currentSpell,
     setCurrentSpell,
     incrementPower,
@@ -19,7 +20,7 @@ const EditSpellEntryModal = ({
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title">{currentSpell ? "Edit Spell Entry" : "Add Spell"}</h5>
+                        <h5 className="modal-title">{spellBeingEdited ? "Edit Spell Entry" : "Add Spell"}</h5>
                         <button type="button" className="btn-close" onClick={closeModal}></button>
                     </div>
                     <div className="modal-body">
@@ -177,16 +178,16 @@ const EditSpellEntryModal = ({
                         <button type="button" className="btn btn-secondary" onClick={closeModal}>
                             <i className="fas fa-times me-1"></i>Close
                         </button>
-                        {currentSpell && (
+                        {spellBeingEdited && (
                             <button type="button"
                                 className="btn btn-danger"
-                                onClick={() => removeSpell(currentSpell.id)}>
+                                onClick={() => removeSpell(spellBeingEdited.id)}>
                                 <i className="fas fa-trash-alt me-1"></i>Delete
                             </button>
                         )}
                         <button type="button" className="btn btn-success" onClick={saveSpell}>
-                            <i className={`fas ${currentSpell ? 'fa-save' : 'fa-plus'} me-1`}></i>
-                            {currentSpell ? "Save Changes" : "Add Spell"}
+                            <i className={`fas ${spellBeingEdited ? 'fa-save' : 'fa-plus'} me-1`}></i>
+                            {spellBeingEdited ? "Save Changes" : "Add Spell"}
                         </button>
                     </div>
                 </div>

@@ -33,6 +33,8 @@ const SpellManager = () => {
     };
 
     const [currentSpell, setCurrentSpell] = useState(defaultSpell);
+    const [spellBeingEdited, setSpellBeingEdited] = useState(null);
+
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
 
@@ -50,18 +52,22 @@ const SpellManager = () => {
     }, []);
 
     const openEditModal = (spell = null) => {
+        setSpellBeingEdited(spell);
         setCurrentSpell(spell || defaultSpell);
         setIsEditModalOpen(true);
     };
     const closeEditModal = () => {
+        setSpellBeingEdited(null);
         setIsEditModalOpen(false);
     };
 
     const openLinkModal = (spell = null) => {
-        setIsLinkModalOpen(true);
+        setSpellBeingEdited(spell);
         setCurrentSpell(spell || defaultSpell);
+        setIsLinkModalOpen(true);
     };
     const closeLinkModal = () => {
+        setSpellBeingEdited(null);
         setIsLinkModalOpen(false);
     };
 
@@ -363,6 +369,7 @@ const SpellManager = () => {
                 <EditSpellEntryModal
                     isModalOpen={isEditModalOpen}
                     closeModal={closeEditModal}
+                    spellBeingEdited={spellBeingEdited}
                     currentSpell={currentSpell}
                     setCurrentSpell={setCurrentSpell}
                     incrementPower={incrementPower}
