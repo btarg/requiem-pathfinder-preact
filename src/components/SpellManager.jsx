@@ -18,7 +18,7 @@ import LinkSpellModal from "./modals/LinkSpellModal";
 const SpellManager = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
     const { spells, setSpells, getLinkedStats } = useSpellContext();
-    
+
     const defaultSpell = {
         name: "",
         quantity: 1,
@@ -37,6 +37,12 @@ const SpellManager = () => {
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+
+    const [expandedSpellId, setExpandedSpellId] = useState(null);
+
+    const toggleExpandSpell = (id) => {
+        setExpandedSpellId(expandedSpellId === id ? null : id);
+    };
 
     useEffect(() => {
         localStorage.setItem('spells', JSON.stringify(spells));
@@ -88,10 +94,10 @@ const SpellManager = () => {
         }
 
         if (validateDiceString(currentSpell.dice)) {
-            if (currentSpell) {
+            if (spellBeingEdited) {
                 setSpells(spells.map(spell =>
-                    spell.id === currentSpell.id ?
-                        { ...currentSpell, id: currentSpell.id } :
+                    spell.id === spellBeingEdited.id ?
+                        { ...currentSpell, id: spellBeingEdited.id } :
                         spell
                 ));
             } else {
@@ -278,89 +284,98 @@ const SpellManager = () => {
                 <ul className="list-group">
                     {spells.map((spell, index) => (
                         <li key={spell.id}
-                            className="list-group-item d-flex justify-content-between align-items-center py-3 spell-item"
+                            className="list-group-item"
                             style={{ transition: 'background-color 0.3s' }}
                             onMouseOver={e => e.currentTarget.style.backgroundColor = '#2c3034'}
-                            onMouseOut={e => e.currentTarget.style.backgroundColor = ''}>
+                            onMouseOut={e => e.currentTarget.style.backgroundColor = ''}
+                            onClick={() => toggleExpandSpell(spell.id)}>
+                            <div class="d-flex justify-content-between py-3 spell-item">
+                                <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}>
+                                    <span className="badge bg-primary me-3" style={{ minWidth: '3rem', flexShrink: 0 }}>
+                                        {spell.quantity}
+                                    </span>
+                                    <span className="me-2" style={{ flexShrink: 0 }}>{getActionLabel(spell.actions)}</span>
 
-                            <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}>
-                                <span className="badge bg-primary me-3" style={{ minWidth: '3rem', flexShrink: 0 }}>
-                                    {spell.quantity}
-                                </span>
-                                <span className="me-2" style={{ flexShrink: 0 }}>{getActionLabel(spell.actions)}</span>
+                                    {/* Spell name */}
+                                    <span className="text-truncate">{spell.name}</span>
 
-                                {/* Spell name */}
-                                <span className="text-truncate">{spell.name}</span>
-
-                                {/* Link badge */}
-                                <span
-                                    className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'} ms-2`}
-                                    data-bs-toggle="tooltip"
-                                    title={spell.isLinked ? STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
-                                    onClick={() => handleBadgeClick(spell)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <i className={`fas ${spell.isLinked ? STATS_CONFIG[spell.linkedStat].icon : 'fa-link-slash'} me-1`}></i>
-                                    {spell.isLinked ? `+${calculateStatBonus(spell.quantity, spell.rank)}` : ''}
-                                </span>
-                                {/* Edit button */}
-                                <i className="fas fa-edit text-primary ms-2"
-                                    onClick={(e) => { e.stopPropagation(); openEditModal(spell); }}
-                                    style={{ cursor: 'pointer', transition: 'opacity 0.3s', opacity: 0.6, flexShrink: 0 }}
-                                    onMouseOver={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "1" }}
-                                    onMouseOut={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "0.6" }}
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Edit Spell"
-                                />
-                            </div>
-
-                            <div className="d-flex align-items-center" style={{ flexShrink: 0, marginLeft: '1rem', gap: '0.5rem' }}>
-                                {/* Roll button with fixed width */}
-                                <button className="btn btn-outline-danger btn-sm"
-                                    style={{ width: '120px', whiteSpace: 'nowrap', overflow: 'hidden' }}
-                                    onClick={(e) => { e.stopPropagation(); rollSpellDamage(spell); }}
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Roll Damage">
-                                    <i className="fas fa-dice-d20"></i>
-                                    <span className="ms-1 text-truncate">{getFriendlyDiceString(spell.dice, characterStats)}</span>
-                                </button>
-
-                                {/* Quantity controls with fixed width */}
-                                <div className="input-group input-group-sm" style={{ width: '140px', flexShrink: 0 }}>
-                                    <button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); decrementSpellQuantity(spell.id); }}>
-                                        <i className="fas fa-minus"></i>
-                                    </button>
-                                    <input
-                                        type="number"
-                                        className="form-control form-control-sm text-center"
-                                        style={{ width: '60px' }}
-                                        value={incrementAmount}
-                                        onChange={(e) => setIncrementAmount(Math.max(1, Math.min(100, parseInt(e.currentTarget.value) || 1)))}
-                                        onClick={(e) => e.stopPropagation()}
+                                    {/* Link badge */}
+                                    <span
+                                        className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'} ms-2`}
+                                        data-bs-toggle="tooltip"
+                                        title={spell.isLinked ? STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
+                                        onClick={() => handleBadgeClick(spell)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <i className={`fas ${spell.isLinked ? STATS_CONFIG[spell.linkedStat].icon : 'fa-link-slash'} me-1`}></i>
+                                        {spell.isLinked ? `+${calculateStatBonus(spell.quantity, spell.rank)}` : ''}
+                                    </span>
+                                    {/* Edit button */}
+                                    <i className="fas fa-edit text-primary ms-2"
+                                        onClick={(e) => { e.stopPropagation(); openEditModal(spell); }}
+                                        style={{ cursor: 'pointer', transition: 'opacity 0.3s', opacity: 0.6, flexShrink: 0 }}
+                                        onMouseOver={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "1" }}
+                                        onMouseOut={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "0.6" }}
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Edit Spell"
                                     />
-                                    <button
-                                        className="btn btn-outline-success btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); incrementSpellQuantity(spell.id); }}>
-                                        <i className="fas fa-plus"></i>
-                                    </button>
                                 </div>
 
-                                {/* Up and down buttons */}
-                                <div className="btn-group" style={{ flexShrink: 0 }}>
-                                    <button className="btn btn-outline-secondary btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); moveSpell(index, 1); }}>
-                                        <i className="fas fa-chevron-down"></i>
+                                <div className="d-flex align-items-center" style={{ flexShrink: 0, marginLeft: '1rem', gap: '0.5rem' }}>
+                                    {/* Roll button with fixed width */}
+                                    <button className="btn btn-outline-danger btn-sm"
+                                        style={{ width: '120px', whiteSpace: 'nowrap', overflow: 'hidden' }}
+                                        onClick={(e) => { e.stopPropagation(); rollSpellDamage(spell); }}
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Roll Damage">
+                                        <i className="fas fa-dice-d20"></i>
+                                        <span className="ms-1 text-truncate">{getFriendlyDiceString(spell.dice, characterStats)}</span>
                                     </button>
-                                    <button className="btn btn-outline-secondary btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); moveSpell(index, -1); }}>
-                                        <i className="fas fa-chevron-up"></i>
-                                    </button>
+
+                                    {/* Quantity controls with fixed width */}
+                                    <div className="input-group input-group-sm" style={{ width: '140px', flexShrink: 0 }}>
+                                        <button
+                                            className="btn btn-outline-danger btn-sm"
+                                            onClick={(e) => { e.stopPropagation(); decrementSpellQuantity(spell.id); }}>
+                                            <i className="fas fa-minus"></i>
+                                        </button>
+                                        <input
+                                            type="number"
+                                            className="form-control form-control-sm text-center"
+                                            style={{ width: '60px' }}
+                                            value={incrementAmount}
+                                            onChange={(e) => setIncrementAmount(Math.max(1, Math.min(100, parseInt(e.currentTarget.value) || 1)))}
+                                            onClick={(e) => e.stopPropagation()}
+                                        />
+                                        <button
+                                            className="btn btn-outline-success btn-sm"
+                                            onClick={(e) => { e.stopPropagation(); incrementSpellQuantity(spell.id); }}>
+                                            <i className="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+
+                                    {/* Up and down buttons */}
+                                    <div className="btn-group" style={{ flexShrink: 0 }}>
+                                        <button className="btn btn-outline-secondary btn-sm"
+                                            onClick={(e) => { e.stopPropagation(); moveSpell(index, 1); }}>
+                                            <i className="fas fa-chevron-down"></i>
+                                        </button>
+                                        <button className="btn btn-outline-secondary btn-sm"
+                                            onClick={(e) => { e.stopPropagation(); moveSpell(index, -1); }}>
+                                            <i className="fas fa-chevron-up"></i>
+                                        </button>
+                                    </div>
                                 </div>
+                                <br />
+                                
                             </div>
+                            {expandedSpellId === spell.id && (
+                                <div className="mt-2">
+                                    <p className="text-truncate" style={{ maxWidth: '100%' }}>{spell.description}</p>
+                                </div>
+                            )}
                         </li>
                     ))}
                 </ul>
@@ -389,7 +404,7 @@ const SpellManager = () => {
                     setCurrentSpell={setCurrentSpell}
                     saveSpell={saveSpell}
                     getLinkedStats={getLinkedStats}
-                    
+
                 />
 
                 {/* Delete Confirmation Modal */}
