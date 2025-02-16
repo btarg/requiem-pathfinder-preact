@@ -314,19 +314,21 @@ const SpellManager = () => {
                                         {spell.quantity}
                                     </span>
 
-                                    {/* Name and action count */}
-
-                                    {getElementIcon(spell.element)}
-                                    <span className="text-truncate me-2">{spell.name}</span>
-                                    <span className="me-2" style={{ flexShrink: 0 }}>{getActionLabel(spell.actions)}</span>
-
+                                    <div class="d-flex text-truncate me-2">
+                                        <span className="me-2">{getActionLabel(spell.actions)}</span>
+                                        <span className="me-2">{getElementIcon(spell.element)}</span>
+                                        <span>{spell.name}</span>
+                                    </div>
                                     {/* Link badge */}
                                     <span
                                         className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'} ms-2`}
                                         data-bs-toggle="tooltip"
                                         data-bs-original-title=""
                                         title={spell.isLinked ? "Linked to " + STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
-                                        onClick={() => handleBadgeClick(spell)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleBadgeClick(spell);
+                                        }}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         <i className={`fas ${spell.isLinked ? STATS_CONFIG[spell.linkedStat].icon : 'fa-link-slash'} me-1`}></i>
