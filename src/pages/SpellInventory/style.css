@@ -25,7 +25,7 @@
 }
 
 /* Spell item layout fixes */
-.spell-item .btn-outline-danger {
+.spell-item .roll-button {
     width: 80px !important; /* Roll button width reduced */
     min-width: 80px;
     padding: 0.25rem 0.5rem;

@@ -3,15 +3,12 @@ import { ElementType } from "../../config/enums"
 const EditSpellEntryModal = ({
     isModalOpen,
     closeModal,
-    spellBeingEdited,
     currentSpell,
     setCurrentSpell,
     incrementPower,
     decrementPower,
     getSpellRank,
     getActionLabel,
-    STATS_CONFIG,
-    getLinkedStats,
     validateDiceRoll,
     diceError,
     saveSpell,
@@ -22,7 +19,7 @@ const EditSpellEntryModal = ({
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title">{spellBeingEdited ? "Edit Spell Entry" : "Add Spell"}</h5>
+                        <h5 className="modal-title">{currentSpell ? "Edit Spell Entry" : "Add Spell"}</h5>
                         <button type="button" className="btn-close" onClick={closeModal}></button>
                     </div>
                     <div className="modal-body">
@@ -119,31 +116,7 @@ const EditSpellEntryModal = ({
                             </select>
                         </div>
 
-                        <label className="form-label">Linked Stat</label>
-                        <div className="input-group mb-2">
-                            <span className="input-group-text">
-                                <i className="fas fa-link"></i>
-                            </span>
-                            <select
-                                className="form-select"
-                                value={currentSpell.linkedStat}
-                                onChange={(e) => setCurrentSpell({
-                                    ...currentSpell,
-                                    linkedStat: e.currentTarget.value,
-                                    isLinked: e.currentTarget.value !== "None"
-                                })}
-                            >
-                                <option value="None">None</option>
-                                {Object.entries(STATS_CONFIG).map(([statKey, config]) => (
-                                    !getLinkedStats().includes(statKey) || statKey === currentSpell.linkedStat ? (
-                                        <option key={statKey} value={statKey}>
-                                            {config.name}
-                                        </option>
-                                    ) : null
-                                ))}
-                            </select>
-                        </div>
-
+                        
                         <label className="form-label">Damage Roll(s)</label>
                         <div className="input-group mb-2">
                             <span className="input-group-text">
@@ -204,16 +177,16 @@ const EditSpellEntryModal = ({
                         <button type="button" className="btn btn-secondary" onClick={closeModal}>
                             <i className="fas fa-times me-1"></i>Close
                         </button>
-                        {spellBeingEdited && (
+                        {currentSpell && (
                             <button type="button"
                                 className="btn btn-danger"
-                                onClick={() => removeSpell(spellBeingEdited.id)}>
+                                onClick={() => removeSpell(currentSpell.id)}>
                                 <i className="fas fa-trash-alt me-1"></i>Delete
                             </button>
                         )}
                         <button type="button" className="btn btn-success" onClick={saveSpell}>
-                            <i className={`fas ${spellBeingEdited ? 'fa-save' : 'fa-plus'} me-1`}></i>
-                            {spellBeingEdited ? "Save Changes" : "Add Spell"}
+                            <i className={`fas ${currentSpell ? 'fa-save' : 'fa-plus'} me-1`}></i>
+                            {currentSpell ? "Save Changes" : "Add Spell"}
                         </button>
                     </div>
                 </div>

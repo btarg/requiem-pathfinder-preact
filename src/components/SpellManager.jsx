@@ -12,6 +12,7 @@ import { ElementType } from "../config/enums"
 import { useSpellContext } from "../context/SpellContext";
 import DeleteSpellModal from "./modals/DeleteSpellModal";
 import EditSpellEntryModal from "./modals/EditSpellEntryModal";
+import LinkSpellModal from "./modals/LinkSpellModal";
 
 
 const SpellManager = () => {
@@ -32,8 +33,8 @@ const SpellManager = () => {
     };
 
     const [currentSpell, setCurrentSpell] = useState(defaultSpell);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [spellBeingEdited, setSpellBeingEdited] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
 
     useEffect(() => {
         localStorage.setItem('spells', JSON.stringify(spells));
@@ -48,15 +49,20 @@ const SpellManager = () => {
         };
     }, []);
 
-    const openModal = (spell = null) => {
-        setSpellBeingEdited(spell);
+    const openEditModal = (spell = null) => {
         setCurrentSpell(spell || defaultSpell);
-        setIsModalOpen(true);
+        setIsEditModalOpen(true);
+    };
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setSpellBeingEdited(null);
+    const openLinkModal = (spell = null) => {
+        setIsLinkModalOpen(true);
+        setCurrentSpell(spell || defaultSpell);
+    };
+    const closeLinkModal = () => {
+        setIsLinkModalOpen(false);
     };
 
     const [diceError, setDiceError] = useState("");
@@ -76,16 +82,21 @@ const SpellManager = () => {
         }
 
         if (validateDiceString(currentSpell.dice)) {
-            if (spellBeingEdited) {
+            if (currentSpell) {
                 setSpells(spells.map(spell =>
-                    spell.id === spellBeingEdited.id ?
-                        { ...currentSpell, id: spellBeingEdited.id } :
+                    spell.id === currentSpell.id ?
+                        { ...currentSpell, id: currentSpell.id } :
                         spell
                 ));
             } else {
                 setSpells([...spells, { ...currentSpell, id: Date.now() }]);
             }
-            closeModal();
+
+            if (isEditModalOpen)
+                closeEditModal();
+
+            if (isLinkModalOpen)
+                closeLinkModal();
         }
     };
 
@@ -137,7 +148,7 @@ const SpellManager = () => {
 
             setSpells(spells.filter(spell => spell.id !== spellToDelete));
             setSpellToDelete(null);
-            closeModal();
+            closeEditModal();
         }
     };
 
@@ -177,14 +188,14 @@ const SpellManager = () => {
         const spell = spells.find(spell => spell.id === id);
         const newQuantity = Math.min(100, spell.quantity + incrementAmount);
         updateSpell(id, "quantity", newQuantity);
-        // setIncrementAmount(1); // Reset after use
+        setIncrementAmount(1); // Reset after use
     };
 
     const decrementSpellQuantity = (id) => {
         const spell = spells.find(spell => spell.id === id);
         const newQuantity = Math.max(0, spell.quantity - incrementAmount);
         updateSpell(id, "quantity", newQuantity);
-        // setIncrementAmount(1); // Reset after use
+        setIncrementAmount(1); // Reset after use
     };
 
     const getActionLabel = (actions) => {
@@ -231,13 +242,14 @@ const SpellManager = () => {
         } else {
             console.log('No linked stat');
         }
+        openLinkModal(spell);
     };
 
     return (
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container mt-4">
                 <h2>Spell Inventory</h2>
-                <button className="btn bt</div>n-primary mb-3" onClick={() => openModal()}>
+                <button className="btn bt</div>n-primary mb-3" onClick={() => openEditModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
 
@@ -287,7 +299,7 @@ const SpellManager = () => {
                                 </span>
                                 {/* Edit button */}
                                 <i className="fas fa-edit text-primary ms-2"
-                                    onClick={(e) => { e.stopPropagation(); openModal(spell); }}
+                                    onClick={(e) => { e.stopPropagation(); openEditModal(spell); }}
                                     style={{ cursor: 'pointer', transition: 'opacity 0.3s', opacity: 0.6, flexShrink: 0 }}
                                     onMouseOver={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "1" }}
                                     onMouseOut={(e) => { e.stopPropagation(); e.currentTarget.style.opacity = "0.6" }}
@@ -312,7 +324,7 @@ const SpellManager = () => {
                                 {/* Quantity controls with fixed width */}
                                 <div className="input-group input-group-sm" style={{ width: '140px', flexShrink: 0 }}>
                                     <button
-                                        className="btn btn-outline-primary btn-sm"
+                                        className="btn btn-outline-danger btn-sm"
                                         onClick={(e) => { e.stopPropagation(); decrementSpellQuantity(spell.id); }}>
                                         <i className="fas fa-minus"></i>
                                     </button>
@@ -325,13 +337,13 @@ const SpellManager = () => {
                                         onClick={(e) => e.stopPropagation()}
                                     />
                                     <button
-                                        className="btn btn-outline-primary btn-sm"
+                                        className="btn btn-outline-success btn-sm"
                                         onClick={(e) => { e.stopPropagation(); incrementSpellQuantity(spell.id); }}>
                                         <i className="fas fa-plus"></i>
                                     </button>
                                 </div>
 
-                                {/* Move buttons with fixed width */}
+                                {/* Up and down buttons */}
                                 <div className="btn-group" style={{ flexShrink: 0 }}>
                                     <button className="btn btn-outline-secondary btn-sm"
                                         onClick={(e) => { e.stopPropagation(); moveSpell(index, 1); }}>
@@ -349,21 +361,28 @@ const SpellManager = () => {
 
                 {/* Edit Spell Entry Modal */}
                 <EditSpellEntryModal
-                    isModalOpen={isModalOpen}
-                    closeModal={closeModal}
-                    spellBeingEdited={spellBeingEdited}
+                    isModalOpen={isEditModalOpen}
+                    closeModal={closeEditModal}
                     currentSpell={currentSpell}
                     setCurrentSpell={setCurrentSpell}
                     incrementPower={incrementPower}
                     decrementPower={decrementPower}
                     getSpellRank={getSpellRank}
                     getActionLabel={getActionLabel}
-                    STATS_CONFIG={STATS_CONFIG}
-                    getLinkedStats={getLinkedStats}
                     validateDiceRoll={validateDiceString}
                     diceError={diceError}
                     saveSpell={saveSpell}
                     removeSpell={removeSpell}
+                />
+
+                <LinkSpellModal
+                    isLinkModalOpen={isLinkModalOpen}
+                    closeLinkModal={closeLinkModal}
+                    currentSpell={currentSpell}
+                    setCurrentSpell={setCurrentSpell}
+                    saveSpell={saveSpell}
+                    getLinkedStats={getLinkedStats}
+                    
                 />
 
                 {/* Delete Confirmation Modal */}
