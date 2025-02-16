@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { ElementType } from "../../config/enums"
 
 const EditSpellEntryModal = ({
     isModalOpen,
@@ -10,7 +10,6 @@ const EditSpellEntryModal = ({
     decrementPower,
     getSpellRank,
     getActionLabel,
-    ElementType,
     STATS_CONFIG,
     getLinkedStats,
     validateDiceRoll,

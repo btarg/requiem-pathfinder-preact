@@ -226,6 +226,14 @@ const SpellManager = () => {
         );
     };
 
+    const handleBadgeClick = (spell) => {
+        if (spell.isLinked) {
+            console.log(`Linked stat: ${spell.linkedStat}`);
+        } else {
+            console.log('No linked stat');
+        }
+    };
+
     return (
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container mt-4">
@@ -269,16 +277,16 @@ const SpellManager = () => {
                                 <span className="text-truncate">{spell.name}</span>
 
                                 {/* Link badge */}
-                                {spell.isLinked && (
-                                    <span
-                                        className={`badge bg-dark border text-${STATS_CONFIG[spell.linkedStat].color || `primary`} ms-2`}
-                                        data-bs-toggle="tooltip"
-                                        title={STATS_CONFIG[spell.linkedStat].name}
-                                    >
-                                        <i className={`fas ${STATS_CONFIG[spell.linkedStat].icon} me-1`}></i>
-                                        +{calculateStatBonus(spell.quantity, spell.rank)}
-                                    </span>
-                                )}
+                                <span
+                                    className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'} ms-2`}
+                                    data-bs-toggle="tooltip"
+                                    title={spell.isLinked ? STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
+                                    onClick={() => handleBadgeClick(spell)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <i className={`fas ${spell.isLinked ? STATS_CONFIG[spell.linkedStat].icon : 'fa-link-slash'} me-1`}></i>
+                                    {spell.isLinked ? `+${calculateStatBonus(spell.quantity, spell.rank)}` : ''}
+                                </span>
                                 {/* Edit button */}
                                 <i className="fas fa-edit text-primary ms-2"
                                     onClick={(e) => { e.stopPropagation(); openModal(spell); }}
@@ -352,7 +360,6 @@ const SpellManager = () => {
                     decrementPower={decrementPower}
                     getSpellRank={getSpellRank}
                     getActionLabel={getActionLabel}
-                    ElementType={ElementType}
                     STATS_CONFIG={STATS_CONFIG}
                     getLinkedStats={getLinkedStats}
                     validateDiceRoll={validateDiceString}
