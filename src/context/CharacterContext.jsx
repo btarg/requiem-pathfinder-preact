@@ -1,19 +1,16 @@
 import { createContext } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 
-const defaultCharacterStats = {
-    spellAttackModifier: 0
-};
 
 export const CharacterContext = createContext({
-    characterStats: defaultCharacterStats,
+    characterStats: {},
     setCharacterStats: (value) => {}
 });
 
 export function CharacterProvider({ children }) {
     const [characterStats, setCharacterStats] = useState(() => {
         const savedStats = localStorage.getItem('characterStats');
-        return savedStats ? JSON.parse(savedStats) : defaultCharacterStats;
+        return savedStats ? JSON.parse(savedStats) : {};
     });
 
     useEffect(() => {

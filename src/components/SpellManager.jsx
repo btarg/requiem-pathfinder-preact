@@ -5,13 +5,13 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Tooltip } from 'bootstrap';
 import { CharacterContext } from "../context/CharacterContext";
-import { getFriendlyDiceString, getFriendlyStatName, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
-import { getSpellRank } from "../config/stats";
+import { calculateStatBonus, getFriendlyDiceString, getFriendlyStatName, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
+import { getSpellRank, STATS_CONFIG } from "../config/stats";
 import Toast from "./Toast";
 
 
 const SpellManager = () => {
-    const { characterStats } = useContext(CharacterContext);
+    const { characterStats, setCharacterStats } = useContext(CharacterContext);
 
     const [spells, setSpells] = useState(() => {
         const savedSpells = localStorage.getItem('spells');
@@ -65,7 +65,26 @@ const SpellManager = () => {
         return result.isValid;
     };
 
+    const updateLinkedStats = (spell, isDeleting = false) => {
+        if (spell.isLinked) {
+            const stats = { ...characterStats };
+            const currentBonus = stats[spell.linkedStat] || 0;
 
+            if (isDeleting) {
+                // Remove the spell's power from the stat bonus
+                stats[spell.linkedStat] = currentBonus - spell.power;
+            } else {
+                // Add the spell's power to the stat bonus
+                stats[spell.linkedStat] = currentBonus + spell.power;
+            }
+
+            // Ensure bonus doesn't go below 0
+            stats[spell.linkedStat] = Math.max(0, stats[spell.linkedStat]);
+
+            setCharacterStats(stats);
+            console.log(`Updated ${spell.linkedStat} bonus:`, stats[spell.linkedStat]);
+        }
+    };
 
     const saveSpell = () => {
         const errors = validateSpellFields(currentSpell);
@@ -77,17 +96,32 @@ const SpellManager = () => {
 
         if (validateDiceString(currentSpell.dice)) {
             if (spellBeingEdited) {
+                // If editing, first remove old link
+                if (spellBeingEdited.isLinked) {
+                    updateLinkedStats(spellBeingEdited, true);
+                }
+                // Then add new link if needed
+                if (currentSpell.isLinked) {
+                    updateLinkedStats(currentSpell);
+                }
+
                 setSpells(spells.map(spell =>
                     spell.id === spellBeingEdited.id ?
                         { ...currentSpell, id: spellBeingEdited.id } :
                         spell
                 ));
             } else {
+                // If new spell, just add link if needed
+                if (currentSpell.isLinked) {
+                    updateLinkedStats(currentSpell);
+                }
+
                 setSpells([...spells, { ...currentSpell, id: Date.now() }]);
             }
             closeModal();
         }
     };
+
 
     const rollSpellDamage = (spell) => {
         const roller = new DiceRoller();
@@ -133,6 +167,11 @@ const SpellManager = () => {
 
     const confirmDelete = () => {
         if (spellToDelete) {
+            const spellToRemove = spells.find(s => s.id === spellToDelete);
+            if (spellToRemove && spellToRemove.isLinked) {
+                updateLinkedStats(spellToRemove, true);
+            }
+
             setSpells(spells.filter(spell => spell.id !== spellToDelete));
             setSpellToDelete(null);
             closeModal();
@@ -255,13 +294,21 @@ const SpellManager = () => {
                             style={{ transition: 'background-color 0.3s' }}
                             onMouseOver={e => e.currentTarget.style.backgroundColor = '#2c3034'}
                             onMouseOut={e => e.currentTarget.style.backgroundColor = ''}>
-                            
+
                             <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}>
-                                <span className="badge bg-primary rounded-pill me-3" style={{ minWidth: '3rem', flexShrink: 0 }}>
+                                <span className="badge bg-primary me-3" style={{ minWidth: '3rem', flexShrink: 0 }}>
                                     {spell.quantity}
                                 </span>
                                 <span className="me-2" style={{ flexShrink: 0 }}>{getActionLabel(spell.actions)}</span>
+                                {/* Spell name */}
                                 <span className="text-truncate">{spell.name}</span>
+                                {spell.isLinked && (
+                                    <span className={`badge text-${STATS_CONFIG[spell.linkedStat].color || `primary`} ms-2`}>
+                                        <i className={`fas ${STATS_CONFIG[spell.linkedStat].icon} me-1`}></i>
+                                        {STATS_CONFIG[spell.linkedStat].name} +{calculateStatBonus(spell.quantity, spell.rank)}
+                                    </span>
+                                )}
+                                {/* Edit button */}
                                 <i className="fas fa-edit text-primary ms-2"
                                     onClick={(e) => { e.stopPropagation(); openModal(spell); }}
                                     style={{ cursor: 'pointer', transition: 'opacity 0.3s', opacity: 0.6, flexShrink: 0 }}
@@ -272,7 +319,7 @@ const SpellManager = () => {
                                     title="Edit Spell"
                                 />
                             </div>
-                        
+
                             <div className="d-flex align-items-center" style={{ flexShrink: 0, marginLeft: '1rem', gap: '0.5rem' }}>
                                 {/* Roll button with fixed width */}
                                 <button className="btn btn-outline-danger btn-sm"
@@ -284,7 +331,7 @@ const SpellManager = () => {
                                     <i className="fas fa-dice-d20"></i>
                                     <span className="ms-1 text-truncate">{getFriendlyDiceString(spell.dice)}</span>
                                 </button>
-                        
+
                                 {/* Quantity controls with fixed width */}
                                 <div className="input-group input-group-sm" style={{ width: '140px', flexShrink: 0 }}>
                                     <button
@@ -306,7 +353,7 @@ const SpellManager = () => {
                                         <i className="fas fa-plus"></i>
                                     </button>
                                 </div>
-                        
+
                                 {/* Move buttons with fixed width */}
                                 <div className="btn-group" style={{ flexShrink: 0 }}>
                                     <button className="btn btn-outline-secondary btn-sm"
@@ -382,7 +429,7 @@ const SpellManager = () => {
                                             </div>
                                         )}
                                     </div>
-                                    
+
                                 </div>
                                 <div className="alert alert-info py-1 mb-2">
                                     <i className="fas fa-link me-2"></i>
@@ -402,6 +449,29 @@ const SpellManager = () => {
                                         <option value="2">2 Actions</option>
                                         <option value="3">3 Actions</option>
                                         <option value="0">Free Action</option>
+                                    </select>
+                                </div>
+
+                                {/* Junction selector */}
+                                <label className="form-label">Linked Stat</label>
+                                <div className="input-group mb-2">
+                                    <span className="input-group-text">
+                                        <i className="fas fa-link"></i>
+                                    </span>
+                                    <select
+                                        className="form-select"
+                                        value={currentSpell.linkedStat}
+                                        onChange={(e) => setCurrentSpell({
+                                            ...currentSpell,
+                                            linkedStat: e.currentTarget.value,
+                                            isLinked: true
+                                        })}
+                                    >
+                                        {Object.entries(STATS_CONFIG).map(([statKey, config]) => (
+                                            <option key={statKey} value={statKey}>
+                                                {config.name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
 

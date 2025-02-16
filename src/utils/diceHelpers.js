@@ -7,7 +7,7 @@ export const getFriendlyStatName = (stat) => {
         .trim();
 };
 
-const calculateStatBonus = (stock, spellRank) => {
+export const calculateStatBonus = (stock, spellRank) => {
     return Math.floor((spellRank * 2) * Math.sqrt(stock / 2));
 };
 

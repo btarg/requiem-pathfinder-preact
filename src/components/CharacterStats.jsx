@@ -6,10 +6,6 @@ import { STAT_CATEGORIES } from '../types/statTypes';
 const CharacterStats = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
 
-    useEffect(() => {
-        console.log('CharacterStats updated:', characterStats);
-    }, [characterStats]);
-
     const updateStat = (statName, value) => {
         setCharacterStats(prev => ({
             ...prev,
