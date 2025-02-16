@@ -1,6 +1,6 @@
 import { createContext } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-
+import { STATS_CONFIG } from '../config/stats';
 
 export const CharacterContext = createContext({
     characterStats: {},
@@ -8,10 +8,20 @@ export const CharacterContext = createContext({
 });
 
 export function CharacterProvider({ children }) {
-    const [characterStats, setCharacterStats] = useState(() => {
+    const initializeCharacterStats = () => {
         const savedStats = localStorage.getItem('characterStats');
-        return savedStats ? JSON.parse(savedStats) : {};
-    });
+        if (savedStats) {
+            return JSON.parse(savedStats);
+        } else {
+            const defaultStats = {};
+            for (const statKey in STATS_CONFIG) {
+                defaultStats[statKey] = STATS_CONFIG[statKey].defaultValue || 0;
+            }
+            return defaultStats;
+        }
+    };
+
+    const [characterStats, setCharacterStats] = useState(initializeCharacterStats);
 
     useEffect(() => {
         localStorage.setItem('characterStats', JSON.stringify(characterStats));

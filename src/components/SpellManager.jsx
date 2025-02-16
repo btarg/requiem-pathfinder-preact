@@ -91,12 +91,11 @@ const SpellManager = () => {
 
 
     const rollSpellDamage = (spell) => {
-        const roller = new DiceRoller();
         if (spell.quantity > 0 && spell.dice) {
             try {
                 const diceWithStats = replaceDiceStats(spell.dice, characterStats);
-                const friendlyDice = getFriendlyDiceString(spell.dice)
-                const result = roller.roll(diceWithStats);
+                const friendlyDice = getFriendlyDiceString(spell.dice, characterStats)
+                const result = new DiceRoller().roll(diceWithStats);
                 alert(`Spell cast!\nFormula: ${friendlyDice}\nRoll: ${diceWithStats}\nResult: ${result.value}`);
                 updateSpell(spell.id, "quantity", spell.quantity - 1);
             } catch (error) {
@@ -249,8 +248,7 @@ const SpellManager = () => {
                     />
                 )}
 
-                {/* // Debug display for stats
-                <div className="mb-3">
+                {/* <div className="mb-3">
                     {Object.entries(characterStats).map(([key, value]) => (
                         <span key={key} className="badge bg-secondary me-2">
                             {key}: {value}
@@ -308,7 +306,7 @@ const SpellManager = () => {
                                     data-bs-placement="top"
                                     title="Roll Damage">
                                     <i className="fas fa-dice-d20"></i>
-                                    <span className="ms-1 text-truncate">{getFriendlyDiceString(spell.dice)}</span>
+                                    <span className="ms-1 text-truncate">{getFriendlyDiceString(spell.dice, characterStats)}</span>
                                 </button>
 
                                 {/* Quantity controls with fixed width */}

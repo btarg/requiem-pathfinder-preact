@@ -24,18 +24,16 @@ export const rollDrawDice = (luck, hasMastery) => {
 export const replaceDiceStats = (diceString, stats) => {
     return diceString.replace(/\[(\w+)\]/g, (match, stat) => {
         const value = stats[stat];
-        if (value === undefined) {
+        if (!value) {
             throw new Error(`Unknown stat: ${stat}`);
         }
-        const hasLeadingPlus = diceString.indexOf(match) > 0 &&
-            diceString[diceString.indexOf(match) - 1] === '+';
-        return value >= 0 && !hasLeadingPlus ? `+${value}` : value.toString();
+        return value.toString();
     });
 };
 
-export const getFriendlyDiceString = (diceString) => {
+export const getFriendlyDiceString = (diceString, characterStats) => {
     return diceString.replace(/\[(\w+)\]/g, (match, stat) =>
-        `(${getFriendlyStatName(stat)})`
+        `(${characterStats[stat]})`
     );
 }
 
