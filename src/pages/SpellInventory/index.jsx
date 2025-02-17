@@ -3,9 +3,9 @@ import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { Stats } from '../StatsPage';
+import CharacterStats from '../../components/CharacterStats';
 
-export function SpellInventory() {
+export function SpellsAndStats() {
     return (
         <div className="spell-inventory container-fluid p-0">
             <div className="row g-0">
@@ -15,7 +15,7 @@ export function SpellInventory() {
                 </div>
                 {/* Stats - full width on mobile, 3 columns on desktop */}
                 <div className="col-12 col-md-3 order-2 order-md-1" style={{ minHeight: '50vh', overflowY: 'auto' }}>
-                    <Stats />
+                    <CharacterStats />
                 </div>
             </div>
         </div>

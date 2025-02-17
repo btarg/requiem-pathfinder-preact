@@ -8,6 +8,7 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-text-size-adjust: 100%;
+    
 }
 
 @font-face {
@@ -68,12 +69,5 @@ main {
 @media (max-width: 639px) {
 	main {
 		margin: 2rem;
-	}
-}
-
-@media (prefers-color-scheme: dark) {
-	:root {
-		color: #ccc;
-		background-color: #1a1a1a;
 	}
 }

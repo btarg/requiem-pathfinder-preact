@@ -1,41 +1,58 @@
-.spell-inventory {
-    max-width: 1400px;
-    /* Increased from default bootstrap container width */
-    width: 100%;
-    margin: 0 auto;
-    padding: 1rem;
+.form-control-lg,
+.hp-input {
+    font-size: 1.5rem;
+    height: 80px;
+    padding: 0.25rem;
+    font-weight: bold;
+    width: 80px;
 }
 
-.spell-item {
-    font-size: 1.2rem;
-    padding: 0.5rem 1rem !important;
-    width: 100%;
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--bs-primary);
 }
 
-.list-group {
-    width: 100%;
+.progress {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    height: 8px;
 }
 
-/* Make the spell name take up more space */
-.spell-info {
-    flex: 1;
-    min-width: 0;
-    /* Prevents flex items from overflowing */
+.btn-outline-danger:hover i,
+.btn-outline-success:hover i {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
 }
 
-/* Keep the action buttons from shrinking */
-.action-buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
+.hp-input::-webkit-inner-spin-button,
+.hp-input::-webkit-outer-spin-button {
+    opacity: 1;
+    margin: 0;
+    height: 80px;
 }
 
-.character-stats {
-    max-width: 300px;
-    margin-bottom: 1rem;
+.damage-flash,
+.heal-flash,
+.temp-flash {
+    animation-duration: 0.3s;
+    animation-timing-function: ease;
 }
 
-.character-stats .input-group-text {
-    min-width: 40px;
+.damage-flash { animation-name: flash-red; }
+.heal-flash { animation-name: flash-green; }
+.temp-flash { animation-name: flash-blue; }
+
+@keyframes flash-red {
+    from { border-color: rgb(255, 0, 50); }
+    to { border-color: var(--bs-secondary); }
+}
+
+@keyframes flash-green {
+    from { border-color: springgreen; }
+    to { border-color: var(--bs-secondary); }
+}
+
+@keyframes flash-blue {
+    from { border-color: aqua; }
+    to { border-color: var(--bs-secondary); }
 }
