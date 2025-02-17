@@ -1,14 +1,26 @@
-import { h } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 
 export default function HitPoints() {
-    const [currentHealth, setCurrentHealth] = useState(62)
-    const [maxHealth, setMaxHealth] = useState(70)
-    const [tempHealth, setTempHealth] = useState(0)
+    // const [currentHealth, setCurrentHealth] = useState(62)
+    // const [maxHealth, setMaxHealth] = useState(70)
+    // const [tempHealth, setTempHealth] = useState(0)
     const [amount, setAmount] = useState(1)
     const [damageTaken, setDamageTaken] = useState(false)
     const [healed, setHealed] = useState(false)
     const [tempDamageTaken, setTempDamageTaken] = useState(false)
+
+    const [currentHealth, setCurrentHealth] = useState(() => {
+        const saved = localStorage.getItem('currentHealth')
+        return saved ? parseInt(saved) : 62
+    })
+    const [maxHealth, setMaxHealth] = useState(() => {
+        const saved = localStorage.getItem('maxHealth')
+        return saved ? parseInt(saved) : 70
+    })
+    const [tempHealth, setTempHealth] = useState(() => {
+        const saved = localStorage.getItem('tempHealth')
+        return saved ? parseInt(saved) : 0
+    })
 
     useEffect(() => {
         if (currentHealth > maxHealth) {
@@ -36,6 +48,27 @@ export default function HitPoints() {
             return () => clearTimeout(timer)
         }
     }, [healed])
+
+    useEffect(() => {
+        localStorage.setItem('currentHealth', currentHealth.toString())
+    }, [currentHealth])
+
+    useEffect(() => {
+        localStorage.setItem('maxHealth', maxHealth.toString())
+    }, [maxHealth])
+
+    useEffect(() => {
+        localStorage.setItem('tempHealth', tempHealth.toString())
+    }, [tempHealth])
+
+    const handleReset = () => {
+        localStorage.removeItem('currentHealth')
+        localStorage.removeItem('maxHealth')
+        localStorage.removeItem('tempHealth')
+        setCurrentHealth(62)
+        setMaxHealth(70)
+        setTempHealth(0)
+    }
 
     const handleDamage = () => {
         if (tempHealth > 0) {
