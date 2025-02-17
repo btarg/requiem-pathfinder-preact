@@ -1,6 +1,18 @@
 import { STAT_CATEGORIES, STAT_TYPES } from '../types/statTypes';
 
 export const STATS_CONFIG = {
+    currentHealth: {
+        defaultValue: 100,
+        label: 'Current HP'
+    },
+    maxHealth: {
+        defaultValue: 100,
+        label: 'Max HP'
+    },
+    tempHealth: {
+        defaultValue: 0,
+        label: 'Temporary HP'
+    },
     strength: {
         name: "Strength",
         icon: "fa-fist-raised",

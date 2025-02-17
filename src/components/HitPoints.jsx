@@ -1,33 +1,14 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useState, useContext } from 'preact/hooks'
+import { CharacterContext } from '../context/CharacterContext'
 
 export default function HitPoints() {
-    // const [currentHealth, setCurrentHealth] = useState(62)
-    // const [maxHealth, setMaxHealth] = useState(70)
-    // const [tempHealth, setTempHealth] = useState(0)
+    const { characterStats, setCharacterStats } = useContext(CharacterContext)
     const [amount, setAmount] = useState(1)
     const [damageTaken, setDamageTaken] = useState(false)
     const [healed, setHealed] = useState(false)
     const [tempDamageTaken, setTempDamageTaken] = useState(false)
 
-    const [currentHealth, setCurrentHealth] = useState(() => {
-        const saved = localStorage.getItem('currentHealth')
-        return saved ? parseInt(saved) : 62
-    })
-    const [maxHealth, setMaxHealth] = useState(() => {
-        const saved = localStorage.getItem('maxHealth')
-        return saved ? parseInt(saved) : 70
-    })
-    const [tempHealth, setTempHealth] = useState(() => {
-        const saved = localStorage.getItem('tempHealth')
-        return saved ? parseInt(saved) : 0
-    })
-
-    useEffect(() => {
-        if (currentHealth > maxHealth) {
-            setCurrentHealth(maxHealth)
-        }
-    }, [maxHealth])
-
+    // Animation effects
     useEffect(() => {
         if (damageTaken) {
             const timer = setTimeout(() => setDamageTaken(false), 300)
@@ -49,64 +30,57 @@ export default function HitPoints() {
         }
     }, [healed])
 
-    useEffect(() => {
-        localStorage.setItem('currentHealth', currentHealth.toString())
-    }, [currentHealth])
-
-    useEffect(() => {
-        localStorage.setItem('maxHealth', maxHealth.toString())
-    }, [maxHealth])
-
-    useEffect(() => {
-        localStorage.setItem('tempHealth', tempHealth.toString())
-    }, [tempHealth])
-
-    const handleReset = () => {
-        localStorage.removeItem('currentHealth')
-        localStorage.removeItem('maxHealth')
-        localStorage.removeItem('tempHealth')
-        setCurrentHealth(62)
-        setMaxHealth(70)
-        setTempHealth(0)
+    // Health management functions
+    const updateHealth = (updates) => {
+        setCharacterStats(prev => ({
+            ...prev,
+            ...updates
+        }))
     }
 
     const handleDamage = () => {
-        if (tempHealth > 0) {
+        if (characterStats.tempHealth > 0) {
             setTempDamageTaken(true)
-            const remainingDamage = amount - tempHealth
-            setTempHealth(Math.max(0, tempHealth - amount))
+            const remainingDamage = amount - characterStats.tempHealth
+            updateHealth({
+                tempHealth: Math.max(0, characterStats.tempHealth - amount)
+            })
             if (remainingDamage > 0) {
                 setDamageTaken(true)
-                setCurrentHealth(Math.max(0, currentHealth - remainingDamage))
+                updateHealth({
+                    currentHealth: Math.max(0, characterStats.currentHealth - remainingDamage)
+                })
             }
         } else {
             setDamageTaken(true)
-            setCurrentHealth(Math.max(0, currentHealth - amount))
+            updateHealth({
+                currentHealth: Math.max(0, characterStats.currentHealth - amount)
+            })
         }
         setAmount(1)
     }
 
     const handleHeal = () => {
         setHealed(true)
-        setCurrentHealth(Math.min(maxHealth, currentHealth + amount))
+        updateHealth({
+            currentHealth: Math.min(characterStats.maxHealth, characterStats.currentHealth + amount)
+        })
         setAmount(1)
     }
 
     const handleMaxHealthChange = (e) => {
         const newMax = Math.max(1, parseInt(e.currentTarget.value) || 1)
-        setMaxHealth(newMax)
-        if (currentHealth > newMax) {
-            setCurrentHealth(newMax)
+        updateHealth({ maxHealth: newMax })
+        if (characterStats.currentHealth > newMax) {
+            updateHealth({ currentHealth: newMax })
         }
     }
 
-    const handleCurrentHealthChange = (e) => {
-        const newCurrent = Math.max(0, Math.min(maxHealth, parseInt(e.currentTarget.value) || 0))
-        setCurrentHealth(newCurrent)
-    }
-
-    const healthPercentage = (currentHealth / maxHealth) * 100
-    const tempHealthPercentage = (tempHealth / maxHealth) * 100
+    const healthPercentage = (characterStats.currentHealth / characterStats.maxHealth) * 100
+    const tempHealthPercentage = (characterStats.tempHealth / characterStats.maxHealth) * 100
+    const totalHealth = characterStats.currentHealth + characterStats.tempHealth
+    const tempDistribution = (characterStats.tempHealth / totalHealth * 100) || 0
+    const healthDistribution = (characterStats.currentHealth / totalHealth * 100) || 0
 
     return (
         <div className="bg-dark text-light p-3">
@@ -115,15 +89,16 @@ export default function HitPoints() {
             </div>
 
             <div className="d-flex gap-4 mb-3">
-                {/* Health values group */}
                 <div>
                     <div className="d-flex align-items-end gap-2">
                         <div className="text-center">
                             <small className="d-block mb-1 text-secondary">Temp</small>
                             <input
                                 type="number"
-                                value={tempHealth}
-                                onChange={(e) => setTempHealth(Math.max(0, parseInt(e.currentTarget.value) || 0))}
+                                value={characterStats.tempHealth}
+                                onChange={(e) => updateHealth({
+                                    tempHealth: Math.max(0, parseInt(e.currentTarget.value) || 0)
+                                })}
                                 className={`form-control hp-input text-center bg-dark text-light ${tempDamageTaken ? 'damage-flash' : ''}`}
                                 min="0"
                                 style={{ fontSize: '1.5rem', height: '80px' }}
@@ -133,19 +108,21 @@ export default function HitPoints() {
                         <div className="d-flex align-items-center justify-content-center" style={{ width: '40px', height: '80px' }}>
                             <span className="h4 m-0 text-secondary">+</span>
                         </div>
-                        
+
                         <div className="text-center">
                             <small className="d-block mb-1 text-secondary">Current</small>
                             <input
                                 type="number"
-                                value={currentHealth}
-                                onChange={handleCurrentHealthChange}
+                                value={characterStats.currentHealth}
+                                onChange={(e) => updateHealth({
+                                    currentHealth: Math.max(0, Math.min(characterStats.maxHealth, parseInt(e.currentTarget.value) || 0))
+                                })}
                                 className={`form-control form-control-lg hp-input text-center bg-dark
                                     ${damageTaken ? 'damage-flash' : ''}
                                     ${healed ? 'heal-flash' : ''}
                                     ${tempDamageTaken ? 'temp-flash' : ''}`}
                                 min="0"
-                                max={maxHealth}
+                                max={characterStats.maxHealth}
                             />
                         </div>
 
@@ -157,36 +134,17 @@ export default function HitPoints() {
                             <small className="d-block mb-1 text-secondary">Max</small>
                             <input
                                 type="number"
-                                value={maxHealth}
+                                value={characterStats.maxHealth}
                                 onChange={handleMaxHealthChange}
                                 className="form-control form-control-lg hp-input text-center bg-dark"
                                 min="1"
                             />
                         </div>
                     </div>
-                    <div className="progress mt-2" style={{ height: '8px' }}>
-                        <div
-                            className="progress-bar bg-info"
-                            style={`width: ${tempHealthPercentage}%`}
-                            role="progressbar"
-                            aria-valuenow={tempHealth}
-                            aria-valuemin={0}
-                            aria-valuemax={maxHealth}
-                        ></div>
-                        <div
-                            className="progress-bar bg-success"
-                            style={`width: ${healthPercentage}%`}
-                            role="progressbar"
-                            aria-valuenow={currentHealth}
-                            aria-valuemin={0}
-                            aria-valuemax={maxHealth}
-                        ></div>
-                    </div>
+
                 </div>
 
-                {/* Controls group */}
                 <div className="d-flex gap-2">
-
                     <div className="text-center" style={{ width: '80px', height: '80px' }}>
                         <br />
                         <button
@@ -220,10 +178,38 @@ export default function HitPoints() {
                             <small className="d-block">Heal</small>
                         </button>
                     </div>
+                </div>
 
+            </div>
+            {/* Health bar */}
+            <div className="progress mt-2">
+                <div
+                    className="progress-bar progress-bar-striped bg-info"
+                    style={{
+                        width: `${tempHealthPercentage}%`,
+                        transition: 'width 0.3s ease-in-out'
+                    }}
+                    role="progressbar"
+                    aria-valuenow={characterStats.tempHealth}
+                    aria-valuemin={0}
+                    aria-valuemax={characterStats.maxHealth}
+                >
+                    <small>{tempDistribution > 10 && `${Math.round(tempDistribution)}%`}</small>
+                </div>
+                <div
+                    className="progress-bar bg-success"
+                    style={{
+                        width: `${healthPercentage}%`,
+                        transition: 'width 0.3s ease-in-out'
+                    }}
+                    role="progressbar"
+                    aria-valuenow={characterStats.currentHealth}
+                    aria-valuemin={0}
+                    aria-valuemax={characterStats.maxHealth}
+                >
+                    <small>{healthDistribution > 10 && `${Math.round(healthDistribution)}%`}</small>
                 </div>
             </div>
         </div>
-        
     )
 }
