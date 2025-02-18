@@ -92,19 +92,37 @@ const SpellManager = () => {
         });
     };
 
-    // Update the rollSpellDamage function
+
     const rollSpellDamage = (spell) => {
         if (spell.quantity > 0 && spell.dice) {
             try {
                 const diceWithStats = replaceDiceStats(spell.dice, characterStats);
-                navigator.clipboard.writeText("/r " + diceWithStats);
-                showToast(`Copied "${diceWithStats}" to clipboard`, 'clipboard', 'success');
+                const elementIcon = getElementIcon(spell.element);
+                const attackRoll = replaceDiceStats("1d20+[strength]", characterStats);
+
+
+                let actionText;
+                if (spell.actions === 0) {
+                    actionText = "Free Action";
+                } else {
+                    actionText = spell.actions === 1 ? "Action" : "Actions";
+                }
+
+                const rollCommand = `&{template:default} {{name=${spell.name}}} \
+                                {{Actions=${spell.actions === 0 ? "Free Action" : `${spell.actions} ${actionText}`}}} \
+                                {{Level=**Spell ${spell.power}** (S.Link Rank ${spell.rank})}} \
+                                {{Attack=[[${attackRoll}]]}} \
+                                {{Damage=[[${diceWithStats}]] ${elementIcon} ${spell.element}}} \
+                                ${spell.description ? `{{Description=${spell.description}}}` : ''}`;
+
+                navigator.clipboard.writeText(rollCommand);
+                showToast("Roll command copied! Paste it into the text chat on Roll20.", 'clipboard', 'success', 'Copied to clipboard');
                 updateSpell(spell.id, "quantity", spell.quantity - 1);
             } catch (error) {
                 alert(error.message || "Invalid dice format!");
             }
         } else {
-            alert("No more charges of this spell remaining!");
+            showToast("No more charges of this spell remaining!", 'exclamation-triangle', 'warning', 'Cannot cast spell');
         }
     };
 
@@ -390,7 +408,7 @@ const SpellManager = () => {
                                         data-bs-placement="top"
                                         title="Click to copy roll command">
                                         <i className="fas fa-dice-d20"></i>
-                                        <span className="ms-1 text-truncate">{replaceDiceStats(spell.dice, characterStats)}</span>
+                                        <span className="ms-1 text-truncate">{replaceDiceStats(spell.dice, characterStats, true)}</span>
                                     </button>
 
                                     {/* Quantity controls with fixed width */}

@@ -1,4 +1,5 @@
 import { DiceRoller } from "dice-roller-parser";
+import { capitalizeFirstLetter } from "./commonUtils";
 
 export const getFriendlyStatName = (stat) => {
     return stat
@@ -21,13 +22,17 @@ export const rollDrawDice = (luck, hasMastery) => {
     return result.value;
 };
 
-export const replaceDiceStats = (diceString, stats) => {
+export const replaceDiceStats = (diceString, stats, friendly_name = false) => {
     return diceString.replace(/\[(\w+)\]/g, (match, stat) => {
-        const value = stats[stat];
-        if (!value) {
-            throw new Error(`Unknown stat: ${stat}`);
+        var value = stats[stat] || 0;
+        
+        if (!friendly_name) {
+            value += `[${stat}]`;
+        } else {
+            value = capitalizeFirstLetter(value.toString());
         }
-        return value.toString();
+        
+        return value;
     });
 };
 
