@@ -474,18 +474,22 @@ const SpellManager = () => {
 
                                     </div>
 
-                                    <p className="py-1 border-bottom h5">Description</p>
-                                    <div
-                                        className="mb-0 spell-description"
-                                        style={{
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: '3',
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis'
-                                        }}
-                                        dangerouslySetInnerHTML={{ __html: spell.description }}
-                                    />
+                                    {spell.description && (
+                                        <>
+                                            <p className="py-1 border-bottom h5">Description</p>
+                                            <div
+                                                className="mb-0 spell-description"
+                                                style={{
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: '3',
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis'
+                                                }}
+                                                dangerouslySetInnerHTML={{ __html: spell.description }}
+                                            />
+                                        </>
+                                    )}
                                 </div>
                             )}
                         </li>
