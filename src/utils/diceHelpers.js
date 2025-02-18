@@ -22,17 +22,22 @@ export const rollDrawDice = (luck, hasMastery) => {
     return result.value;
 };
 
-export const replaceDiceStats = (diceString, stats, friendly_name = false) => {
-    return diceString.replace(/\[(\w+)\]/g, (match, stat) => {
-        var value = stats[stat] || 0;
+export const getLinkStatBonus = (spellsList, statKey) => {
+    const linkedSpell = spellsList.find(spell => spell.isLinked && spell.linkedStat === statKey);
+    return linkedSpell ? calculateStatBonus(linkedSpell.quantity, linkedSpell.rank) : 0;
+};
+
+export const replaceDiceStats = (spells, diceString, stats, friendly_name = false) => {
+    return diceString.replace(/\[(\w+)\]/g, (match, statKey) => {
+        const value = stats[statKey] || 0;
+        const bonus = getLinkStatBonus(spells, statKey);
+        const total = value + bonus;
         
         if (!friendly_name) {
-            value += `[${stat}]`;
+            return `${total}[${statKey}]`;
         } else {
-            value = capitalizeFirstLetter(value.toString());
+            return capitalizeFirstLetter(total.toString());
         }
-        
-        return value;
     });
 };
 

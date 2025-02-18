@@ -1,23 +1,19 @@
 import { useState, useEffect, useContext } from "preact/hooks";
-import { DiceRoller } from "dice-roller-parser";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Tooltip } from 'bootstrap';
 import { CharacterContext } from "../context/CharacterContext";
 import { calculateStatBonus, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
 import { getSpellRank, STATS_CONFIG } from "../config/stats";
-import { Toast } from 'bootstrap';
-import { ElementType, getElementIcon } from "../config/enums"
+import { ElementType, getElementIcon } from "../config/enums";
 import { useSpellContext } from "../context/SpellContext";
 import DeleteSpellModal from "./modals/DeleteSpellModal";
 import EditSpellEntryModal from "./modals/EditSpellEntryModal";
 import LinkSpellModal from "./modals/LinkSpellModal";
-
+import ToastManager from "./ToastManager";
 
 const SpellManager = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
     const { spells, setSpells, getLinkedStats } = useSpellContext();
+    const { showToast } = ToastManager();
 
     const defaultSpell = {
         name: "",
@@ -40,66 +36,12 @@ const SpellManager = () => {
 
     const [expandedSpellId, setExpandedSpellId] = useState(null);
 
-
-    const [toastContainer, setToastContainer] = useState(null);
-
-    // Add this useEffect to initialize toast container
-    useEffect(() => {
-        setToastContainer(document.createElement('div'));
-    }, []);
-
-    useEffect(() => {
-        if (toastContainer) {
-            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-            document.body.appendChild(toastContainer);
-            return () => {
-                document.body.removeChild(toastContainer);
-            };
-        }
-    }, [toastContainer]);
-
-    const showToast = (message, icon = 'info-circle', type = 'primary', title = 'Spell Update') => {
-        if (!toastContainer) return;
-
-        const toastElement = document.createElement('div');
-        toastElement.className = 'toast';
-        toastElement.setAttribute('role', 'alert');
-        toastElement.setAttribute('aria-live', 'assertive');
-        toastElement.setAttribute('aria-atomic', 'true');
-
-        toastElement.innerHTML = `
-            <div class="toast-header">
-                <i class="fas fa-${icon} me-2 text-${type}"></i>
-                <strong class="me-auto">${title}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                ${message}
-            </div>
-        `;
-
-        toastContainer.appendChild(toastElement);
-        const toast = new Toast(toastElement, {
-            autohide: true,
-            delay: 3000
-        });
-
-        toast.show();
-
-        // Remove the element after it's hidden
-        toastElement.addEventListener('hidden.bs.toast', () => {
-            toastContainer.removeChild(toastElement);
-        });
-    };
-
-
     const rollSpellDamage = (spell) => {
         if (spell.quantity > 0 && spell.dice) {
             try {
-                const diceWithStats = replaceDiceStats(spell.dice, characterStats);
+                const diceWithStats = replaceDiceStats(spells, spell.dice, characterStats);
                 const elementIcon = getElementIcon(spell.element);
-                const attackRoll = replaceDiceStats("1d20+[strength]", characterStats);
-
+                const attackRoll = replaceDiceStats(spells, "1d20+[strength]", characterStats);
 
                 let actionText;
                 if (spell.actions === 0) {
@@ -112,11 +54,12 @@ const SpellManager = () => {
                                 {{Actions=${spell.actions === 0 ? "Free Action" : `${spell.actions} ${actionText}`}}} \
                                 {{Level=**Spell ${spell.power}** (S.Link Rank ${spell.rank})}} \
                                 {{Attack=[[${attackRoll}]]}} \
+                                ${spell.description ? `{{Description=${spell.description}}}
                                 {{Damage=[[${diceWithStats}]] ${elementIcon} ${spell.element}}} \
-                                ${spell.description ? `{{Description=${spell.description}}}` : ''}`;
+                                ` : ''}`;
 
                 navigator.clipboard.writeText(rollCommand);
-                showToast("Roll command copied! Paste it into the text chat on Roll20.", 'clipboard', 'success', 'Copied to clipboard');
+                showToast("Spell roll command copied! Paste it into the text chat on Roll20.", 'clipboard', 'success', 'Copied to clipboard');
                 updateSpell(spell.id, "quantity", spell.quantity - 1);
             } catch (error) {
                 alert(error.message || "Invalid dice format!");
@@ -126,13 +69,11 @@ const SpellManager = () => {
         }
     };
 
-
     const notifySpellQuantityChange = (spell, newQuantity, oldQuantity) => {
         const change = newQuantity - oldQuantity;
         const message = `${spell.name}: ${oldQuantity} → ${newQuantity} (${change >= 0 ? '+' : ''}${change})`;
         console.log(message);
     };
-
 
     const toggleExpandSpell = (id) => {
         setExpandedSpellId(expandedSpellId === id ? null : id);
@@ -245,7 +186,6 @@ const SpellManager = () => {
         }
     };
 
-
     const incrementPower = () => {
         const newPower = currentSpell.power + 1;
         setCurrentSpell({
@@ -348,12 +288,7 @@ const SpellManager = () => {
                 {/* Spell list */}
                 <ul className="list-group">
                     {spells.map((spell, index) => (
-                        <li key={spell.id}
-                            className="list-group-item spell-item"
-                            style={{ transition: 'background-color 0.3s' }}
-                            onMouseOver={e => e.currentTarget.style.backgroundColor = '#2c3034'}
-                            onMouseOut={e => e.currentTarget.style.backgroundColor = ''}
-                        >
+                        <li key={spell.id} className="list-group-item spell-item">
                             <div class="d-flex justify-content-left">
                                 <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}
                                     onClick={() => toggleExpandSpell(spell.id)}>
@@ -415,7 +350,7 @@ const SpellManager = () => {
                                         data-bs-placement="top"
                                         title="Click to copy roll command">
                                         <i className="fas fa-dice-d20"></i>
-                                        <span className="ms-1 text-truncate">{replaceDiceStats(spell.dice, characterStats, true)}</span>
+                                        <span className="ms-1 text-truncate">{replaceDiceStats(spells, spell.dice, characterStats, true)}</span>
                                     </button>
 
                                     {/* Quantity controls with fixed width */}

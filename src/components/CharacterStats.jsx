@@ -3,7 +3,7 @@ import { CharacterContext } from '../context/CharacterContext';
 import { STATS_CONFIG } from '../config/stats';
 import { STAT_CATEGORIES } from '../types/statTypes';
 import { useSpellContext } from '../context/SpellContext';
-import { calculateStatBonus } from '../utils/diceHelpers';
+import { calculateStatBonus, getLinkStatBonus } from '../utils/diceHelpers';
 const CharacterStats = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
     const { spells } = useSpellContext();
@@ -13,11 +13,6 @@ const CharacterStats = () => {
             ...prev,
             [statName]: parseInt(value, 10) || 0
         }));
-    };
-
-    const getStatBonus = (statKey) => {
-        const linkedSpell = spells.find(spell => spell.isLinked && spell.linkedStat === statKey);
-        return linkedSpell ? calculateStatBonus(linkedSpell.quantity, linkedSpell.rank) : 0;
     };
 
     const renderStatGroup = (category) => {
@@ -49,14 +44,14 @@ const CharacterStats = () => {
                                     onChange={(e) => updateStat(statKey, e.currentTarget.value)}
                                 />
                                 <span className="input-group-text">
-                                    <i className={`fas ${getStatBonus(statKey) ? '' : 'fa-link-slash'} text-muted`}></i>
-                                    {getStatBonus(statKey) > 0 && (
+                                    <i className={`fas ${getLinkStatBonus(spells, statKey) ? '' : 'fa-link-slash'} text-muted`}></i>
+                                    {getLinkStatBonus(spells, statKey) > 0 && (
                                         <div>
                                             <span className="text-secondary ms-1">
-                                                +{getStatBonus(statKey)} = 
+                                                +{getLinkStatBonus(spells, statKey)} = 
                                             </span>
                                             <span className="text-muted ms-1">
-                                                {characterStats[statKey] + getStatBonus(statKey)}
+                                                {characterStats[statKey] + getLinkStatBonus(spells, statKey)}
                                             </span>
                                         </div>
                                     )}

@@ -1,14 +1,24 @@
-import { useContext } from 'preact/hooks';
-import { CharacterContext } from '../context/CharacterContext';
-import { replaceDiceStats } from '../utils/diceHelpers';
+import ToastManager from './ToastManager';
+import { useSpellContext } from '../context/SpellContext';
+import { getLinkStatBonus } from '../utils/diceHelpers';
+import { capitalizeFirstLetter } from '../utils/commonUtils';
 
 const QuickRolls = () => {
-    const { characterStats } = useContext(CharacterContext);
+    const { showToast } = ToastManager();
+    const { spells } = useSpellContext();
 
     const copyRollToClipboard = (rollType, stat) => {
-        const roll = replaceDiceStats(`1d20+[${stat}]`, characterStats);
-        const command = `&{template:default} {{name=${rollType}}} {{Roll=[[${roll}]]}}`;
+        let roll = "[[1d20+" + getLinkStatBonus(spells, stat);
+        if (rollType === 'Initiative') {
+            roll += "&{tracker}";
+        }
+        roll += "]]";
+        
+        const command = `&{template:default} {{name=${rollType}}}\
+        {{Roll=${roll}}}\
+        {{Stat Bonus=[[${getLinkStatBonus(spells, stat)}]] from ${capitalizeFirstLetter(stat)}}}`;
         navigator.clipboard.writeText(command);
+        showToast(rollType + " roll command copied! Paste it into the text chat on Roll20.", 'clipboard', 'success', 'Copied to clipboard');
     };
 
     const saveRolls = [
@@ -22,16 +32,16 @@ const QuickRolls = () => {
     return (
         <div className="save-rolls p-3 rounded">
             <h5 className="text-secondary-emphasis mb-3">QUICK ROLLS</h5>
-            <div className="d-flex flex-wrap gap-2">
+            <div className="d-flex flex-wrap gap-2 align-items-center justify-content-center">
                 {saveRolls.map((roll) => (
                     <button
                         key={roll.name}
                         onClick={() => copyRollToClipboard(roll.name, roll.stat)}
                         className={`btn dark-btn d-flex align-items-center justify-content-center flex-grow-1 position-relative`}
-                        style={{ minWidth: '140px', height: '48px' }}
+                        style={{ minWidth: '140px', maxWidth: '170px', height: '48px' }}
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        title={`Roll ${roll.name.toLowerCase()} (1d20 + ${characterStats[roll.stat] || 0})`}
+                        title={`Roll ${roll.name})`}
                     >
                         <i className={`fas ${roll.icon} me-2`} style={{ width: '20px' }}></i>
                         <span className="text-light">{roll.name}</span>
@@ -41,10 +51,10 @@ const QuickRolls = () => {
                     key={initiativeRoll.name}
                     onClick={() => copyRollToClipboard(initiativeRoll.name, initiativeRoll.stat)}
                     className={`btn dark-btn-primary d-flex align-items-center justify-content-center flex-grow-1 position-relative`}
-                    style={{ minWidth: '140px', height: '48px' }}
+                    style={{ minWidth: '140px', maxWidth: '170px', height: '48px' }}
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title={`Roll ${initiativeRoll.name.toLowerCase()} (1d20 + ${characterStats[initiativeRoll.stat] || 0})`}
+                    title={`Roll ${initiativeRoll.name}`}
                 >
                     <i className={`fas ${initiativeRoll.icon} text-${initiativeRoll.color} me-2`} style={{ width: '20px' }}></i>
                     <span className="text-light">{initiativeRoll.name}</span>

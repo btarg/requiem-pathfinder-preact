@@ -5,9 +5,12 @@ import { CharacterProvider } from './context/CharacterContext';
 import { Header } from './components/Header.jsx';
 import { SpellsAndStats } from './pages/SpellInventory/index.jsx';
 import { NotFound } from './pages/_404.jsx';
-import './style.css';
 import { Stats } from './pages/StatsPage';
 import { SpellProvider } from './context/SpellContext';
+
+import './style.scss';
+import '@fortawesome/fontawesome-free/scss/solid.scss';
+
 
 export function App() {
     return (

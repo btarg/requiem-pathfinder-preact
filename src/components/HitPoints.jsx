@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'preact/hooks'
 import { CharacterContext } from '../context/CharacterContext'
-import './HitPoints.css'
+import './HitPoints.scss'
 
 export default function HitPoints() {
     const { characterStats, setCharacterStats } = useContext(CharacterContext)

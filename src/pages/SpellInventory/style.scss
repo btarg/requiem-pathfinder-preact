@@ -22,9 +22,13 @@
     border-radius: 4px;
 }
 
-/* Spell item components */
 .spell-item {
     padding: 0.25rem !important;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: #18181b;
+    }
 }
 
 .spell-item .text-truncate {
@@ -53,22 +57,16 @@
     font-size: small;
 }
 
-@keyframes flash-update {
-    0% {
-        background-color: whitesmoke;
-    }
-    50% {
-        background-color: var(--bs-primary);
-    }
-    100% {
-        background-color: whitesmoke;
-    }
-}
 .quantity-badge {
     background-color: whitesmoke;
+
+    &.quantity-flash {
+        animation: flash-update 0.2s;
+    }
 }
-.quantity-flash {
-    animation: flash-update 0.2s ease;
+
+@keyframes flash-update {
+    50% { background-color: var(--bs-info); }
 }
 
 /* Link badge responsiveness */
