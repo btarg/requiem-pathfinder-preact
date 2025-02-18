@@ -2,16 +2,19 @@ import { STAT_CATEGORIES, STAT_TYPES } from '../types/statTypes';
 
 export const STATS_CONFIG = {
     currentHealth: {
-        defaultValue: 100,
-        label: 'Current HP'
+        defaultValue: 10,
+        label: 'Current HP',
+        type: STAT_TYPES.CORE
     },
     maxHealth: {
-        defaultValue: 100,
-        label: 'Max HP'
+        defaultValue: 10,
+        label: 'Max HP',
+        type: STAT_TYPES.CORE
     },
     tempHealth: {
         defaultValue: 0,
-        label: 'Temporary HP'
+        label: 'Temporary HP',
+        type: STAT_TYPES.CORE
     },
     strength: {
         name: "Strength",

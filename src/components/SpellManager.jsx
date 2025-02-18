@@ -5,15 +5,14 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Tooltip } from 'bootstrap';
 import { CharacterContext } from "../context/CharacterContext";
-import { calculateStatBonus, getFriendlyDiceString, getFriendlyStatName, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
+import { calculateStatBonus, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
 import { getSpellRank, STATS_CONFIG } from "../config/stats";
-import Toast from "./Toast";
-import { ElementType } from "../config/enums"
+import { Toast } from 'bootstrap';
+import { ElementType, getElementIcon } from "../config/enums"
 import { useSpellContext } from "../context/SpellContext";
 import DeleteSpellModal from "./modals/DeleteSpellModal";
 import EditSpellEntryModal from "./modals/EditSpellEntryModal";
 import LinkSpellModal from "./modals/LinkSpellModal";
-import { capitalizeFirstLetter } from "../utils/commonUtils";
 
 
 const SpellManager = () => {
@@ -30,7 +29,7 @@ const SpellManager = () => {
         rank: 1,
         isLinked: false,
         linkedStat: "None", // See stats.js for the definitions
-        element: ElementType.Acid
+        element: ElementType.PHYS
     };
 
     const [currentSpell, setCurrentSpell] = useState(defaultSpell);
@@ -40,6 +39,82 @@ const SpellManager = () => {
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
 
     const [expandedSpellId, setExpandedSpellId] = useState(null);
+
+
+    const [toastContainer, setToastContainer] = useState(null);
+
+    // Add this useEffect to initialize toast container
+    useEffect(() => {
+        setToastContainer(document.createElement('div'));
+    }, []);
+
+    useEffect(() => {
+        if (toastContainer) {
+            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+            return () => {
+                document.body.removeChild(toastContainer);
+            };
+        }
+    }, [toastContainer]);
+
+    const showToast = (message, icon = 'info-circle', type = 'primary', title = 'Spell Update') => {
+        if (!toastContainer) return;
+
+        const toastElement = document.createElement('div');
+        toastElement.className = 'toast';
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+
+        toastElement.innerHTML = `
+            <div class="toast-header">
+                <i class="fas fa-${icon} me-2 text-${type}"></i>
+                <strong class="me-auto">${title}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+
+        toastContainer.appendChild(toastElement);
+        const toast = new Toast(toastElement, {
+            autohide: true,
+            delay: 3000
+        });
+
+        toast.show();
+
+        // Remove the element after it's hidden
+        toastElement.addEventListener('hidden.bs.toast', () => {
+            toastContainer.removeChild(toastElement);
+        });
+    };
+
+    // Update the rollSpellDamage function
+    const rollSpellDamage = (spell) => {
+        if (spell.quantity > 0 && spell.dice) {
+            try {
+                const diceWithStats = replaceDiceStats(spell.dice, characterStats);
+                navigator.clipboard.writeText("/r " + diceWithStats);
+                showToast(`Copied "${diceWithStats}" to clipboard`, 'clipboard', 'success');
+                updateSpell(spell.id, "quantity", spell.quantity - 1);
+            } catch (error) {
+                alert(error.message || "Invalid dice format!");
+            }
+        } else {
+            alert("No more charges of this spell remaining!");
+        }
+    };
+
+
+    const notifySpellQuantityChange = (spell, newQuantity, oldQuantity) => {
+        const change = newQuantity - oldQuantity;
+        const message = `${spell.name}: ${oldQuantity} → ${newQuantity} (${change >= 0 ? '+' : ''}${change})`;
+        console.log(message);
+    };
+
 
     const toggleExpandSpell = (id) => {
         setExpandedSpellId(expandedSpellId === id ? null : id);
@@ -113,31 +188,7 @@ const SpellManager = () => {
         }
     };
 
-
-    const rollSpellDamage = (spell) => {
-        if (spell.quantity > 0 && spell.dice) {
-            try {
-                const diceWithStats = replaceDiceStats(spell.dice, characterStats);
-                const friendlyDice = getFriendlyDiceString(spell.dice, characterStats)
-                const result = new DiceRoller().roll(diceWithStats);
-                alert(`Spell cast!\nFormula: ${friendlyDice}\nRoll: ${diceWithStats}\nResult: ${result.value}`);
-                updateSpell(spell.id, "quantity", spell.quantity - 1);
-            } catch (error) {
-                alert(error.message || "Invalid dice format!");
-            }
-        } else {
-            alert("No more charges of this spell remaining!");
-        }
-    };
-
     const [lastUpdate, setLastUpdate] = useState(null);
-
-    const notifySpellQuantityChange = (spell, newQuantity, oldQuantity) => {
-        const change = newQuantity - oldQuantity;
-        const message = `${spell.name}: ${oldQuantity} → ${newQuantity} (${change >= 0 ? '+' : ''}${change})`;
-        console.log(message);
-        setLastUpdate(message);
-    };
 
     const updateSpell = (id, key, value) => {
         const spell = spells.find(s => s.id === id);
@@ -211,24 +262,6 @@ const SpellManager = () => {
         setIncrementAmount(1); // Reset after use
     };
 
-    const getElementIcon = (element) => {
-        switch (element) {
-            case ElementType.Acid:
-                return '🧪';
-            case ElementType.Cold:
-                return '❄️';
-            case ElementType.Electricity:
-                return '⚡';
-            case ElementType.Fire:
-                return '🔥';
-            case ElementType.Sonic:
-                return '🔊';
-            default:
-                return '⚔️';
-        }
-
-    };
-
     const getActionLabel = (actions) => {
         let label = "";
         let title = "";
@@ -279,17 +312,10 @@ const SpellManager = () => {
     return (
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container">
-                <h2>Spell Inventory</h2>
-                <button className="btn bt</div>n-primary mb-3" onClick={() => openEditModal()}>
+                <h5 className="m-0 text-secondary-emphasis mb-4">STOCKED SPELLS</h5>
+                <button className="btn btn-primary mb-4" onClick={() => openEditModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
-
-                {lastUpdate && (
-                    <Toast
-                        message={lastUpdate}
-                        onClose={() => setLastUpdate(null)}
-                    />
-                )}
 
                 {/* <div className="mb-3">
                     {Object.entries(characterStats).map(([key, value]) => (
@@ -363,9 +389,9 @@ const SpellManager = () => {
                                         onClick={(e) => { e.stopPropagation(); rollSpellDamage(spell); }}
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        title="Roll Damage">
+                                        title="Click to copy roll command">
                                         <i className="fas fa-dice-d20"></i>
-                                        <span className="ms-1 text-truncate">{getFriendlyDiceString(spell.dice, characterStats)}</span>
+                                        <span className="ms-1 text-truncate">{replaceDiceStats(spell.dice, characterStats)}</span>
                                     </button>
 
                                     {/* Quantity controls with fixed width */}
@@ -391,7 +417,7 @@ const SpellManager = () => {
                                     </div>
 
                                     {/* Up and down buttons */}
-                                    
+
                                     <div className="btn-group hide-on-small" style={{ flexShrink: 0 }}>
                                         <button className="btn btn-outline-secondary btn-sm"
                                             onClick={(e) => { e.stopPropagation(); moveSpell(index, 1); }}>
@@ -409,7 +435,7 @@ const SpellManager = () => {
                             </div>
                             {expandedSpellId === spell.id && (
                                 <div className="mt-3">
-                                                                        {/* Badges for spell info */}
+                                    {/* Badges for spell info */}
                                     <div className="d-flex flex-wrap justify-content-center mb-2" style={{ gap: '0.5rem' }}>
                                         <span
                                             className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'}
@@ -433,12 +459,12 @@ const SpellManager = () => {
                                                 </>
                                             ) : ''}</span>
                                         </span>
-                                    
+
                                         <span className="badge bg-dark border">
                                             <small>{getActionLabel(spell.actions)} {spell.actions} Actions</small>
                                         </span>
                                         <span className="badge bg-dark border">
-                                            <small>{getElementIcon(spell.element)} {capitalizeFirstLetter(spell.element)}</small>
+                                            <small>{getElementIcon(spell.element)} {spell.element}</small>
                                         </span>
                                         <span className="badge bg-dark border">
                                             <small>Power: {spell.power}</small>
@@ -446,7 +472,7 @@ const SpellManager = () => {
                                         <span className="badge bg-dark border">
                                             <small>Rank: {spell.rank}</small>
                                         </span>
-                                        
+
                                     </div>
 
                                     <p className="py-1 border-bottom h5">Description</p>

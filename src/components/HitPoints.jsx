@@ -79,8 +79,7 @@ export default function HitPoints() {
     const healthPercentage = (characterStats.currentHealth / characterStats.maxHealth) * 100
     const tempHealthPercentage = (characterStats.tempHealth / characterStats.maxHealth) * 100
     const totalHealth = characterStats.currentHealth + characterStats.tempHealth
-    const tempDistribution = (characterStats.tempHealth / totalHealth * 100) || 0
-    const healthDistribution = (characterStats.currentHealth / totalHealth * 100) || 0
+
 
     return (
         <div className="bg-dark text-light p-3">
@@ -194,7 +193,6 @@ export default function HitPoints() {
                     aria-valuemin={0}
                     aria-valuemax={characterStats.maxHealth}
                 >
-                    <small>{tempDistribution > 10 && `${Math.round(tempDistribution)}%`}</small>
                 </div>
                 <div
                     className="progress-bar bg-success"
@@ -207,7 +205,6 @@ export default function HitPoints() {
                     aria-valuemin={0}
                     aria-valuemax={characterStats.maxHealth}
                 >
-                    <small>{healthDistribution > 10 && `${Math.round(healthDistribution)}%`}</small>
                 </div>
             </div>
         </div>

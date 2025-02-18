@@ -31,12 +31,6 @@ export const replaceDiceStats = (diceString, stats) => {
     });
 };
 
-export const getFriendlyDiceString = (diceString, characterStats) => {
-    return diceString.replace(/\[(\w+)\]/g, (match, stat) =>
-        `(${characterStats[stat]})`
-    );
-}
-
 export const validateSpellFields = (spell) => {
     const errors = [];
     if (!spell.name) errors.push("Spell name is required");

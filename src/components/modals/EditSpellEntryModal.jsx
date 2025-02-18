@@ -1,4 +1,5 @@
-import { ElementType } from "../../config/enums"
+import { ElementType, getElementIcon } from "../../config/enums"
+import { capitalizeFirstLetter } from "../../utils/commonUtils";
 
 const EditSpellEntryModal = ({
     isModalOpen,
@@ -96,10 +97,10 @@ const EditSpellEntryModal = ({
                             </select>
                         </div>
 
-                        <label className="form-label">Spell Affinity</label>
+                        <label className="form-label">Element</label>
                         <div className="input-group mb-2">
                             <span className="input-group-text">
-                                <i className="fas fa-magic"></i>
+                                {getElementIcon(currentSpell.element)}
                             </span>
                             <select
                                 className="form-select"
@@ -110,8 +111,8 @@ const EditSpellEntryModal = ({
                                 })}
                             >
                                 {Object.entries(ElementType).map(([key, value]) => (
-                                    <option key={value} value={value}>
-                                        {key}
+                                    <option key={key} value={value}>
+                                        {value}
                                     </option>
                                 ))}
                             </select>

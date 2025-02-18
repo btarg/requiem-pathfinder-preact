@@ -13,5 +13,6 @@ export const DAMAGE_TYPES = {
 export const STAT_TYPES = {
     OFFENSIVE: 'offensive',
     DEFENSIVE: 'defensive',
-    UTILITY: 'utility'
+    UTILITY: 'utility',
+    CORE: 'core'
 };

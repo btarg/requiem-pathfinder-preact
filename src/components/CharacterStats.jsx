@@ -31,15 +31,13 @@ const CharacterStats = () => {
                 </h4>
                 <div className="stat-grid">
                     {statsInCategory.map(([statKey, config]) => (
-                        <div key={statKey} className="stat-group mb-3">
-                            <label
-                                className="form-label d-flex justify-content-between align-items-center"
-                                title={config.description}
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                            >
-                                {config.name}
-                            </label>
+                        <div
+                            key={statKey}
+                            className="stat-group mb-3"
+                            title={`${config.name} ${config.description}`}
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                        >
                             <div className="input-group">
                                 <span className="input-group-text">
                                     <i className={`fas ${config.icon} text-${config.color || "secondary"}`}></i>
@@ -64,7 +62,7 @@ const CharacterStats = () => {
 
     return (
         <div className="character-stats p-4 bg-dark text-light rounded">
-            <h3 className="mb-4">Stats</h3>
+            <h5 className="m-0 text-secondary-emphasis mb-4">STATS</h5>
             {renderStatGroup(STAT_CATEGORIES.PHYSICAL)}
             {renderStatGroup(STAT_CATEGORIES.MAGICAL)}
             {renderStatGroup(STAT_CATEGORIES.UTILITY)}

@@ -1,4 +1,5 @@
 import { STATS_CONFIG } from "../../config/stats";
+import { STAT_TYPES } from "../../types/statTypes";
 
 const LinkSpellModal = ({
     isLinkModalOpen,
@@ -37,7 +38,7 @@ const LinkSpellModal = ({
                         >
                             <option value="None">None</option>
                             {Object.entries(STATS_CONFIG).map(([statKey, config]) => (
-                                !getLinkedStats().includes(statKey) || statKey === currentSpell.linkedStat ? (
+                                (!getLinkedStats().includes(statKey) || statKey === currentSpell.linkedStat) && config.type != STAT_TYPES.CORE ? (
                                     <option key={statKey} value={statKey}>
                                         {config.name}
                                     </option>
