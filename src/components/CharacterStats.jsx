@@ -49,8 +49,17 @@ const CharacterStats = () => {
                                     onChange={(e) => updateStat(statKey, e.currentTarget.value)}
                                 />
                                 <span className="input-group-text">
-                                    <i className={`${getStatBonus(statKey) ? '' : 'fas fa-link-slash'} text-muted`}></i>
-                                    {getStatBonus(statKey) ? `+${getStatBonus(statKey)}` : ''}
+                                    <i className={`fas ${getStatBonus(statKey) ? '' : 'fa-link-slash'} text-muted`}></i>
+                                    {getStatBonus(statKey) > 0 && (
+                                        <div>
+                                            <span className="text-secondary ms-1">
+                                                +{getStatBonus(statKey)} = 
+                                            </span>
+                                            <span className="text-muted ms-1">
+                                                {characterStats[statKey] + getStatBonus(statKey)}
+                                            </span>
+                                        </div>
+                                    )}
                                 </span>
                             </div>
                         </div>

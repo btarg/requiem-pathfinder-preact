@@ -53,6 +53,22 @@
     font-size: small;
 }
 
+@keyframes flash-update {
+    0% {
+        background-color: var(--bs-primary);
+    }
+    50% {
+        background-color: var(--bs-success);
+    }
+    100% {
+        background-color: var(--bs-primary);
+    }
+}
+
+.quantity-flash {
+    animation: flash-update 0.5s ease;
+}
+
 /* Link badge responsiveness */
 @media screen and (max-width: 1200px) {
     .link-badge-normal {

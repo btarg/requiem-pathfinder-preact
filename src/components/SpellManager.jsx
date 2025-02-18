@@ -188,7 +188,6 @@ const SpellManager = () => {
         }
     };
 
-    const [lastUpdate, setLastUpdate] = useState(null);
 
     const updateSpell = (id, key, value) => {
         const spell = spells.find(s => s.id === id);
