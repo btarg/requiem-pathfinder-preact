@@ -54,8 +54,8 @@ const SpellManager = () => {
                                 {{Actions=${spell.actions === 0 ? "Free Action" : `${spell.actions} ${actionText}`}}} \
                                 {{Level=**Spell ${spell.power}** (S.Link Rank ${spell.rank})}} \
                                 {{Attack=[[${attackRoll}]]}} \
-                                ${spell.description ? `{{Description=${spell.description}}}
                                 {{Damage=[[${diceWithStats}]] ${elementIcon} ${spell.element}}} \
+                                ${spell.description ? `{{Description=${spell.description}}}
                                 ` : ''}`;
 
                 navigator.clipboard.writeText(rollCommand);
