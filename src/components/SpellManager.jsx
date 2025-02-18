@@ -441,7 +441,7 @@ const SpellManager = () => {
                                                 className="mb-0 spell-description"
                                                 style={{
                                                     display: '-webkit-box',
-                                                    WebkitLineClamp: '3',
+                                                    WebkitLineClamp: '5',
                                                     WebkitBoxOrient: 'vertical',
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis'
