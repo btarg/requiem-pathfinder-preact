@@ -55,18 +55,20 @@
 
 @keyframes flash-update {
     0% {
-        background-color: var(--bs-primary);
+        background-color: whitesmoke;
     }
     50% {
-        background-color: var(--bs-success);
-    }
-    100% {
         background-color: var(--bs-primary);
     }
+    100% {
+        background-color: whitesmoke;
+    }
 }
-
+.quantity-badge {
+    background-color: whitesmoke;
+}
 .quantity-flash {
-    animation: flash-update 0.5s ease;
+    animation: flash-update 0.2s ease;
 }
 
 /* Link badge responsiveness */

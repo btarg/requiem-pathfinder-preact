@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from 'preact/hooks'
 import { CharacterContext } from '../context/CharacterContext'
+import './HitPoints.css'
 
 export default function HitPoints() {
     const { characterStats, setCharacterStats } = useContext(CharacterContext)
@@ -82,7 +83,7 @@ export default function HitPoints() {
 
 
     return (
-        <div className="bg-dark text-light p-3">
+        <div className="p-3">
             <div className="d-flex justify-content-between align-items-center mb-2">
                 <h5 className="m-0 text-secondary-emphasis">HIT POINTS</h5>
             </div>

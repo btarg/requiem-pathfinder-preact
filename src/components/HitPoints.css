@@ -1,0 +1,75 @@
+.form-control-lg,
+.hp-input {
+    font-size: 1.5rem;
+    height: 80px;
+    padding: 0.25rem;
+    font-weight: bold;
+    width: 80px;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--bs-primary);
+}
+
+.progress {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    height: 12px;
+}
+
+.hp-input::-webkit-inner-spin-button,
+.hp-input::-webkit-outer-spin-button {
+    opacity: 1;
+    margin: 0;
+    height: 80px;
+}
+
+.damage-flash,
+.heal-flash,
+.temp-flash {
+    animation-duration: 0.3s;
+    animation-timing-function: ease;
+}
+
+.damage-flash {
+    animation-name: flash-red;
+}
+
+.heal-flash {
+    animation-name: flash-green;
+}
+
+.temp-flash {
+    animation-name: flash-blue;
+}
+
+@keyframes flash-red {
+    from {
+        border-color: rgb(255, 0, 50);
+    }
+
+    to {
+        border-color: var(--bs-secondary);
+    }
+}
+
+@keyframes flash-green {
+    from {
+        border-color: springgreen;
+    }
+
+    to {
+        border-color: var(--bs-secondary);
+    }
+}
+
+@keyframes flash-blue {
+    from {
+        border-color: aqua;
+    }
+
+    to {
+        border-color: var(--bs-secondary);
+    }
+}

@@ -70,7 +70,7 @@ const CharacterStats = () => {
     };
 
     return (
-        <div className="character-stats p-4 bg-dark text-light rounded">
+        <div className="character-stats p-4 rounded">
             <h5 className="m-0 text-secondary-emphasis mb-4">STATS</h5>
             {renderStatGroup(STAT_CATEGORIES.PHYSICAL)}
             {renderStatGroup(STAT_CATEGORIES.MAGICAL)}

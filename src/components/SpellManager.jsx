@@ -206,11 +206,14 @@ const SpellManager = () => {
         }
     };
 
+    const [flashingSpellId, setFlashingSpellId] = useState(null);
 
     const updateSpell = (id, key, value) => {
         const spell = spells.find(s => s.id === id);
         if (spell) {
             if (key === "quantity" && spell.quantity !== value) {
+                setFlashingSpellId(id);
+                setTimeout(() => setFlashingSpellId(null), 300); // Reset after 300ms
                 notifySpellQuantityChange(spell, value, spell.quantity);
             }
             setSpells(spells.map(spell => spell.id === id ? { ...spell, [key]: value } : spell));
@@ -330,7 +333,7 @@ const SpellManager = () => {
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container">
                 <h5 className="m-0 text-secondary-emphasis mb-4">STOCKED SPELLS</h5>
-                <button className="btn btn-primary mb-4" onClick={() => openEditModal()}>
+                <button className="btn dark-btn mb-4" onClick={() => openEditModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
 
@@ -354,7 +357,11 @@ const SpellManager = () => {
                             <div class="d-flex justify-content-left">
                                 <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}
                                     onClick={() => toggleExpandSpell(spell.id)}>
-                                    <span className="badge bg-primary me-2" style={{ width: '2.5rem', flexShrink: 0 }}>
+                                    <span
+                                        id={`quantity-badge-${spell.id}`}
+                                        className={`text-black badge quantity-badge me-2 ${flashingSpellId === spell.id ? 'quantity-flash' : ''}`}
+                                        style={{ width: '2.5rem', flexShrink: 0 }}
+                                    >
                                         <small>{spell.quantity}</small>
                                     </span>
                                     {/* Action Label */}

@@ -8,6 +8,9 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-text-size-adjust: 100%;
+
+    --bs-body-bg: #18181b !important;
+    --bs-bg-dark: #18181b !important;
     
 }
 
@@ -70,4 +73,26 @@ main {
 	main {
 		margin: 2rem;
 	}
+}
+
+.dark-btn {
+    transition: all 0.2s ease-in-out;
+    padding: 0.5rem 1rem;
+    background-color: #27272a;
+}
+
+.dark-btn:hover {
+    background-color: #3f3f46;
+}
+
+
+.dark-btn-primary {
+    transition: all 0.2s ease-in-out;
+    padding: 0.5rem 1rem;
+    border: 1px solid #9c59fe;
+    background-color: #9333ea;
+}
+
+.dark-btn-primary:hover {
+    background-color: #9c59fe;
 }
