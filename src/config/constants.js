@@ -1,1 +1,1 @@
-export const MAX_SPELL_STACKS = 10;
+export const MAX_SPELL_STACKS = 16;
