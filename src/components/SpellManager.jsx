@@ -9,6 +9,7 @@ import DeleteSpellModal from "./modals/DeleteSpellModal";
 import EditSpellEntryModal from "./modals/EditSpellEntryModal";
 import LinkSpellModal from "./modals/LinkSpellModal";
 import ToastManager from "./ToastManager";
+import { MAX_SPELL_STACKS } from "../config/constants";
 
 const SpellManager = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
@@ -210,7 +211,7 @@ const SpellManager = () => {
 
     const incrementSpellQuantity = (id) => {
         const spell = spells.find(spell => spell.id === id);
-        const newQuantity = Math.min(100, spell.quantity + incrementAmount);
+        const newQuantity = Math.min(MAX_SPELL_STACKS, spell.quantity + incrementAmount);
         updateSpell(id, "quantity", newQuantity);
         setIncrementAmount(1); // Reset after use
     };

@@ -1,3 +1,4 @@
+import { MAX_SPELL_STACKS } from "../../config/constants";
 import { ElementType, getElementIcon } from "../../config/enums"
 import { capitalizeFirstLetter } from "../../utils/commonUtils";
 
@@ -157,15 +158,15 @@ const EditSpellEntryModal = ({
                             <div className="input-group">
                                 <input
                                     type="number"
-                                    className={`form-control ${currentSpell.quantity < 0 || currentSpell.quantity > 100 ? 'is-invalid' : ''}`}
+                                    className={`form-control ${currentSpell.quantity < 0 || currentSpell.quantity > MAX_SPELL_STACKS ? 'is-invalid' : ''}`}
                                     placeholder="Quantity"
                                     min="0"
-                                    max="100"
+                                    max={MAX_SPELL_STACKS.toString()}
                                     value={currentSpell.quantity}
                                     onInput={(e) => {
                                         const value = parseInt(e.currentTarget.value, 10) || 0;
-                                        if (value > 100) {
-                                            setCurrentSpell({ ...currentSpell, quantity: 100 });
+                                        if (value > MAX_SPELL_STACKS) {
+                                            setCurrentSpell({ ...currentSpell, quantity: MAX_SPELL_STACKS });
                                         } else {
                                             setCurrentSpell({ ...currentSpell, quantity: Math.max(0, value) });
                                         }

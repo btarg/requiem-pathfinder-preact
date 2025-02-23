@@ -1,5 +1,6 @@
 import { DiceRoller } from "dice-roller-parser";
 import { capitalizeFirstLetter } from "./commonUtils";
+import { MAX_SPELL_STACKS } from "../config/constants";
 
 export const getFriendlyStatName = (stat) => {
     return stat
@@ -9,7 +10,8 @@ export const getFriendlyStatName = (stat) => {
 };
 
 export const calculateStatBonus = (stock, spellRank) => {
-    return Math.floor((spellRank * 2) * Math.sqrt(stock / 2));
+    // return Math.floor((spellRank * 2) * Math.sqrt(stock / 2));
+    return Math.floor(Math.floor(stock * spellRank) / 5);
 };
 
 export const rollDrawDice = (luck, hasMastery) => {
@@ -45,7 +47,7 @@ export const validateSpellFields = (spell) => {
     const errors = [];
     if (!spell.name) errors.push("Spell name is required");
     if (spell.quantity < 0) errors.push("Quantity must be 0 or higher");
-    if (spell.quantity > 100) errors.push("Quantity must be 100 max");
+    if (spell.quantity > MAX_SPELL_STACKS) errors.push("Quantity over maximum stack limit");
     if (spell.power <= 0) errors.push("Spell level must be greater than 0");
     if (!spell.dice) errors.push("Damage roll is required");
     return errors;

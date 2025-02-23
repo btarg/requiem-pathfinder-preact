@@ -41,7 +41,7 @@ const QuickRolls = () => {
                         style={{ minWidth: '140px', maxWidth: '170px', height: '48px' }}
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        title={`Roll ${roll.name})`}
+                        title={`Roll ${roll.name}`}
                     >
                         <i className={`fas ${roll.icon} me-2`} style={{ width: '20px' }}></i>
                         <span className="text-light">{roll.name}</span>
