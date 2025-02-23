@@ -27,6 +27,7 @@ export function App() {
                     </main>
                 </LocationProvider>
             </SpellProvider>
+        {BUILD_DATE}
         </CharacterProvider>
     );
 }

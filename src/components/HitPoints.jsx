@@ -143,7 +143,7 @@ export default function HitPoints() {
                     </div>
 
                 </div>
-
+                {/* These should appear below the other controls */}
                 <div className="d-flex gap-2">
                     <div className="text-center" style={{ width: '80px', height: '80px' }}>
                         <br />

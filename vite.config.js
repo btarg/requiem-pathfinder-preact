@@ -5,6 +5,9 @@ import { writeFileSync, readFileSync } from 'fs';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    define: {
+        BUILD_DATE: JSON.stringify(new Date().toISOString())
+    },
     plugins: [
         preact(),
         {
