@@ -2,6 +2,7 @@ import ToastManager from './ToastManager';
 import { useSpellContext } from '../context/SpellContext';
 import { getLinkStatBonus } from '../utils/diceHelpers';
 import { capitalizeFirstLetter } from '../utils/commonUtils';
+import { STATS_CONFIG } from '../config/stats';
 
 const QuickRolls = () => {
     const { showToast } = ToastManager();
@@ -13,18 +14,17 @@ const QuickRolls = () => {
             roll += "&{tracker}";
         }
         roll += "]]";
-        
-        const command = `&{template:default} {{name=${rollType}}}\
-        {{Roll=${roll}}}\
-        {{Stat Bonus=[[${getLinkStatBonus(spells, stat)}]] from ${capitalizeFirstLetter(stat)}}}`;
+
+        const command = `&{template:default} {{name=${rollType}}}\{{Roll=${roll}}}\{{Stat Bonus=[[${getLinkStatBonus(spells, stat)}]] from ${capitalizeFirstLetter(stat)}}}`;
+
         navigator.clipboard.writeText(command);
         showToast(rollType + " roll command copied! Paste it into the text chat on Roll20.", 'clipboard', 'success', 'Copied to clipboard');
     };
 
     const saveRolls = [
-        { name: 'Fortitude Save', stat: 'vitality', icon: 'fa-shield-heart' },
-        { name: 'Will Save', stat: 'spirit', icon: 'fa-brain' },
-        { name: 'Reflex Save', stat: 'speed', icon: 'fa-person-running' },
+        { name: 'Fortitude Save (VIT)', stat: 'vitality' },
+        { name: 'Will Save (SPR)', stat: 'spirit' },
+        { name: 'Reflex Save (SPD)', stat: 'speed' },
     ];
 
     const initiativeRoll = { name: 'Initiative', stat: 'speed', icon: 'fa-bolt' };
@@ -43,7 +43,7 @@ const QuickRolls = () => {
                         data-bs-placement="top"
                         title={`Roll ${roll.name}`}
                     >
-                        <i className={`fas ${roll.icon} me-2`} style={{ width: '20px' }}></i>
+                        <i className={`fas ${STATS_CONFIG[roll.stat].icon} me-2`} style={{ width: '20px' }}></i>
                         <span className="text-light">{roll.name}</span>
                     </button>
                 ))}
