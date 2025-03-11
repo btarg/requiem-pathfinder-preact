@@ -1,27 +1,23 @@
 import { render } from 'preact';
+import { NotFound } from './pages/_404.jsx';
 import { LocationProvider, Router, Route } from 'preact-iso';
 import { CharacterProvider } from './context/CharacterContext';
-
-import { Header } from './components/Header.jsx';
 import { SpellsAndStats } from './pages/SpellInventory/index.jsx';
-import { NotFound } from './pages/_404.jsx';
-import { Stats } from './pages/StatsPage';
 import { SpellProvider } from './context/SpellContext';
 
 import './style.scss';
 import '@fortawesome/fontawesome-free/scss/solid.scss';
 
+const BASE_URL = import.meta.env.BASE_URL || '/';
 
 export function App() {
     return (
         <CharacterProvider>
             <SpellProvider>
                 <LocationProvider>
-                    <Header />
                     <main>
                         <Router>
-                            <Route path="/requiem-pathfinder-preact/" component={Stats} />
-                            <Route path="/requiem-pathfinder-preact/spells" component={SpellsAndStats} />
+                            <Route path={BASE_URL} component={SpellsAndStats} />
                             <Route default component={NotFound} />
                         </Router>
                     </main>

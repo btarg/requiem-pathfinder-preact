@@ -22,9 +22,9 @@ const QuickRolls = () => {
     };
 
     const saveRolls = [
-        { name: 'Fortitude Save (VIT)', stat: 'vitality' },
-        { name: 'Will Save (SPR)', stat: 'spirit' },
-        { name: 'Reflex Save (SPD)', stat: 'speed' },
+        { name: 'Fortitude Save', stat: 'vitality' },
+        { name: 'Will Save', stat: 'spirit' },
+        { name: 'Reflex Save', stat: 'speed' },
     ];
 
     const initiativeRoll = { name: 'Initiative', stat: 'speed', icon: 'fa-bolt' };
@@ -41,7 +41,7 @@ const QuickRolls = () => {
                         style={{ minWidth: '140px', maxWidth: '170px', height: '48px' }}
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        title={`Roll ${roll.name}`}
+                        title={`Roll ${roll.name} (${STATS_CONFIG[roll.stat].shortName})`}
                     >
                         <i className={`fas ${STATS_CONFIG[roll.stat].icon} me-2`} style={{ width: '20px' }}></i>
                         <span className="text-light">{roll.name}</span>
@@ -54,7 +54,7 @@ const QuickRolls = () => {
                     style={{ minWidth: '140px', maxWidth: '170px', height: '48px' }}
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title={`Roll ${initiativeRoll.name}`}
+                    title={`Roll ${initiativeRoll.name} (${STATS_CONFIG[initiativeRoll.stat].shortName})`}
                 >
                     <i className={`fas ${initiativeRoll.icon} text-${initiativeRoll.color} me-2`} style={{ width: '20px' }}></i>
                     <span className="text-light">{initiativeRoll.name}</span>

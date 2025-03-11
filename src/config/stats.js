@@ -18,6 +18,7 @@ export const STATS_CONFIG = {
     },
     strength: {
         name: "Strength",
+        shortName: "STR",
         icon: "fa-fist-raised",
         color: "danger",
         description: "Increases physical attack damage unless resisted/absorbed/immune. Applied as flat bonus to Physical damage rolls.",
@@ -30,6 +31,7 @@ export const STATS_CONFIG = {
     },
     vitality: {
         name: "Vitality",
+        shortName: "VIT",
         icon: "fa-shield-alt",
         color: "primary-emphasis",
         description: "Reduces incoming Physical damage when attack is resisted. Does not affect neutral or absorbed damage.",
@@ -42,6 +44,7 @@ export const STATS_CONFIG = {
     },
     magic: {
         name: "Magic",
+        shortName: "MAG",
         icon: "fa-hand-sparkles",
         color: "success-emphasis",
         description: "Increases magical attack damage unless resisted/absorbed/immune. Applied as flat bonus.",
@@ -54,6 +57,7 @@ export const STATS_CONFIG = {
     },
     spirit: {
         name: "Spirit",
+        shortName: "SPR",
         icon: "fa-shield-heart",
         color: "info",
         description: "Reduces incoming magical damage when attack is resisted. Does not affect neutral or absorbed damage.",
@@ -66,6 +70,7 @@ export const STATS_CONFIG = {
     },
     speed: {
         name: "Speed",
+        shortName: "SPD",
         icon: "fa-running",
         color: "secondary-emphasis",
         description: "Bonus to Initiative and movement distance per turn",
@@ -80,6 +85,7 @@ export const STATS_CONFIG = {
     },
     luck: {
         name: "Luck",
+        shortName: "LUCK",
         icon: "fa-clover",
         color: "success",
         description: "Affects spell draws and knockdown resistance",

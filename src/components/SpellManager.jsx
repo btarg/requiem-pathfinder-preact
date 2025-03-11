@@ -261,6 +261,10 @@ const SpellManager = () => {
         );
     };
 
+    const getLinkedSpellString = (spell) => {
+        return spell.isLinked ? "Linked to " + STATS_CONFIG[spell.linkedStat].name : 'No linked stat';
+    }
+
     const handleBadgeClick = (spell) => {
         if (spell.isLinked) {
             console.log(`Linked stat: ${spell.linkedStat}`);
@@ -328,8 +332,8 @@ const SpellManager = () => {
                                     <span
                                         className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'} ms-2 d-flex justify-content-between align-items-center link-badge-normal`}
                                         data-bs-toggle="tooltip"
-                                        data-bs-original-title=""
-                                        title={spell.isLinked ? "Linked to " + STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
+                                        data-bs-original-title={getLinkedSpellString(spell)}
+                                        title={getLinkedSpellString(spell)}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleBadgeClick(spell);
@@ -401,8 +405,8 @@ const SpellManager = () => {
                                             className={`badge bg-dark border text-${spell.isLinked ? STATS_CONFIG[spell.linkedStat].color : 'secondary'}
                                                 link-badge-responsive`}
                                             data-bs-toggle="tooltip"
-                                            data-bs-original-title=""
-                                            title={spell.isLinked ? "Linked to " + STATS_CONFIG[spell.linkedStat].name : 'No linked stat'}
+                                            data-bs-original-title={getLinkedSpellString(spell)}
+                                            title={getLinkedSpellString(spell)}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleBadgeClick(spell);
