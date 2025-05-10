@@ -20,7 +20,7 @@ const CharacterStats = () => {
             .filter(([_, config]) => config.category === category);
 
         return statsInCategory.length > 0 && (
-            <div className="stat-category mb-4">
+            <div className="stat-category">
                 <h6 className="stat-category-title text-secondary mb-3">
                     {category.charAt(0).toUpperCase() + category.slice(1)} Stats
                 </h6>
