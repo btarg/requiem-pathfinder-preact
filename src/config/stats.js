@@ -97,7 +97,29 @@ export const STATS_CONFIG = {
             maxExtraDrawDice: (value) => Math.min(Math.floor(value), 4),
             knockdownBonus: (value) => value // Flat bonus to Fortitude saves
         }
-    }
+    },
+    influence: {
+        name: "Influence",
+        shortName: "INF",
+        icon: "fa-comments",
+        color: "warning",
+        description: "Used for social rolls, such as Deception, Intimidation, Performance, Diplomacy and Persuasion.",
+        category: STAT_CATEGORIES.UTILITY,
+        type: STAT_TYPES.UTILITY,
+        defaultValue: 0,
+        displayModifier: true,
+    },
+    wisdom: {
+        name: "Wisdom",
+        shortName: "WIS",
+        icon: "fa-book-open",
+        color: "warning-emphasis",
+        description: "Used for Recalling Knowledge of any kind: essentially every Pathfinder 2E lore skill rolled into one. Also useful in social situations.",
+        category: STAT_CATEGORIES.UTILITY,
+        type: STAT_TYPES.UTILITY,
+        defaultValue: 0,
+        displayModifier: true,
+    },
 };
 
 export const calculateSoulLinkBonus = (spellStock, spellRank) => {
