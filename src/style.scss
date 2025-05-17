@@ -89,18 +89,18 @@ main {
 
 .dark-btn-secondary {
     padding: 0.5rem 1rem;
-    border: 1px solid #244ec2;
-    box-shadow: inset 0 0 10px 1px rgba(47, 127, 255, 0.5);
+    border: 1px solid #24aac2;
+    box-shadow: inset 0 0 10px 1px rgba(47, 227, 255, 0.5);
 }
 
 .dark-btn-secondary:hover {
-    background-color: rgba(30, 40, 90, 0.25);
-    border-color: #3B82F6; // Keep existing hover border change
-    box-shadow: inset 0 0 16px 2px rgba(56, 145, 255, 0.7);
+    background-color: rgba(30, 56, 90, 0.25);
+    border-color: #3bbbf6;
+    box-shadow: inset 0 0 16px 2px rgba(56, 209, 255, 0.7);
 }
 
 .dark-btn-secondary:active {
-    background-color: #1a2c5a !important;
+    background-color: #1a485a !important;
     border-color: #5c9dff !important;
     box-shadow: inset 0 0 12px 3px rgba(70, 150, 255, 0.85) !important;
 }

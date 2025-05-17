@@ -43,7 +43,8 @@
 }
 
 .spell-item .input-group {
-    width: 120px !important;
+    width: 90px !important;
+    flex-wrap: nowrap;
 }
 
 .spell-item .input-group .form-control {

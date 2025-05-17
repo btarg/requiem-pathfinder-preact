@@ -14,15 +14,6 @@ export const calculateStatBonus = (stock, spellRank) => {
     return Math.floor(Math.floor(stock * spellRank) / 5);
 };
 
-export const rollDrawDice = (luck, hasMastery) => {
-    const baseDice = hasMastery ? "2d6" : "1d6";
-    const maxExtraDice = Math.min(Math.floor(luck), 4);
-    const extraDice = maxExtraDice > 0 ? `+${maxExtraDice}d4` : '';
-
-    const roller = new DiceRoller();
-    const result = roller.roll(`${baseDice}${extraDice}`);
-    return result.value;
-};
 
 export const getLinkStatBonus = (spellsList, statKey) => {
     const linkedSpell = spellsList.find(spell => spell.isLinked && spell.linkedStat === statKey);

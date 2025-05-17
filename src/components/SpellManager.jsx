@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "preact/hooks";
 import { Tooltip } from 'bootstrap';
 import { CharacterContext } from "../context/CharacterContext";
-import { calculateStatBonus, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
+import { calculateStatBonus, getLinkStatBonus, replaceDiceStats, validateDiceRoll, validateSpellFields } from "../utils/diceHelpers";
 import { getSpellRank, STATS_CONFIG } from "../config/stats";
 import { ElementType, getElementIcon } from "../config/enums";
 import { useSpellContext } from "../context/SpellContext";
@@ -9,7 +9,7 @@ import DeleteSpellModal from "./modals/DeleteSpellModal";
 import EditSpellEntryModal from "./modals/EditSpellEntryModal";
 import LinkSpellModal from "./modals/LinkSpellModal";
 import ToastManager from "./ToastManager";
-import { MAX_SPELL_STACKS } from "../config/constants";
+import { MAX_DRAW_LUCK_BONUS, MAX_SPELL_STACKS } from "../config/constants";
 import DecorativeTitle from "./DecorativeTitle";
 
 const SpellManager = () => {
@@ -37,6 +37,57 @@ const SpellManager = () => {
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
 
     const [expandedSpellId, setExpandedSpellId] = useState(null);
+    const [drawMasteryEnabled, setDrawMasteryEnabled] = useState(false); // State for the mastery toggle
+
+    const handleDrawMasteryToggle = (e) => {
+        setDrawMasteryEnabled(e.target.checked);
+    };
+
+    const spellIsMastered = (spellToDraw) => {
+        if (!spellToDraw) {
+            return false;
+        }
+        return characterStats.affinities?.[spellToDraw.element]?.mastered || false
+    }
+
+    const handleRollToDrawSpecificSpell = (spellToDraw) => {
+        if (!spellToDraw) {
+            return;
+        }
+        handleRollToDraw(spellIsMastered(spellToDraw));
+    }
+    // Why is this even necessary?
+    const handleRollToDrawButton = () => {
+        handleRollToDraw(drawMasteryEnabled);
+    };
+
+    const handleRollToDraw = (hasMastery) => {
+
+        const originalLuckValue = characterStats.luck + getLinkStatBonus(spells, "luck") || 0;
+        const luckValue = Math.min(originalLuckValue, MAX_DRAW_LUCK_BONUS);
+
+        var luckString = `🍀 Luck=[[${originalLuckValue}`;
+        if (originalLuckValue > MAX_DRAW_LUCK_BONUS) {
+            luckString += `]] (+${MAX_DRAW_LUCK_BONUS} max bonus)`;
+        } else {
+            luckString += `]]`;
+        }
+
+        const diceCount = hasMastery ? 2 : 1;
+        const rollFormula = `${diceCount}d6cf1 + ${luckValue}[Luck Bonus]`;
+        const drawTitle = hasMastery ? "Draw Spell (Mastery)" : "Draw Spell";
+
+        const command = `&{template:default} {{name=${drawTitle}}} {{Charges Gained=[[${rollFormula}]]}} {{${luckString}}} {{Note=If the number is highlighted red, the true amount of Charges Gained is that total MINUS the Luck Bonus.}}`;
+
+        navigator.clipboard.writeText(command)
+            .then(() => {
+                showToast(`${drawTitle} command copied! Paste it into Roll20.`, 'clipboard', 'success', 'Copied to clipboard');
+            })
+            .catch(err => {
+                console.error('Failed to copy command: ', err);
+                showToast('Failed to copy command.', 'exclamation-triangle', 'danger', 'Copy Error');
+            });
+    };
 
     const rollSpellDamage = (spell) => {
         if (spell.quantity > 0 && spell.dice) {
@@ -53,7 +104,7 @@ const SpellManager = () => {
                 }
 
                 const rollCommand = `&{template:default} {{name=${spell.name}}} \
-                                {{Actions=${spell.actions === 0 ? "Free Action" : `${spell.actions} ${actionText}`}}} \
+                                {{Actions=${spell.actions} ${actionText}}} \
                                 {{Level=**Spell ${spell.power}** (S.Link Rank ${spell.rank})}} \
                                 {{Attack=[[${attackRoll}]]}} \
                                 {{Damage=[[${diceWithStats}]] ${elementIcon} ${spell.element}}} \
@@ -275,13 +326,34 @@ const SpellManager = () => {
         openLinkModal(spell);
     };
 
-    return (
+return (
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container">
-                <DecorativeTitle title="STOCKED SPELLS" lineMaxWidth="50px" />
-                <button className="btn dark-btn-primary mb-4 mt-4" onClick={() => openEditModal()}>
+                <DecorativeTitle title="SPELL INVENTORY" lineMaxWidth="50px" />
+                <div className="d-flex align-items-center justify-content-center mb-4">
+                    <div className="form-check form-switch me-3">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            id="drawMasteryToggle"
+                            checked={drawMasteryEnabled}
+                            onChange={handleDrawMasteryToggle} // Using extracted handler
+                            style={{ cursor: 'pointer' }}
+                        />
+                        <label className="form-check-label text-light" htmlFor="drawMasteryToggle" style={{ cursor: 'pointer' }}>
+                            Mastery
+                        </label>
+                    </div>
+                <button className="btn dark-btn-secondary me-2" onClick={handleRollToDrawButton}>
+                    <i className="fas fa-dice"></i> Roll to Draw
+                </button>
+                {/* Changed onClick to openEditModal for adding a new spell */}
+                <button className="btn dark-btn-primary" onClick={() => openEditModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
+                </div>
+                
 
                 {/* Spell list */}
                 <ul className="list-group">
@@ -342,7 +414,7 @@ const SpellManager = () => {
                                         <span>{spell.isLinked ? `+${calculateStatBonus(spell.quantity, spell.rank)}` : ''}</span>
                                     </span>
 
-                                    {/* Roll button with fixed width */}
+                                    {/* Roll button */}
                                     <button className="btn btn-outline-danger btn-sm roll-button"
                                         style={{ width: '120px', whiteSpace: 'nowrap', overflow: 'hidden' }}
                                         onClick={(e) => { e.stopPropagation(); rollSpellDamage(spell); }}
@@ -353,8 +425,21 @@ const SpellManager = () => {
                                         <span className="ms-1 text-truncate">{replaceDiceStats(spells, spell.dice, characterStats, true)}</span>
                                     </button>
 
-                                    {/* Quantity controls with fixed width */}
-                                    <div className="input-group input-group-sm" style={{ width: '140px', flexShrink: 0 }}>
+                                    {/* Draw Charges Button */}
+                                    <button
+                                        className="btn btn-outline-info btn-sm"
+                                        onClick={(e) => { e.stopPropagation(); handleRollToDrawSpecificSpell(spell); }}
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title={`Draw charges for ${spell.name} (${spell.element} - ${spellIsMastered(spell) ? "mastery" : "normal"})`}
+                                        style={{ flexShrink: 0 }}
+                                    >
+                                        <i className="fas fa-hand-sparkles"></i>
+                                        <span className="ms-1 text-truncate">Draw</span>
+                                    </button>
+
+                                    {/* Quantity controls */}
+                                    <div className="input-group input-group-sm">
                                         <button
                                             className="btn btn-outline-danger btn-sm"
                                             onClick={(e) => { e.stopPropagation(); decrementSpellQuantity(spell.id); }}>
@@ -365,7 +450,9 @@ const SpellManager = () => {
                                             className="form-control form-control-sm text-center"
                                             style={{ width: '60px' }}
                                             value={incrementAmount}
-                                            onChange={(e) => setIncrementAmount(Math.max(1, Math.min(100, parseInt(e.currentTarget.value) || 1)))}
+                                            min="1" // Add min attribute
+                                            max={MAX_SPELL_STACKS} // Add max attribute, using MAX_SPELL_STACKS
+                                            onChange={(e) => setIncrementAmount(Math.max(1, Math.min(MAX_SPELL_STACKS, parseInt(e.currentTarget.value) || 1)))} // Cap upper limit with MAX_SPELL_STACKS
                                             onClick={(e) => e.stopPropagation()}
                                         />
                                         <button
