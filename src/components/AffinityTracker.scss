@@ -6,6 +6,8 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1rem;
+    max-width: 75%;
+    justify-self: center;
 }
 
 .element-item {
@@ -13,9 +15,6 @@
     overflow: hidden;
 }
 
-// .element-header {
-//     font-weight: bold;
-// }
 
 .affinity-buttons .btn {
     padding: 0.25rem 0.5rem;

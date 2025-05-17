@@ -37,39 +37,16 @@ span.action {
 	min-height: 100vh;
 }
 
-header {
-	display: flex;
-	justify-content: center;
-	background-color: #673ab8;
-    padding: 1rem 0;
-    font-size: larger;
-}
-
-header nav {
-	display: flex;
-}
-
-header a {
-	color: #fff;
-	padding: 0.75rem;
-	text-decoration: none;
-}
-
-header a.active {
-	background-color: #0005;
-}
-
-header a:hover {
-	background-color: #0008;
-}
 
 main {
-	flex: auto;
-	display: flex;
-	align-items: center;
-	max-width: 1280px;
-	margin: 0 auto;
-	text-align: center;
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    /* Stack children vertically */
+    align-items: stretch;
+    max-width: 1280px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 @media (max-width: 639px) {

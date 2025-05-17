@@ -1,0 +1,23 @@
+/* breakpoint for HP/MP tracker layout */
+@media screen and (max-width: 1130px) {
+
+    /* Reverse the order of trackers */
+    .hp-mp-container {
+        flex-direction: column-reverse !important;
+    }
+
+    /* Full width for each tracker on smaller screens */
+    .hp-section,
+    .mp-section {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        margin-bottom: 1rem;
+    }
+
+    /* Center both trackers */
+    .hp-section .d-flex,
+    .mp-section .d-flex {
+        justify-content: center !important;
+    }
+}

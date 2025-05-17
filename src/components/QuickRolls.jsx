@@ -30,8 +30,8 @@ const QuickRolls = () => {
     const initiativeRoll = { name: 'Initiative', stat: 'speed', icon: 'fa-bolt' };
 
     return (
-        <div className="save-rolls p-3 rounded">
-            <h5 className="text-secondary-emphasis mb-3">QUICK ROLLS</h5>
+        <div className="save-rolls p-3 mb-4">
+            <h5 className="text-secondary-emphasis mb-4">QUICK ROLLS</h5>
             <div className="d-flex flex-wrap gap-2 align-items-center justify-content-center">
                 {saveRolls.map((roll) => (
                     <button

@@ -10,7 +10,7 @@ const ToastManager = () => {
 
     useEffect(() => {
         if (toastContainer) {
-            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
             document.body.appendChild(toastContainer);
             return () => {
                 document.body.removeChild(toastContainer);
