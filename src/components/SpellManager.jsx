@@ -94,6 +94,7 @@ const SpellManager = () => {
             try {
                 const diceWithStats = replaceDiceStats(spells, spell.dice, characterStats);
                 const elementIcon = getElementIcon(spell.element);
+                // STR is used for the attack roll now, not the damage roll
                 const attackRoll = replaceDiceStats(spells, "1d20+[strength]", characterStats);
 
                 let actionText;
@@ -345,16 +346,14 @@ return (
                             Mastery
                         </label>
                     </div>
-                <button className="btn dark-btn-secondary me-2" onClick={handleRollToDrawButton}>
-                    <i className="fas fa-dice"></i> Roll to Draw
+                <button className="dark-btn dark-btn-secondary me-2" onClick={handleRollToDrawButton}>
+                    <i className="fas fa-dice me-2"></i> <span>Roll to Draw</span>
                 </button>
-                {/* Changed onClick to openEditModal for adding a new spell */}
-                <button className="btn dark-btn-primary" onClick={() => openEditModal()}>
-                    <i className="fas fa-plus"></i> Add Spell
+                <button className="dark-btn dark-btn-primary" onClick={() => openEditModal()}>
+                    <i className="fas fa-plus me-2"></i> <span>Add Spell</span>
                 </button>
                 </div>
                 
-
                 {/* Spell list */}
                 <ul className="list-group">
                     {spells.map((spell, index) => (
@@ -371,7 +370,7 @@ return (
                                     </span>
                                     {/* Action Label and name */}
                                     <div class="text-truncate">
-                                        <span className="me-2">{`${getElementIcon(spell.element)} ${spell.name}`}</span>
+                                        {getElementIcon(spell.element)} <span className="arsenal me-2">{spell.name}</span>
 
                                         <span className="action-label hide-on-small me-2" style={{
                                             width: window.innerWidth <= 750 ? '0px' : '50px',
@@ -520,9 +519,9 @@ return (
 
                                     {spell.description && (
                                         <>
-                                            <p className="py-1 border-bottom h5">Description</p>
+                                            <p className="py-1 border-bottom h5 arsenal">Description</p>
                                             <div
-                                                className="mb-0 spell-description"
+                                                className="mb-0 spell-description arsenal"
                                                 style={{
                                                     display: '-webkit-box',
                                                     WebkitLineClamp: '5',

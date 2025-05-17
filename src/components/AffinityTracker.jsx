@@ -116,9 +116,9 @@ const AffinityTracker = () => {
                                 <div className="d-flex align-items-center">
                                     
                                     <span className="element-name">
-                                        {getElementIcon(element)} {element}:
+                                        {getElementIcon(element)} <span className="arsenal">{element}:</span>
                                     </span>
-                                    <span className={`ms-1 text-${getAffinityColor(currentAffinity.type)}`}>
+                                    <span className={`arsenal ms-1 text-${getAffinityColor(currentAffinity.type)}`}>
                                         {currentAffinity.type}
                                     </span>
                                 </div>

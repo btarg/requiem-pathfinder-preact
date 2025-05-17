@@ -40,7 +40,7 @@ const QuickRolls = () => {
                     <button
                         key={roll.name}
                         onClick={() => copyRollToClipboard(roll.name, roll.stat)}
-                        className={`btn dark-btn-secondary d-flex align-items-center justify-content-center flex-grow-1 position-relative`}
+                        className={`dark-btn dark-btn-secondary d-flex align-items-center justify-content-center flex-grow-1 position-relative`}
                         style={{ minWidth: '140px', maxWidth: '170px', height: '48px' }}
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
@@ -53,7 +53,7 @@ const QuickRolls = () => {
                 <button
                     key={initiativeRoll.name}
                     onClick={() => copyRollToClipboard(initiativeRoll.name, initiativeRoll.stat)}
-                    className={`btn dark-btn-primary d-flex align-items-center justify-content-center flex-grow-1 position-relative`}
+                    className={`dark-btn dark-btn-primary d-flex align-items-center justify-content-center flex-grow-1 position-relative`}
                     style={{ minWidth: '140px', maxWidth: '170px', height: '48px' }}
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
@@ -66,7 +66,7 @@ const QuickRolls = () => {
 
             </div>
 
-            <DecorativeTitle title="QUICK ROLLS" containerClassName='mt-3' />
+            <DecorativeTitle title="QUICK ROLLS" containerClassName='mt-3 arsenal' />
         </div>
     );
 };
