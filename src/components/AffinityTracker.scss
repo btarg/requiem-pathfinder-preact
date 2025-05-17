@@ -5,7 +5,7 @@
 .element-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
+    gap: 0.1rem;
     max-width: 100%;
     justify-self: center;
 }
@@ -13,8 +13,10 @@
 .element-item {
     border-radius: 4px;
     overflow: hidden;
+    padding: 8px 10px;
+    position: relative;
+    transition: background 0.3s ease;
 }
-
 
 .affinity-buttons .btn {
     padding: 0.25rem 0.25rem;
@@ -23,4 +25,41 @@
 .affinity-text {
     margin-left: 0.25rem;
     display: inline-block;
+}
+
+/* Improved gold background effect */
+.gold-bg {
+    background: linear-gradient(90deg, rgba(255, 217, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0) 100%);
+    border-left: 3px solid gold;
+    border-radius: 8px;
+    overflow: hidden;
+    text-shadow: 0 0 4px black;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Subtle top border glow */
+.gold-bg::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
+}
+
+/* Subtle bottom border glow */
+.gold-bg::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
+}
+
+.gold-bg .element-name {
+    color: gold;
 }

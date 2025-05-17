@@ -5,15 +5,51 @@ import { STAT_CATEGORIES } from '../types/statTypes';
 import { useSpellContext } from '../context/SpellContext';
 import { getLinkStatBonus } from '../utils/diceHelpers';
 import DecorativeTitle from './DecorativeTitle';
+import ToastManager from './ToastManager';
+import { capitalizeFirstLetter } from '../utils/commonUtils';
 const CharacterStats = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
     const { spells } = useSpellContext();
+
+    const { showToast } = ToastManager();
 
     const updateStat = (statName, value) => {
         setCharacterStats(prev => ({
             ...prev,
             [statName]: parseInt(value, 10) || 0
         }));
+    };
+
+    const copyStatCheckRoll = (stat) => {
+        // Ask the user to input a DC, where leaving it as zero will just do a normal roll
+        const dc = prompt("Enter a DC for the roll (leave blank for normal roll):");
+        const dcValue = parseInt(dc, 10) || 0;
+        
+        // Base roll calculation with the bonus
+        const bonus = (characterStats[stat] || 0) + getLinkStatBonus(spells, stat);
+        const statConfig = STATS_CONFIG[stat];
+        
+        // Build the roll command
+        let roll = `1d20+${bonus}`;
+        
+        // Add success/failure tracking for Roll20 if DC is provided
+        if (dcValue > 0) {
+            roll = `${roll}cs>=${dcValue}cf<${dcValue}`;
+        }
+        
+        const checkString = dcValue ? `check vs DC ${dcValue}` : 'check';
+        const command = `&{template:default} {{name=${capitalizeFirstLetter(stat)} ${checkString}}}` +
+                       `{{Roll=[[${roll}]]}}` +
+                       `{{Stat Bonus=[[${bonus}]] from ${statConfig.shortName}}}`;
+        
+        // Copy to clipboard and show confirmation
+        navigator.clipboard.writeText(command);
+        
+        const toastMessage = dcValue 
+            ? `${statConfig.name} roll vs DC ${dcValue} copied! Paste it into Roll20.`
+            : `${statConfig.name} roll command copied! Paste it into Roll20.`;
+            
+        showToast(toastMessage, 'clipboard', 'success', 'Copied to clipboard');
     };
 
     const renderStatGroup = (category) => {
@@ -35,21 +71,23 @@ const CharacterStats = () => {
                             data-bs-placement="top"
                         >
                             <div className="input-group">
-                                {/* Updated to add shortname text */}
+
                                 <span className={`input-group-text gap-1 text-${config.color}`}
-                                // style={{ borderColor: `var(--bs-${config.color}) !important` }}
+                                    onClick={() => copyStatCheckRoll(statKey)}
+                                    
+                                    style={{ cursor: 'pointer' }}
                                 >
-                                    <i className={`fas ${config.icon}`}></i> <span class="stat-text">{config.shortName}</span>
+                                    <i className={`fas ${config.icon}`}></i> <span className="stat-text">{config.shortName}</span>
                                 </span>
                                 <input
                                     type="number"
                                     className="form-control"
                                     value={characterStats[statKey] || 0}
                                     onChange={(e) => updateStat(statKey, e.currentTarget.value)}
-                                    // style={{ borderColor: `var(--bs-${config.color})` }}
+                                // style={{ borderColor: `var(--bs-${config.color})` }}
                                 />
                                 <span className="input-group-text"
-                                    // style={{ borderColor: `var(--bs-${config.color}) !important` }}
+                                // style={{ borderColor: `var(--bs-${config.color}) !important` }}
                                 >
                                     <i className={`fas ${getLinkStatBonus(spells, statKey) ? '' : 'fa-link-slash'} text-muted`}></i>
                                     {getLinkStatBonus(spells, statKey) > 0 && (

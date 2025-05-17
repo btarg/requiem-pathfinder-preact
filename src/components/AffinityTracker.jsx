@@ -111,11 +111,11 @@ const AffinityTracker = () => {
                 {Object.values(ElementType).map((element) => {
                     const currentAffinity = characterStats.affinities[element] || { type: AffinityType.NEUTRAL, mastered: false };
                     return (
-                        <div key={element} className="element-item mb-3">
+                        <div key={element} className={`element-item mb-3 ${currentAffinity.mastered ? 'gold-bg' : ''}`}>
                             <div className="element-header d-flex align-items-center justify-content-between mb-1">
                                 <div className="d-flex align-items-center">
                                     
-                                    <span className={`element-name ${currentAffinity.mastered ? 'text-warning fw-bold' : ''}`}>
+                                    <span className="element-name">
                                         {getElementIcon(element)} {element}:
                                     </span>
                                     <span className={`ms-1 text-${getAffinityColor(currentAffinity.type)}`}>
@@ -123,12 +123,18 @@ const AffinityTracker = () => {
                                     </span>
                                 </div>
                                 <button
-                                    className={`btn btn-sm ${currentAffinity.mastered ? 'btn-warning' : 'btn-outline-secondary'}`}
                                     onClick={() => toggleMastery(element)}
                                     title={currentAffinity.mastered ? "Disable Mastery" : "Enable Mastery"}
-                                    style={{ lineHeight: 1, minWidth: '30px' }}
+                                    style={{
+                                        border: 'none',
+                                        padding: 0,
+                                        background: 'none',
+                                        color: currentAffinity.mastered ? 'gold' : 'currentColor',
+                                        cursor: 'pointer',
+                                        fontSize: '1.25rem' // Adjust size as needed
+                                    }}
                                 >
-                                    <i className={`fas fa-star`}></i>
+                                    <i className={`${currentAffinity.mastered ? 'fas fa-star' : 'fa-regular fa-star'}`}></i>
                                 </button>
                             </div>
                             <div className="affinity-buttons btn-group d-flex flex-wrap"> {/* Added flex-wrap */}
