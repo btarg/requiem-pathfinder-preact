@@ -1,8 +1,13 @@
-import { useState, useContext, useEffect } from 'preact/hooks';
+import { useContext, useEffect } from 'preact/hooks';
 import { CharacterContext } from '../context/CharacterContext';
 import { ElementType, AffinityType, getElementIcon } from '../config/enums';
 import './AffinityTracker.scss';
 import DecorativeTitle from './DecorativeTitle';
+import reflectIconSvg from '../assets/shield-reflect.svg'; // Import reflect SVG
+// import reflectIconSvg from '../assets/divert.svg';
+
+import weakIconSvg from '../assets/achilles-heel.svg'; // Import weak SVG
+import healIconSvg from '../assets/heart-plus.svg'; // Import heal SVG for Absorb
 
 const AffinityTracker = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
@@ -12,8 +17,10 @@ const AffinityTracker = () => {
         let needsUpdate = !characterStats.affinities;
         if (characterStats.affinities) {
             const firstElementKey = Object.keys(ElementType)[0];
-            if (firstElementKey && characterStats.affinities[ElementType[firstElementKey]] && typeof characterStats.affinities[ElementType[firstElementKey]] !== 'object') {
-                // Old format detected (value is string, not object)
+            // Check if the first element's affinity is not an object (old format)
+            if (firstElementKey &&
+                characterStats.affinities[ElementType[firstElementKey]] &&
+                typeof characterStats.affinities[ElementType[firstElementKey]] !== 'object') {
                 needsUpdate = true;
             }
         }
@@ -39,7 +46,7 @@ const AffinityTracker = () => {
             affinities: {
                 ...prev.affinities,
                 [element]: {
-                    ...(prev.affinities?.[element] || { type: AffinityType.NEUTRAL, mastered: false }), // Ensure object exists
+                    ...(prev.affinities?.[element] || { type: AffinityType.NEUTRAL, mastered: false }),
                     type: affinityTypeValue
                 }
             }
@@ -52,7 +59,7 @@ const AffinityTracker = () => {
             affinities: {
                 ...prev.affinities,
                 [element]: {
-                    ...(prev.affinities?.[element] || { type: AffinityType.NEUTRAL, mastered: false }), // Ensure object exists
+                    ...(prev.affinities?.[element] || { type: AffinityType.NEUTRAL, mastered: false }),
                     mastered: !prev.affinities?.[element]?.mastered
                 }
             }
@@ -65,23 +72,36 @@ const AffinityTracker = () => {
             case AffinityType.RESIST: return 'info';
             case AffinityType.IMMUNE: return 'warning';
             case AffinityType.ABSORB: return 'success';
-            default: return 'secondary';
+            case AffinityType.REFLECT: return 'primary';
+            default: return 'secondary'; // NEUTRAL
         }
     };
 
     const getAffinityIcon = (affinityTypeValue) => {
+        const iconStyle = {
+            width: '1.25em',
+            height: '1.25em',
+            color: "white",
+        };
+
         switch (affinityTypeValue) {
-            case AffinityType.WEAK: return 'fa-triangle-exclamation';
-            case AffinityType.RESIST: return 'fa-shield-alt';
-            case AffinityType.IMMUNE: return 'fa-ban';
-            case AffinityType.ABSORB: return 'fa-heart-circle-plus';
-            default: return 'fa-minus';
+            case AffinityType.WEAK:
+                return <img src={weakIconSvg} alt="Weak" style={iconStyle} />;
+            case AffinityType.RESIST:
+                return <i className="fas fa-shield-alt" style={iconStyle}></i>;
+            case AffinityType.IMMUNE:
+                return <i className="fas fa-ban" style={iconStyle}></i>;
+            case AffinityType.ABSORB:
+                return <img src={healIconSvg} alt="Absorb" style={iconStyle} />;
+            case AffinityType.REFLECT:
+                return <img src={reflectIconSvg} alt="Reflect" style={iconStyle} />;
+            default: // NEUTRAL
+                return <i className="fas fa-minus" style={iconStyle}></i>;
         }
     };
 
-    // Ensure affinities is initialized and in the new object format
     if (!characterStats.affinities || typeof characterStats.affinities[Object.values(ElementType)[0]] !== 'object') {
-        return <div className="p-3">Loading affinities...</div>; // Or some other loading/default state
+        return <div className="p-3">Loading affinities...</div>;
     }
 
     return (
@@ -94,9 +114,9 @@ const AffinityTracker = () => {
                         <div key={element} className="element-item mb-3">
                             <div className="element-header d-flex align-items-center justify-content-between mb-1">
                                 <div className="d-flex align-items-center">
-                                    <span className="me-2">{getElementIcon(element)}</span>
+                                    
                                     <span className={`element-name ${currentAffinity.mastered ? 'text-warning fw-bold' : ''}`}>
-                                        {element}:
+                                        {getElementIcon(element)} {element}:
                                     </span>
                                     <span className={`ms-1 text-${getAffinityColor(currentAffinity.type)}`}>
                                         {currentAffinity.type}
@@ -106,23 +126,23 @@ const AffinityTracker = () => {
                                     className={`btn btn-sm ${currentAffinity.mastered ? 'btn-warning' : 'btn-outline-secondary'}`}
                                     onClick={() => toggleMastery(element)}
                                     title={currentAffinity.mastered ? "Disable Mastery" : "Enable Mastery"}
-                                    style={{ lineHeight: 1, minWidth: '30px' }} // Adjust for icon alignment
+                                    style={{ lineHeight: 1, minWidth: '30px' }}
                                 >
                                     <i className={`fas fa-star`}></i>
                                 </button>
                             </div>
-                            <div className="affinity-buttons btn-group d-flex">
+                            <div className="affinity-buttons btn-group d-flex flex-wrap"> {/* Added flex-wrap */}
                                 {Object.values(AffinityType).map(affinityValue => (
                                     <button
                                         key={affinityValue}
-                                        className={`btn btn-sm btn-${currentAffinity.type === affinityValue
+                                        className={`btn btn-${currentAffinity.type === affinityValue // Removed btn-sm
                                             ? getAffinityColor(affinityValue)
                                             : 'outline-secondary'
                                             }`}
                                         onClick={() => updateAffinityType(element, affinityValue)}
                                         title={affinityValue}
                                     >
-                                        <i className={`fas ${getAffinityIcon(affinityValue)}`}></i>
+                                        {getAffinityIcon(affinityValue)}
                                     </button>
                                 ))}
                             </div>

@@ -78,6 +78,9 @@
     .link-badge-responsive {
         display: flex !important;
     }
+    .hide-when-small {
+        display: none !important;
+    }
 }
 
 @media screen and (min-width: 1201px) {
@@ -87,6 +90,9 @@
 
     .link-badge-responsive {
         display: none !important;
+    }
+    .hide-when-small {
+        display: inline-block !important;
     }
 }
 

@@ -431,11 +431,11 @@ return (
                                         onClick={(e) => { e.stopPropagation(); handleRollToDrawSpecificSpell(spell); }}
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        title={`Draw charges for ${spell.name} (${spell.element} - ${spellIsMastered(spell) ? "mastery" : "normal"})`}
+                                        title={`Click to copy the Draw command for ${spell.name} (${spell.element} - ${spellIsMastered(spell) ? "mastery" : "normal"})`}
                                         style={{ flexShrink: 0 }}
                                     >
                                         <i className="fas fa-hand-sparkles"></i>
-                                        <span className="ms-1 text-truncate">Draw</span>
+                                        <span className="ms-1 hide-when-small">Draw</span>
                                     </button>
 
                                     {/* Quantity controls */}

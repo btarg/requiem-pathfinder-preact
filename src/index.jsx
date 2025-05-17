@@ -27,7 +27,7 @@ export function App() {
                                 <Route default component={NotFound} />
                             </Router>
                         </main>
-                        <Footer buildDate={BUILD_DATE} githubUrl="https://github.com/btarg/requiem-pathfinder-preact" />
+                        <Footer buildDate={BUILD_DATE} />
                     </div>
                 </LocationProvider>
             </SpellProvider>

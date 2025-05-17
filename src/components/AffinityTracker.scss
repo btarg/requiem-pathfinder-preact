@@ -6,7 +6,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1rem;
-    max-width: 85%;
+    max-width: 100%;
     justify-self: center;
 }
 
@@ -17,22 +17,10 @@
 
 
 .affinity-buttons .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+    padding: 0.25rem 0.25rem;
 }
 
 .affinity-text {
     margin-left: 0.25rem;
     display: inline-block;
-}
-
-@media (max-width: 768px) {
-    .element-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    
-    .affinity-buttons .btn {
-        padding: 0.25rem;
-    }
 }

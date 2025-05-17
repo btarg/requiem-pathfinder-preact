@@ -17,6 +17,7 @@ export const AffinityType = Object.freeze({
     RESIST: "Resist",
     IMMUNE: "Immune",
     ABSORB: "Drain",
+    REFLECT: "Reflect",
 });
 
 export const getElementIcon = (element) => {
