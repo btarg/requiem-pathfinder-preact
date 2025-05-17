@@ -19,13 +19,13 @@ export function Header() {
                 <nav className="btn-group align-self-stretch" role="group" aria-label="Main navigation">
                     {/* Make buttons take full height and center their text */}
                     <a
-                        className={`btn h-100 d-flex align-items-center justify-content-center ${url === characterSheetPath ? 'dark-btn-nav' : 'dark-btn'}`}
+                        className={`btn h-100 d-flex align-items-center justify-content-center ${url === characterSheetPath ? 'dark-btn-secondary' : 'dark-btn'}`}
                         href={characterSheetPath}
                     >
                         Character Sheet
                     </a>
                     <a
-                        className={`btn h-100 d-flex align-items-center justify-content-center ${url === spellsPath ? 'dark-btn-nav' : 'dark-btn'}`}
+                        className={`btn h-100 d-flex align-items-center justify-content-center ${url === spellsPath ? 'dark-btn-secondary' : 'dark-btn'}`}
                         href={spellsPath}
                     >
                         Spell Inventory

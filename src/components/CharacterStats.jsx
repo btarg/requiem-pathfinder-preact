@@ -37,7 +37,8 @@ const CharacterStats = () => {
                             <div className="input-group">
                                 {/* Updated to add shortname text */}
                                 <span className={`input-group-text gap-1 text-${config.color}`}
-                                    style={{ borderColor: `var(--bs-${config.color}) !important` }}>
+                                // style={{ borderColor: `var(--bs-${config.color}) !important` }}
+                                >
                                     <i className={`fas ${config.icon}`}></i> <span class="stat-text">{config.shortName}</span>
                                 </span>
                                 <input
@@ -45,9 +46,11 @@ const CharacterStats = () => {
                                     className="form-control"
                                     value={characterStats[statKey] || 0}
                                     onChange={(e) => updateStat(statKey, e.currentTarget.value)}
-                                    style={{ borderColor: `var(--bs-${config.color})` }}
+                                    // style={{ borderColor: `var(--bs-${config.color})` }}
                                 />
-                                <span className="input-group-text" style={{ borderColor: `var(--bs-${config.color}) !important` }}>
+                                <span className="input-group-text"
+                                    // style={{ borderColor: `var(--bs-${config.color}) !important` }}
+                                >
                                     <i className={`fas ${getLinkStatBonus(spells, statKey) ? '' : 'fa-link-slash'} text-muted`}></i>
                                     {getLinkStatBonus(spells, statKey) > 0 && (
                                         <div>

@@ -279,7 +279,7 @@ const SpellManager = () => {
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container">
                 <DecorativeTitle title="STOCKED SPELLS" lineMaxWidth="50px" />
-                <button className="btn dark-btn mb-4 mt-4" onClick={() => openEditModal()}>
+                <button className="btn dark-btn-primary mb-4 mt-4" onClick={() => openEditModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
 
@@ -297,14 +297,16 @@ const SpellManager = () => {
                                     >
                                         <small>{spell.quantity}</small>
                                     </span>
-                                    {/* Action Label */}
+                                    {/* Action Label and name */}
                                     <div class="text-truncate">
+                                        <span className="me-2">{`${getElementIcon(spell.element)} ${spell.name}`}</span>
+
                                         <span className="action-label hide-on-small me-2" style={{
                                             width: window.innerWidth <= 750 ? '0px' : '50px',
                                         }}>
                                             {getActionLabel(spell.actions)}
                                         </span>
-                                        <span>{spell.name}</span>
+                                        
                                     </div>
 
                                 </div>
@@ -418,16 +420,13 @@ const SpellManager = () => {
                                         </span>
 
                                         <span className="badge bg-dark border">
-                                            <small>{getActionLabel(spell.actions)} {spell.actions} Actions</small>
+                                            {getActionLabel(spell.actions)} {spell.actions} Actions
                                         </span>
                                         <span className="badge bg-dark border">
-                                            <small>{getElementIcon(spell.element)} {spell.element}</small>
+                                            {getElementIcon(spell.element)} {spell.element}
                                         </span>
                                         <span className="badge bg-dark border">
-                                            <small>Power: {spell.power}</small>
-                                        </span>
-                                        <span className="badge bg-dark border">
-                                            <small>Rank: {spell.rank}</small>
+                                            Spell {spell.power} <i>(SL. Rank: {spell.rank})</i>
                                         </span>
 
                                     </div>
