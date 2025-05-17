@@ -286,13 +286,13 @@ const SpellManager = () => {
                 {/* Spell list */}
                 <ul className="list-group">
                     {spells.map((spell, index) => (
-                        <li key={spell.id} className="list-group-item spell-item">
+                        <li key={spell.id} className={`list-group-item spell-item ${flashingSpellId === spell.id ? 'quantity-flash' : ''}`}>
                             <div class="d-flex justify-content-left">
                                 <div className="d-flex align-items-center overflow-hidden" style={{ flex: '1 1 0' }}
                                     onClick={() => toggleExpandSpell(spell.id)}>
                                     <span
                                         id={`quantity-badge-${spell.id}`}
-                                        className={`text-black badge quantity-badge me-2 ${flashingSpellId === spell.id ? 'quantity-flash' : ''}`}
+                                        className="text-black badge quantity-badge me-2"
                                         style={{ width: '2.5rem', flexShrink: 0 }}
                                     >
                                         <small>{spell.quantity}</small>

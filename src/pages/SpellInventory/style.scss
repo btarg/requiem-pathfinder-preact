@@ -59,14 +59,13 @@
 
 .quantity-badge {
     background-color: whitesmoke;
-
-    &.quantity-flash {
-        animation: flash-update 0.2s;
-    }
+}
+.quantity-flash {
+    animation: flash-update 0.2s;
 }
 
 @keyframes flash-update {
-    50% { background-color: var(--bs-info); }
+    50% { border-color: var(--bs-info); }
 }
 
 /* Link badge responsiveness */
@@ -169,4 +168,11 @@
 .stat-text {
     font-size: 0.75rem;
     font-weight: bold;
+}
+
+ul > li {
+    background-color: transparent !important;
+}
+ul>li:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
 }

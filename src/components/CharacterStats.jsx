@@ -23,7 +23,7 @@ const CharacterStats = () => {
         return statsInCategory.length > 0 && (
             <div className="stat-category">
                 <h6 className="stat-category-title text-secondary mb-3">
-                    {category.charAt(0).toUpperCase() + category.slice(1)} Stats
+                    {category.toUpperCase()}
                 </h6>
                 <div className="stat-grid">
                     {statsInCategory.map(([statKey, config]) => (
