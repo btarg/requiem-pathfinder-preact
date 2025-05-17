@@ -8,15 +8,15 @@
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^6.7.2",
-		"bootstrap": "^5.3.3",
+		"bootstrap": "^5.3.6",
 		"dice-roller-parser": "^0.1.8",
-		"preact": "^10.13.1",
-		"preact-iso": "^2.3.1",
-		"preact-render-to-string": "^6.2.0",
-		"sass": "^1.85.0"
+		"preact": "^10.26.6",
+		"preact-iso": "^2.9.1",
+		"preact-render-to-string": "^6.5.13",
+		"sass": "^1.89.0"
 	},
 	"devDependencies": {
-		"@preact/preset-vite": "^2.5.0",
+		"@preact/preset-vite": "^2.10.1",
 		"vite": "^6.3.5"
 	}
 }
