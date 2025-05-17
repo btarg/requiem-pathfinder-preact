@@ -47,7 +47,7 @@ const QuickRolls = () => {
                         title={`Roll ${roll.name} (${STATS_CONFIG[roll.stat].shortName})`}
                     >
                         <i className={`fas ${STATS_CONFIG[roll.stat].icon} me-2`} style={{ width: '20px' }}></i>
-                        <span className="text-light">{roll.name}</span>
+                        <span>{roll.name}</span>
                     </button>
                 ))}
                 <button
@@ -60,7 +60,7 @@ const QuickRolls = () => {
                     title={`Roll ${initiativeRoll.name} (${STATS_CONFIG[initiativeRoll.stat].shortName})`}
                 >
                     <i className={`fas ${initiativeRoll.icon} text-${initiativeRoll.color} me-2`} style={{ width: '20px' }}></i>
-                    <span className="text-light">{initiativeRoll.name}</span>
+                    <span>{initiativeRoll.name}</span>
                 </button>
             </div>
 
