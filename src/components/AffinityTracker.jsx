@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'preact/hooks';
 import { CharacterContext } from '../context/CharacterContext';
 import { ElementType, AffinityType, getElementIcon } from '../config/enums';
 import './AffinityTracker.scss';
+import DecorativeTitle from './DecorativeTitle';
 
 const AffinityTracker = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
@@ -55,8 +56,8 @@ const AffinityTracker = () => {
 
     return (
         <div className="affinity-tracker p-3">
-            <h5 className="text-secondary-emphasis mb-4">ELEMENTAL AFFINITIES</h5>
-            <div className="element-grid">
+            <DecorativeTitle title="ELEMENTAL AFFINITIES" />
+            <div className="element-grid mt-4">
                 {Object.entries(ElementType).map(([key, element]) => (
                     <div key={key} className="element-item mb-2">
                                                 <div className="element-header d-flex align-items-center mb-1">

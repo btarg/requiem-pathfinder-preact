@@ -5,7 +5,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 export function SpellsPage() {
     return (
         <div className="spell-inventory container-fluid">
-            <div className="row g-0">
+            <div className="row">
                 {/* Stats - full width on mobile, 4 columns on desktop */}
                 <div className="col-12 col-md-4 order-2 order-md-1" style={{ minHeight: '50vh', overflowY: 'auto' }}>
                     <CharacterStats />

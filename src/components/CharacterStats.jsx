@@ -4,6 +4,7 @@ import { STATS_CONFIG } from '../config/stats';
 import { STAT_CATEGORIES } from '../types/statTypes';
 import { useSpellContext } from '../context/SpellContext';
 import { getLinkStatBonus } from '../utils/diceHelpers';
+import DecorativeTitle from './DecorativeTitle';
 const CharacterStats = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
     const { spells } = useSpellContext();
@@ -66,8 +67,8 @@ const CharacterStats = () => {
     };
 
     return (
-        <div className="character-stats p-4 rounded">
-            <h5 className="mb-1 text-secondary-emphasis mb-4">STATS</h5>
+        <div className="character-stats">
+            <DecorativeTitle title="STATS" lineMaxWidth='50px' />
             {renderStatGroup(STAT_CATEGORIES.PHYSICAL)}
             {renderStatGroup(STAT_CATEGORIES.MAGICAL)}
             {renderStatGroup(STAT_CATEGORIES.UTILITY)}

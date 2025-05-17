@@ -8,7 +8,7 @@ export function CharacterSheet() {
         <div className="character-sheet container-fluid">
             <div className="row g-0">
                 <HitPoints />
-                <QuickRolls />
+                {/* <QuickRolls /> */}
                 <AffinityTracker />
             </div>
         </div>

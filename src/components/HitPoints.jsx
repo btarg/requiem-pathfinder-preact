@@ -134,7 +134,7 @@ export default function HitPoints() {
 
     return (
         <div className="mt-4 mb-4">
-            <div className="row justify-content-center align-items-start p-3">
+            <div className="row justify-content-center align-items-start px-3">
                 {/* HP Section */}
                 <div className="hp-section col-12 col-md-6 d-flex flex-column align-items-sm-start"> 
                     <div className="d-flex justify-content-between align-items-center mb-4">

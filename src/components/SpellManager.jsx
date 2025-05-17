@@ -10,6 +10,7 @@ import EditSpellEntryModal from "./modals/EditSpellEntryModal";
 import LinkSpellModal from "./modals/LinkSpellModal";
 import ToastManager from "./ToastManager";
 import { MAX_SPELL_STACKS } from "../config/constants";
+import DecorativeTitle from "./DecorativeTitle";
 
 const SpellManager = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
@@ -277,18 +278,10 @@ const SpellManager = () => {
     return (
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container">
-                <h5 className="mb-1 text-secondary-emphasis mb-4">STOCKED SPELLS</h5>
-                <button className="btn dark-btn mb-4" onClick={() => openEditModal()}>
+                <DecorativeTitle title="STOCKED SPELLS" lineMaxWidth="50px" />
+                <button className="btn dark-btn mb-4 mt-4" onClick={() => openEditModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
-
-                {/* <div className="mb-3">
-                    {Object.entries(characterStats).map(([key, value]) => (
-                        <span key={key} className="badge bg-secondary me-2">
-                            {key}: {value}
-                        </span>
-                    ))}
-                </div> */}
 
                 {/* Spell list */}
                 <ul className="list-group">

@@ -3,6 +3,7 @@ import { useSpellContext } from '../context/SpellContext';
 import { getLinkStatBonus } from '../utils/diceHelpers';
 import { capitalizeFirstLetter } from '../utils/commonUtils';
 import { STATS_CONFIG } from '../config/stats';
+import DecorativeTitle from './DecorativeTitle';
 
 const QuickRolls = () => {
     const { showToast } = ToastManager();
@@ -30,8 +31,10 @@ const QuickRolls = () => {
     const initiativeRoll = { name: 'Initiative', stat: 'speed', icon: 'fa-bolt' };
 
     return (
-        <div className="save-rolls p-3 mb-4">
-            <h5 className="text-secondary-emphasis mb-4">QUICK ROLLS</h5>
+        <div className="save-rolls">
+            
+            <DecorativeTitle title="QUICK ROLLS" />
+
             <div className="d-flex flex-wrap gap-2 align-items-center justify-content-center">
                 {saveRolls.map((roll) => (
                     <button
@@ -60,6 +63,7 @@ const QuickRolls = () => {
                     <span className="text-light">{initiativeRoll.name}</span>
                 </button>
             </div>
+
         </div>
     );
 };

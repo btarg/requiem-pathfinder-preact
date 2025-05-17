@@ -35,6 +35,7 @@ span.action {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+    text-align: center;
 }
 
 
@@ -46,7 +47,6 @@ main {
     align-items: stretch;
     max-width: 1280px;
     margin: 0 auto;
-    text-align: center;
 }
 
 @media (max-width: 639px) {
