@@ -84,7 +84,7 @@ export const STATS_CONFIG = {
         icon: "fa-running",
         color: "secondary-emphasis",
         description: "Bonus to Initiative and movement distance per turn",
-        category: STAT_CATEGORIES.UTILITY,
+        category: STAT_CATEGORIES.PHYSICAL,
         type: STAT_TYPES.UTILITY,
         defaultValue: 0,
         displayModifier: true,
