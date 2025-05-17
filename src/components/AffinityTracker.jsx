@@ -55,7 +55,7 @@ const AffinityTracker = () => {
 
     return (
         <div className="affinity-tracker p-3">
-            <h5 className="text-secondary-emphasis mb-3">ELEMENTAL AFFINITIES</h5>
+            <h5 className="text-secondary-emphasis mb-4">ELEMENTAL AFFINITIES</h5>
             <div className="element-grid">
                 {Object.entries(ElementType).map(([key, element]) => (
                     <div key={key} className="element-item mb-2">

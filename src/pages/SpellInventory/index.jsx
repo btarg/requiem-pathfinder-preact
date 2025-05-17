@@ -11,8 +11,8 @@ export function SpellsAndStats() {
         <div className="spell-inventory container-fluid">
             <div className="row g-0">
                 <QuickRolls />
-                <AffinityTracker />
                 <HitPoints />
+                <AffinityTracker />
                 
                               
                 {/* SpellManager - full width on mobile, 9 columns on desktop */}

@@ -138,7 +138,7 @@ export default function HitPoints() {
                 {/* HP Section */}
                 <div className="hp-section col-12 col-md-6 d-flex flex-column align-items-sm-start"> 
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h5 className="mb-1 text-secondary-emphasis">HIT POINTS</h5>
+                        <h5 className="mb-1 text-secondary-emphasis">HIT POINTS (HP)</h5>
                     </div>
 
                     <div className="d-flex gap-3 mb-3">
@@ -238,7 +238,7 @@ export default function HitPoints() {
                 {/* MP Section */}
                 <div className="mp-section col-12 col-md-6 d-flex flex-column align-items-sm-end"> 
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h5 className="mb-1 text-secondary-emphasis">MANA POINTS</h5>
+                        <h5 className="mb-1 text-secondary-emphasis">MANA POINTS (MP)</h5>
                     </div>
 
                     <div className="d-flex gap-3 mb-3">
@@ -314,7 +314,7 @@ export default function HitPoints() {
                 </div>
             </div>
             {/* New Health Bar Section - Spanning the width below HP and MP trackers */}
-            <div className="row justify-content-center px-3">
+            <div className="row justify-content-center px-3 mb-1">
                 <div className="col-12">
                     <div className="progress" style={{ height: '16px' }}>
                         <div
