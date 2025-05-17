@@ -3,7 +3,7 @@ import { CharacterContext } from '../context/CharacterContext';
 import { STATS_CONFIG } from '../config/stats';
 import { STAT_CATEGORIES } from '../types/statTypes';
 import { useSpellContext } from '../context/SpellContext';
-import { calculateStatBonus, getLinkStatBonus } from '../utils/diceHelpers';
+import { getLinkStatBonus } from '../utils/diceHelpers';
 const CharacterStats = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
     const { spells } = useSpellContext();
@@ -34,8 +34,9 @@ const CharacterStats = () => {
                             data-bs-placement="top"
                         >
                             <div className="input-group">
-                                <span className="input-group-text">
-                                    <i className={`fas ${config.icon} text-${config.color || "secondary"}`}></i>
+                                {/* Updated to add shortname text */}
+                                <span className={`input-group-text gap-1 text-${config.color}`}>
+                                    <i className={`fas ${config.icon}`}></i> <span class="stat-text">{config.shortName}</span>
                                 </span>
                                 <input
                                     type="number"

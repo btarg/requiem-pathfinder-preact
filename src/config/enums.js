@@ -8,7 +8,15 @@ export const ElementType = Object.freeze({
     CHEM: "Chemical",
     RAD: "Radiant",
     VOID: "Void",
-    ALMIGHTY: "Almighty",
+    TRUE: "Almighty",
+});
+
+export const AffinityType = Object.freeze({
+    WEAK: "Weak",
+    NEUTRAL: "Neutral",
+    RESIST: "Resist",
+    IMMUNE: "Immune",
+    ABSORB: "Drain",
 });
 
 export const getElementIcon = (element) => {

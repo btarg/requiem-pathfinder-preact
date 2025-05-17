@@ -7,6 +7,7 @@
     width: 80px !important;
 }
 
+
 .form-control:focus {
     box-shadow: none;
     border-color: var(--bs-primary);
@@ -27,7 +28,8 @@
 
 .damage-flash,
 .heal-flash,
-.temp-flash {
+.temp-flash,
+.mp-flash {
     animation-duration: 0.3s;
     animation-timing-function: ease;
 }
@@ -43,6 +45,11 @@
 .temp-flash {
     animation-name: flash-blue;
 }
+
+.mp-flash {
+    animation-name: flash-blue;
+}
+
 
 @keyframes flash-red {
     from {

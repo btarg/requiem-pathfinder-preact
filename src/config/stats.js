@@ -11,6 +11,16 @@ export const STATS_CONFIG = {
         label: 'Max HP',
         type: STAT_TYPES.CORE
     },
+    currentMp: {
+        defaultValue: 10,
+        label: 'Current MP',
+        type: STAT_TYPES.CORE
+    },
+    maxMp: {
+        defaultValue: 10,
+        label: 'Max MP',
+        type: STAT_TYPES.CORE
+    },
     tempHealth: {
         defaultValue: 0,
         label: 'Temporary HP',
@@ -85,7 +95,7 @@ export const STATS_CONFIG = {
     },
     luck: {
         name: "Luck",
-        shortName: "LUCK",
+        shortName: "LCK",
         icon: "fa-clover",
         color: "success",
         description: "Affects spell draws and knockdown resistance",
