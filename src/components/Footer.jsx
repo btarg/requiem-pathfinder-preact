@@ -1,6 +1,7 @@
 import { useLocation } from 'preact-iso';
 import { BASE_URL } from '../config/constants.js';
 import DecorativeTitle from './DecorativeTitle.jsx';
+import QuickRolls from './QuickRolls.jsx';
 
 const Footer = ({ buildDate }) => {
     const { url } = useLocation();
@@ -24,24 +25,8 @@ const Footer = ({ buildDate }) => {
                         )}
                     </div>
                      
-                    {/* Center Section: Navigation */}
                     <div className="col-4 text-center">
-                        <nav className="btn-group" role="group" aria-label="Main navigation">
-                            <a
-                                className={`btn ${url === characterSheetPath ? 'dark-btn-secondary' : 'dark-btn'}`}
-                                href={characterSheetPath}
-                            >
-                                Character Sheet
-                            </a>
-                            <a
-                                className={`btn ${url === spellsPath ? 'dark-btn-secondary' : 'dark-btn'}`}
-                                href={spellsPath}
-                            >
-                                Spell Inventory
-                            </a>
-                        </nav>
-                        
-                    <DecorativeTitle title="NAVIGATION" containerClassName='mt-3' />
+                        <QuickRolls />
                     </div>
                     
                     {/* Right Section: Wiki Link */}

@@ -108,17 +108,6 @@ export const STATS_CONFIG = {
             knockdownBonus: (value) => value // Flat bonus to Fortitude saves
         }
     },
-    influence: {
-        name: "Influence",
-        shortName: "INF",
-        icon: "fa-comments",
-        color: "warning",
-        description: "Used for social rolls, such as Deception, Intimidation, Performance, Diplomacy and Persuasion.",
-        category: STAT_CATEGORIES.UTILITY,
-        type: STAT_TYPES.UTILITY,
-        defaultValue: 0,
-        displayModifier: true,
-    },
     perception: {
         name: "Perception",
         shortName: "PER",
@@ -136,6 +125,17 @@ export const STATS_CONFIG = {
         icon: "fa-book-open",
         color: "warning-emphasis",
         description: "Used for Recalling Knowledge of any kind: essentially every Pathfinder 2E lore skill rolled into one. Also useful in social situations.",
+        category: STAT_CATEGORIES.UTILITY,
+        type: STAT_TYPES.UTILITY,
+        defaultValue: 0,
+        displayModifier: true,
+    },
+    influence: {
+        name: "Influence",
+        shortName: "INF",
+        icon: "fa-comments",
+        color: "warning",
+        description: "Used for social rolls, such as Deception, Intimidation, Performance, Diplomacy and Persuasion.",
         category: STAT_CATEGORIES.UTILITY,
         type: STAT_TYPES.UTILITY,
         defaultValue: 0,

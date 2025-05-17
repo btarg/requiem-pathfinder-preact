@@ -32,8 +32,8 @@ const QuickRolls = () => {
 
     return (
         <div className="save-rolls">
-            
-            <DecorativeTitle title="QUICK ROLLS" />
+
+            {/* <DecorativeTitle title="QUICK ROLLS" /> */}
 
             <div className="d-flex flex-wrap gap-2 align-items-center justify-content-center">
                 {saveRolls.map((roll) => (
@@ -62,8 +62,11 @@ const QuickRolls = () => {
                     <i className={`fas ${initiativeRoll.icon} text-${initiativeRoll.color} me-2`} style={{ width: '20px' }}></i>
                     <span>{initiativeRoll.name}</span>
                 </button>
+
+
             </div>
 
+            <DecorativeTitle title="QUICK ROLLS" containerClassName='mt-3' />
         </div>
     );
 };
