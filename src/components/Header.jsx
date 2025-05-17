@@ -12,7 +12,7 @@ export function Header() {
         <header className="header mb-4">
             <div className="d-flex justify-content-center align-items-center p-3 border-bottom">
                 <div className="col-4 text-center">
-                    <DecorativeTitle title="NAVIGATION" containerClassName='mb-3 arsenal' />
+                    <DecorativeTitle title="NAVIGATION" containerClassName='mb-3' />
                     <nav className="btn-group gap-2" role="group" aria-label="Main navigation">
                         <button
                             className={`dark-btn dark-btn-primary ${url === characterSheetPath ? 'dark-btn-active' : ''}`}

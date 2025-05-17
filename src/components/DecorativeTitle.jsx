@@ -24,7 +24,7 @@ const DecorativeTitle = ({
                         backgroundImage: `linear-gradient(to right, transparent, ${lineColor})`
                     }}
                 ></div>
-                <h5 className={`${titleClassName} mx-3 my-0`}>{title}</h5>
+                <h5 className={`${titleClassName} mx-3 my-0 arsenal`}>{title}</h5>
                 {/* Right line with fade */}
                 <div
                     className="flex-grow-1" // Still allows growing up to maxWidth and shrinking

@@ -66,7 +66,7 @@ const QuickRolls = () => {
 
             </div>
 
-            <DecorativeTitle title="QUICK ROLLS" containerClassName='mt-3 arsenal' />
+            <DecorativeTitle title="QUICK ROLLS" containerClassName='mt-3' />
         </div>
     );
 };

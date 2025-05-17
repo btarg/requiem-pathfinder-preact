@@ -178,10 +178,10 @@
 }
 
 ul > li {
-    background-color: transparent !important;
+    background-color: var(--bs-bg-dark) !important;
 }
 ul>li:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: var(--gray-700) !important;
 }
 
 .action-label {
