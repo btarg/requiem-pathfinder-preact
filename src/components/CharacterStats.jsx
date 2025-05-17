@@ -20,6 +20,11 @@ const CharacterStats = () => {
         }));
     };
 
+    // Calculate total allocated stat points (excluding CORE stats)
+    const statTotal = Object.entries(characterStats)
+        .filter(([statKey]) => STATS_CONFIG[statKey]?.category !== STAT_CATEGORIES.CORE)
+        .reduce((acc, [_, val]) => acc + (parseInt(val, 10) || 0), 0);
+
     const copyStatCheckRoll = (stat) => {
         // Ask the user to input a DC, where leaving it as zero will just do a normal roll
         const dc = prompt("Enter a DC for the roll (leave blank for normal roll):");
@@ -59,14 +64,16 @@ const CharacterStats = () => {
 
         return statsInCategory.length > 0 && (
             <div className="stat-category">
-                <h6 className="stat-category-title text-secondary mb-3">
+                <h6 className="stat-category-title text-secondary mb-2">
                     {category.toUpperCase()}
                 </h6>
+                
+                {/* <DecorativeTitle title={category.toUpperCase()} lineMaxWidth='25px' titleClassName='h6 text-secondary' containerClassName='mb-2' lineColor='var(--bs-secondary)' /> */}
                 <div className="stat-grid">
                     {statsInCategory.map(([statKey, config]) => (
                         <div
                             key={statKey}
-                            className="stat-group mb-3"
+                            className="stat-group mb-2"
                             title={`${config.name} ${config.description}`}
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
@@ -113,7 +120,11 @@ const CharacterStats = () => {
 
     return (
         <div className="character-stats">
-            <DecorativeTitle title="STATS" lineMaxWidth='50px' />
+            <DecorativeTitle title="STATS" lineMaxWidth='50px' containerClassName='mb-1' />
+            {/* <DecorativeTitle title={`BASE ALLOCATED POINTS: ${statTotal}`} lineMaxWidth='50px' titleClassName='h6 text-danger' /> */}
+            <h6 className="stat-category-title text-danger mb-4">
+                BASE ALLOCATED POINTS: {statTotal}
+            </h6>
             {renderStatGroup(STAT_CATEGORIES.PHYSICAL)}
             {renderStatGroup(STAT_CATEGORIES.MAGICAL)}
             {renderStatGroup(STAT_CATEGORIES.UTILITY)}
