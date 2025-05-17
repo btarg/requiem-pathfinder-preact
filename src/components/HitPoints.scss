@@ -13,12 +13,6 @@
     border-color: var(--bs-primary);
 }
 
-.progress {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    height: 12px;
-}
-
 .hp-input::-webkit-inner-spin-button,
 .hp-input::-webkit-outer-spin-button {
     opacity: 1;
@@ -50,6 +44,9 @@
     animation-name: flash-blue;
 }
 
+.progress-bar {
+    text-shadow: 0 0 2px black;
+}
 
 @keyframes flash-red {
     from {

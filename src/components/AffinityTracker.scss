@@ -1,0 +1,39 @@
+.affinity-tracker {
+    margin-top: 1rem;
+}
+
+.element-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.element-item {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+// .element-header {
+//     font-weight: bold;
+// }
+
+.affinity-buttons .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.affinity-text {
+    margin-left: 0.25rem;
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .element-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    
+    .affinity-buttons .btn {
+        padding: 0.25rem;
+    }
+}

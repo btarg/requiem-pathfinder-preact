@@ -119,17 +119,26 @@ export default function HitPoints() {
         }
     }
 
-    const healthPercentage = (characterStats.currentHealth / characterStats.maxHealth) * 100
-    const tempHealthPercentage = (characterStats.tempHealth / characterStats.maxHealth) * 100
-    const mpPercentage = (characterStats.currentMp / characterStats.maxMp) * 100
+    const safeCurrentHealth = characterStats.currentHealth || 0;
+    // Ensure maxHealth is at least 1 for division, defaulting to 0 if undefined then taking max with 1.
+    const safeMaxHealth = Math.max(1, characterStats.maxHealth || 0);
+    const safeTempHealth = characterStats.tempHealth || 0;
+
+    const healthPercentage = (safeCurrentHealth / safeMaxHealth) * 100;
+    const tempHealthPercentage = (safeTempHealth / safeMaxHealth) * 100;
+
+    // Ensure mp values are also safe for calculation, though useEffect handles initialization.
+    const safeCurrentMp = characterStats.currentMp || 0;
+    const safeMaxMp = Math.max(1, characterStats.maxMp || 0);
+    const mpPercentage = (safeCurrentMp / safeMaxMp) * 100;
 
     return (
-        <div className="mt-4">
-            <div className="row justify-content-center align-items-start">
+        <div className="mt-4 mb-4">
+            <div className="row justify-content-center align-items-start p-3">
                 {/* HP Section */}
-                <div className="hp-section col-12 col-md-6 d-flex flex-column align-items-center"> 
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h5 className="m-0 text-secondary-emphasis">HIT POINTS</h5>
+                <div className="hp-section col-12 col-md-6 d-flex flex-column align-items-sm-start"> 
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h5 className="mb-1 text-secondary-emphasis">HIT POINTS</h5>
                     </div>
 
                     <div className="d-flex gap-3 mb-3">
@@ -150,7 +159,7 @@ export default function HitPoints() {
                                 </div>
 
                                 <div className="d-flex align-items-center justify-content-center" style={{ width: '40px', height: '80px' }}>
-                                    <span className="h4 m-0 text-secondary">+</span>
+                                    <span className="h4 mb-1 text-secondary">+</span>
                                 </div>
 
                                 <div className="text-center">
@@ -171,7 +180,7 @@ export default function HitPoints() {
                                 </div>
 
                                 <div className="d-flex align-items-center justify-content-center" style={{ width: '40px', height: '80px' }}>
-                                    <span className="h4 m-0 text-secondary">/</span>
+                                    <span className="h4 mb-1 text-secondary">/</span>
                                 </div>
 
                                 <div className="text-center">
@@ -223,39 +232,13 @@ export default function HitPoints() {
                             </div>
                         </div>
                     </div>
-                    {/* Health bar */}
-                    <div className="progress mt-2 mb-3">
-                        <div
-                            className="progress-bar progress-bar-striped bg-info"
-                            style={{
-                                width: `${tempHealthPercentage}%`,
-                                transition: 'width 0.3s ease-in-out'
-                            }}
-                            role="progressbar"
-                            aria-valuenow={characterStats.tempHealth}
-                            aria-valuemin={0}
-                            aria-valuemax={characterStats.maxHealth}
-                        >
-                        </div>
-                        <div
-                            className="progress-bar bg-success"
-                            style={{
-                                width: `${healthPercentage}%`,
-                                transition: 'width 0.3s ease-in-out'
-                            }}
-                            role="progressbar"
-                            aria-valuenow={characterStats.currentHealth}
-                            aria-valuemin={0}
-                            aria-valuemax={characterStats.maxHealth}
-                        >
-                        </div>
-                    </div>
+                    
                 </div>
 
                 {/* MP Section */}
-                <div className="mp-section col-12 col-md-6 d-flex flex-column align-items-center"> 
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h5 className="m-0 text-secondary-emphasis">MANA POINTS</h5>
+                <div className="mp-section col-12 col-md-6 d-flex flex-column align-items-sm-end"> 
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h5 className="mb-1 text-secondary-emphasis">MANA POINTS</h5>
                     </div>
 
                     <div className="d-flex gap-3 mb-3">
@@ -276,7 +259,7 @@ export default function HitPoints() {
                                 </div>
 
                                 <div className="d-flex align-items-center justify-content-center" style={{ width: '40px', height: '80px' }}>
-                                    <span className="h4 m-0 text-secondary">/</span>
+                                    <span className="h4 mb-1 text-secondary">/</span>
                                 </div>
 
                                 <div className="text-center">
@@ -327,23 +310,43 @@ export default function HitPoints() {
                             </div>
                         </div>
                     </div>
-                    {/* Mana bar */}
-                    <div className="progress mt-2 mb-3">
+                    
+                </div>
+            </div>
+            {/* New Health Bar Section - Spanning the width below HP and MP trackers */}
+            <div className="row justify-content-center px-3">
+                <div className="col-12">
+                    <div className="progress" style={{ height: '16px' }}>
                         <div
-                            className="progress-bar bg-primary"
+                            className="progress-bar progress-bar-striped bg-info"
                             style={{
-                                width: `${mpPercentage}%`,
+                                width: `${tempHealthPercentage}%`,
                                 transition: 'width 0.3s ease-in-out'
                             }}
                             role="progressbar"
-                            aria-valuenow={characterStats.currentMp}
+                            aria-valuenow={safeTempHealth}
                             aria-valuemin={0}
-                            aria-valuemax={characterStats.maxMp}
+                            aria-valuemax={safeMaxHealth}
                         >
+                            {safeTempHealth > 0 ? `${safeTempHealth} Temp` : ''}
+                        </div>
+                        <div
+                            className="progress-bar bg-success"
+                            style={{
+                                width: `${healthPercentage}%`,
+                                transition: 'width 0.3s ease-in-out'
+                            }}
+                            role="progressbar"
+                            aria-valuenow={safeCurrentHealth}
+                            aria-valuemin={0}
+                            aria-valuemax={safeMaxHealth}
+                        >
+                            {safeCurrentHealth > 0 ? `${safeCurrentHealth} HP` : ''}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
     )
 }

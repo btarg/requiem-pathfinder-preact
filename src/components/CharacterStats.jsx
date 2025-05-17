@@ -67,7 +67,7 @@ const CharacterStats = () => {
 
     return (
         <div className="character-stats p-4 rounded">
-            <h5 className="m-0 text-secondary-emphasis mb-4">STATS</h5>
+            <h5 className="mb-1 text-secondary-emphasis mb-4">STATS</h5>
             {renderStatGroup(STAT_CATEGORIES.PHYSICAL)}
             {renderStatGroup(STAT_CATEGORIES.MAGICAL)}
             {renderStatGroup(STAT_CATEGORIES.UTILITY)}

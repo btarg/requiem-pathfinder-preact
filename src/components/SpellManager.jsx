@@ -277,7 +277,7 @@ const SpellManager = () => {
     return (
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container">
-                <h5 className="m-0 text-secondary-emphasis mb-4">STOCKED SPELLS</h5>
+                <h5 className="mb-1 text-secondary-emphasis mb-4">STOCKED SPELLS</h5>
                 <button className="btn dark-btn mb-4" onClick={() => openEditModal()}>
                     <i className="fas fa-plus"></i> Add Spell
                 </button>
