@@ -20,6 +20,10 @@
 
 .affinity-buttons .btn {
     padding: 0.25rem 0.25rem;
+    border-color: rgb(69, 69, 69);
+}
+.inactive-btn {
+    background-color: var(--bs-bg-dark);
 }
 
 .affinity-text {

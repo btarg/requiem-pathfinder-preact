@@ -131,19 +131,19 @@ const AffinityTracker = () => {
                                         background: 'none',
                                         color: currentAffinity.mastered ? 'gold' : 'currentColor',
                                         cursor: 'pointer',
-                                        fontSize: '1.25rem' // Adjust size as needed
+                                        fontSize: '1rem'
                                     }}
                                 >
                                     <i className={`${currentAffinity.mastered ? 'fas fa-star' : 'fa-regular fa-star'}`}></i>
                                 </button>
                             </div>
-                            <div className="affinity-buttons btn-group d-flex flex-wrap"> {/* Added flex-wrap */}
+                            <div className="affinity-buttons btn-group d-flex flex-wrap">
                                 {Object.values(AffinityType).map(affinityValue => (
                                     <button
                                         key={affinityValue}
-                                        className={`btn btn-${currentAffinity.type === affinityValue // Removed btn-sm
+                                        className={`btn btn-${currentAffinity.type === affinityValue
                                             ? getAffinityColor(affinityValue)
-                                            : 'outline-secondary'
+                                            : 'dark inactive-btn'
                                             }`}
                                         onClick={() => updateAffinityType(element, affinityValue)}
                                         title={affinityValue}
