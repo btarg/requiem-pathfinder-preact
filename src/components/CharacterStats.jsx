@@ -23,7 +23,11 @@ const CharacterStats = () => {
     const copyStatCheckRoll = (stat) => {
         // Ask the user to input a DC, where leaving it as zero will just do a normal roll
         const dc = prompt("Enter a DC for the roll (leave blank for normal roll):");
-        const dcValue = parseInt(dc, 10) || 0;
+        
+        // if cancelled, return
+        if (dc === null) return;
+
+        const dcValue = Math.max(0, parseInt(dc, 10));
         
         // Base roll calculation with the bonus
         const bonus = (characterStats[stat] || 0) + getLinkStatBonus(spells, stat);
@@ -31,12 +35,9 @@ const CharacterStats = () => {
         
         // Build the roll command
         let roll = `1d20+${bonus}`;
-        
-        // Add success/failure tracking for Roll20 if DC is provided
-        if (dcValue > 0) {
+        if (dcValue > 1) {
             roll = `${roll}cs>=${dcValue}cf<${dcValue}`;
         }
-        
         const checkString = dcValue ? `check vs DC ${dcValue}` : 'check';
         const command = `&{template:default} {{name=${capitalizeFirstLetter(stat)} ${checkString}}}` +
                        `{{Roll=[[${roll}]]}}` +
