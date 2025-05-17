@@ -6,12 +6,15 @@ export const ElementType = Object.freeze({
     FORCE: "Force",
     PSY: "Psychic",
     CHEM: "Chemical",
-    VIT: "Vitality",
-    VOID: "Void"
+    RAD: "Radiant",
+    VOID: "Void",
+    ALMIGHTY: "Almighty",
 });
 
 export const getElementIcon = (element) => {
     switch (element) {
+        case ElementType.PHYS:
+            return '⚔️';
         case ElementType.CHEM:
             return '🧪';
         case ElementType.ICE:
@@ -22,14 +25,14 @@ export const getElementIcon = (element) => {
             return '🔥';
         case ElementType.FORCE:
             return '💥';
-        case ElementType.VIT:
+        case ElementType.RAD:
             return '✨';
         case ElementType.VOID:
             return '🌌';
         case ElementType.PSY:
             return '🌀';
         default:
-            return '⚔️';
+            return '☄️';
     }
 
 };
