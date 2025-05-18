@@ -121,8 +121,8 @@ main {
 // Primary (Red)
 .dark-btn-primary {
     @extend .dark-btn;
-    color: #ff003c; // Initial text color
-    border-color: var(--bs-danger); // Initial border color
+    color: var(--bs-danger);
+    border-color: var(--bs-danger);
 
     &::before {
         background-color: var(--bs-danger);
