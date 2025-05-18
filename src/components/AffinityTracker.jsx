@@ -112,8 +112,10 @@ const AffinityTracker = () => {
     return (
         <div className="affinity-tracker p-3">
             <DecorativeTitle title="ELEMENTAL AFFINITIES" />
-            <div className="element-grid mt-4">
-                {Object.values(ElementType).map((element) => {
+            <div className="element-grid mt-4 gap-1">
+                {Object.values(ElementType)
+                    .filter(element => element !== "Almighty")
+                    .map((element) => {
                     const currentAffinity = characterStats.affinities[element] || { type: AffinityType.NEUTRAL, mastered: false };
                     return (
                         <div 

@@ -20,15 +20,13 @@
                 border-left-color 0.4s ease-out 0.1s, 
                 background-position 0.4s ease-out;
     max-height: 48px;
-    border-left: 3px solid transparent;
+    border-left: 3px solid gray;
 
-    background-image: linear-gradient(90deg, rgba(255, 217, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
-    background-size: 200% 100%;
-    background-position: -140% 0;
-    background-repeat: no-repeat;
-    text-shadow: 0 0 4px black;
+    background-color: var(--bs-bg-dark);
+    // Static grey gradient for default cards
+    background-image: linear-gradient(to right, rgb(50, 50, 50), transparent);
+    text-shadow: 0 0 12px rgba(0, 0, 0, 1), 0 0 16px rgba(0, 0, 0, 0.8);
 }
-
 
 .element-item .element-header,
 .element-item .affinity-buttons {
@@ -40,10 +38,22 @@
     max-height: 130px;
 }
 
+@keyframes sweep-in-and-stay {
+    from {
+        background-position: -100% 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
 .element-item.gold-bg {
     border-left-color: gold;
-    background-position: 0 0;
+    background-image: linear-gradient(90deg, rgba(255, 217, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%) !important;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    background-size: 200% 100%;
+    // background-position is handled by the animation
+    animation: sweep-in-and-stay 0.4s ease-out forwards;
 }
 
 .element-item.gold-bg .element-name {
@@ -70,11 +80,20 @@
     transition: opacity 0.3s ease-in, transform 0.3s ease-in;
 }
 
+@keyframes mastery-appear-anim {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .element-item.gold-bg .mastery-watermark {
-    opacity: 1;
+    opacity: 0;
     transform: translate(-50%, -50%) rotate(-15deg) scale(1);
-    animation: mastery-flash-anim 0.6s ease-out 0.4s;
-    transition-delay: 0.15s;
+    animation: mastery-appear-anim 0.15s ease-out 0.15s forwards,
+    mastery-flash-anim 0.6s ease-out 0.4s;
 }
 
 @keyframes mastery-flash-anim {
