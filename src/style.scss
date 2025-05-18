@@ -129,14 +129,12 @@ main {
     }
 
     &:hover,
-    &.dark-btn--active {
+    &:active {
         color: #1a1a1a; // Dark text for light fill
         border-color: #ffffff; // White border on hover/active
     }
     
     &:active {
-        color: #1a1a1a; // Persist hover text color
-        border-color: #ffffff; // Persist hover border color
         &::before {
             background-color: #e00034; // Darker red fill on active press
         }
@@ -154,14 +152,12 @@ main {
     }
 
     &:hover,
-    &.dark-btn--active {
+    &:active {
         color: #1a1a1a; // Dark text for light fill
         border-color: #ffffff; // White border on hover/active
     }
 
     &:active {
-        color: #1a1a1a; // Persist hover text color
-        border-color: #ffffff; // Persist hover border color
         &::before {
             background-color: #00b8e6; // Slightly darker blue on active press
         }
@@ -179,14 +175,12 @@ main {
     }
 
     &:hover,
-    &.dark-btn--active {
+    &:active {
         color: var(--bs-body-bg); // Dark text for gold fill
         border-color: #fffb00; // Brighter gold/white border
     }
     
     &:active {
-        color: var(--bs-body-bg); // Persist hover text color
-        border-color: #fffb00; // Persist hover border color
         &::before {
             background-color: #d4af00; // Darker gold fill on active press
         }

@@ -73,17 +73,23 @@ export function Header() {
                             }}
                             aria-disabled={currentPageIndex <= 0}
                         />
-                        {pages.map((page, index) => (
-                            <button
-                                key={page.path}
-                                className={`dark-btn dark-btn-primary ${url === page.path ? 'dark-btn-active' : ''}`}
-                                onClick={() => navigateTo(page.path)}
-                                data-bs-toggle="tooltip"
-                                title={`Navigate to ${page.title} (${index > 0 ? 'Left Arrow' : ''}${index > 0 && index < pages.length -1 ? ' / ' : ''}${index < pages.length - 1 ? 'Right Arrow' : ''})`}
-                            >
-                                <span>{page.title}</span>
-                            </button>
-                        ))}
+                        {pages.map((page, index) => {
+                            let buttonClasses = `dark-btn dark-btn-primary`; // Base classes
+                            if (url === page.path) {
+                                buttonClasses += '-active'; // Add active class separately
+                            }
+                            return (
+                                <button
+                                    key={page.path}
+                                    className={buttonClasses}
+                                    onClick={() => navigateTo(page.path)}
+                                    data-bs-toggle="tooltip"
+                                    title={`Navigate to ${page.title} (${index > 0 ? 'Left Arrow' : ''}${index > 0 && index < pages.length -1 ? ' / ' : ''}${index < pages.length - 1 ? 'Right Arrow' : ''})`}
+                                >
+                                    <span>{page.title}</span>
+                                </button>
+                            );
+                        })}
                         <img
                             src={RightArrowIcon}
                             alt="Navigate right"
