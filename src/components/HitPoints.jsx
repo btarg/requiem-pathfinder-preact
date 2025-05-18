@@ -1,7 +1,8 @@
-import { useEffect, useState, useContext } from 'preact/hooks'
+import { useEffect, useState, useContext, useRef } from 'preact/hooks'
 import { CharacterContext } from '../context/CharacterContext'
 import './HitPoints.scss'
 import DecorativeTitle from './DecorativeTitle'
+import ProgressBar from './ProgressBar'
 
 export default function HitPoints() {
     const { characterStats, setCharacterStats } = useContext(CharacterContext)
@@ -11,7 +12,17 @@ export default function HitPoints() {
     const [healed, setHealed] = useState(false)
     const [tempDamageTaken, setTempDamageTaken] = useState(false)
     const [mpChanged, setMpChanged] = useState(false)
-    const [tempHealed, setTempHealed] = useState(false) // ADDED: State for temp heal animation
+    const [tempHealed, setTempHealed] = useState(false)
+
+    // State for advanced health bar animations
+    const [previousMainHealth, setPreviousMainHealth] = useState(null);
+    const [previousTempHealth, setPreviousTempHealth] = useState(null);
+    const [isFlashingHP, setIsFlashingHP] = useState(false);
+    const [isFlashingTempHP, setIsFlashingTempHP] = useState(false);
+
+    // Refs for clearing timeouts
+    const mainHealthTrailTimeoutRef = useRef(null);
+    const tempHealthTrailTimeoutRef = useRef(null);
 
     // Animation effects
     useEffect(() => {
@@ -42,7 +53,6 @@ export default function HitPoints() {
         }
     }, [mpChanged])
 
-    // ADDED: useEffect for tempHealed animation
     useEffect(() => {
         if (tempHealed) {
             const timer = setTimeout(() => setTempHealed(false), 300);
@@ -68,25 +78,96 @@ export default function HitPoints() {
     }, [])
 
     const handleDamage = () => {
-        if (characterStats.tempHealth > 0) {
-            setTempDamageTaken(true)
-            const remainingDamage = amount - characterStats.tempHealth
-            updateHealth({
-                tempHealth: Math.max(0, characterStats.tempHealth - amount)
-            })
-            if (remainingDamage > 0) {
-                setDamageTaken(true)
-                updateHealth({
-                    currentHealth: Math.max(0, characterStats.currentHealth - remainingDamage)
-                })
-            }
-        } else {
-            setDamageTaken(true)
-            updateHealth({
-                currentHealth: Math.max(0, characterStats.currentHealth - amount)
-            })
+        // Clear any existing trail-clearing timeouts
+        if (mainHealthTrailTimeoutRef.current) {
+            clearTimeout(mainHealthTrailTimeoutRef.current);
+            mainHealthTrailTimeoutRef.current = null; // Explicitly nullify after clearing
         }
-        setAmount(1)
+        if (tempHealthTrailTimeoutRef.current) {
+            clearTimeout(tempHealthTrailTimeoutRef.current);
+            tempHealthTrailTimeoutRef.current = null; // Explicitly nullify after clearing
+        }
+
+        const currentCharacterTempHealth = characterStats.tempHealth || 0;
+        let tempHpShouldTrailThisTime = false;
+
+        // Store previous health states for trail animation
+        setPreviousMainHealth(characterStats.currentHealth);
+        if (currentCharacterTempHealth > 0) {
+            setPreviousTempHealth(currentCharacterTempHealth);
+            tempHpShouldTrailThisTime = true;
+        } else {
+            setPreviousTempHealth(null);
+        }
+
+        let newTempHealth = currentCharacterTempHealth;
+        let newCurrentHealth = characterStats.currentHealth;
+        let damageToApply = amount;
+        let tempTookActualDamage = false;
+        let mainTookActualDamage = false;
+
+        // Apply damage to Temp HP first
+        if (newTempHealth > 0) {
+            const damageToTemp = Math.min(damageToApply, newTempHealth);
+            if (damageToTemp > 0) {
+                newTempHealth -= damageToTemp;
+                damageToApply -= damageToTemp;
+                setTempDamageTaken(true); // For input field visual feedback
+                setIsFlashingTempHP(true); // Trigger flash animation for temp HP bar
+                tempTookActualDamage = true;
+            }
+        }
+
+        // Apply remaining damage to Current HP
+        if (damageToApply > 0 && newCurrentHealth > 0) {
+            const damageToMain = Math.min(damageToApply, newCurrentHealth);
+            if (damageToMain > 0) {
+                newCurrentHealth = Math.max(0, newCurrentHealth - damageToMain);
+                setDamageTaken(true); // For input field visual feedback
+                setIsFlashingHP(true); // Trigger flash animation for main HP bar
+                mainTookActualDamage = true;
+            }
+        }
+
+        // Manage flash state removal
+        if (mainTookActualDamage) {
+            setTimeout(() => setIsFlashingHP(false), 200); // Duration of flash animation
+        }
+        if (tempTookActualDamage) {
+            setTimeout(() => setIsFlashingTempHP(false), 200); // Duration of flash animation
+        }
+        
+        // Short delay before updating actual health values in context.
+        // This allows the flash to be perceived on the "old" health value state.
+        // The main bar fill will then animate to the new (lower) health.
+        // The trail bar will start from previousMainHealth/previousTempHealth.
+        setTimeout(() => {
+            setCharacterStats(prev => ({
+                ...prev,
+                currentHealth: newCurrentHealth,
+                tempHealth: newTempHealth
+            }));
+
+            // After trail animations should complete, reset previous health states
+            const trailAnimationClearDelay = 1000; // e.g., 0.7s (trail width) + 0.15s (trail delay) + buffer
+            
+            // Always schedule main health trail to clear, as setPreviousMainHealth() was called.
+            mainHealthTrailTimeoutRef.current = setTimeout(() => {
+                // Animate trail to current health instead of abruptly removing
+                setPreviousMainHealth(newCurrentHealth); 
+            }, trailAnimationClearDelay);
+            
+            // Schedule temp health trail to clear if a trail was initiated for this damage event.
+            if (tempHpShouldTrailThisTime) { 
+                tempHealthTrailTimeoutRef.current = setTimeout(() => {
+                    // Animate trail to current temp health instead of abruptly removing
+                    setPreviousTempHealth(newTempHealth);
+                }, trailAnimationClearDelay);
+            }
+
+        }, 50); // Small delay to commit stat changes after flash starts
+
+        setAmount(1);
     }
 
     const handleHeal = () => {
@@ -97,7 +178,6 @@ export default function HitPoints() {
         setAmount(1)
     }
 
-    // ADDED: Function to handle temporary healing
     const handleTempHeal = () => {
         setTempHealed(true);
         updateHealth({
@@ -139,25 +219,46 @@ export default function HitPoints() {
     }
 
     const safeCurrentHealth = characterStats.currentHealth || 0;
-    // Ensure maxHealth is at least 1 for division, defaulting to 0 if undefined then taking max with 1.
     const safeMaxHealth = Math.max(1, characterStats.maxHealth || 0);
     const safeTempHealth = characterStats.tempHealth || 0;
 
     const healthPercentage = (safeCurrentHealth / safeMaxHealth) * 100;
     const tempHealthPercentage = (safeTempHealth / safeMaxHealth) * 100;
 
-    // Ensure mp values are also safe for calculation, though useEffect handles initialization.
     const safeCurrentMp = characterStats.currentMp || 0;
     const safeMaxMp = Math.max(1, characterStats.maxMp || 0);
     const mpPercentage = (safeCurrentMp / safeMaxMp) * 100;
 
     return (
-        <div className="mt-4 mb-4">
+        <div className="mb-4">
             <div className="row justify-content-between align-items-start px-3">
-                {/* Left Column for HP, MP, and Health Bar */}
-                <div className="col-lg-8">
-                    {/* HP Section */}
-                    <div className="hp-section d-flex flex-column align-items-sm-start mb-4"> 
+
+                <div className="main-health-progress-container mb-4">
+                    <ProgressBar
+                        value={safeCurrentHealth}
+                        maxValue={safeMaxHealth}
+                        color="var(--bs-danger)"
+                        labelRight={`${safeCurrentHealth} / ${safeMaxHealth}`}
+                        trailingStartValue={previousMainHealth}
+                        trailColor="rgba(200, 0, 0, 0.7)" // Darker red for trail
+                        className={isFlashingHP ? 'progress-bar-damage-flash' : ''}
+                    />
+                    {(safeTempHealth > 0 || previousTempHealth !== null) && (
+                        <ProgressBar
+                            value={safeTempHealth}
+                            maxValue={safeMaxHealth}
+                            color="var(--bs-info)"
+                            labelCenter={safeTempHealth > 0 ? `${safeTempHealth} Temp` : ""}
+                            isOverlay={true}
+                            className={`health-overlay-bar ${isFlashingTempHP ? 'progress-bar-damage-flash' : ''}`}
+                            trailingStartValue={previousTempHealth}
+                            trailColor="rgba(0, 50, 200, 0.7)" // Darker blue for trail
+                        />
+                    )}
+                </div>
+
+                <div className="col-lg-7">
+                    <div className="hp-section d-flex flex-column align-items-sm-start mb-4">
                         <div className="d-flex justify-content-between align-items-center ">
                             <h5 className="mb-3 text-secondary-emphasis">HIT POINTS (HP)</h5>
                         </div>
@@ -173,7 +274,7 @@ export default function HitPoints() {
                                             onChange={(e) => updateHealth({
                                                 tempHealth: Math.max(0, parseInt(e.currentTarget.value) || 0)
                                             })}
-                                            className={`form-control hp-input text-center bg-dark text-light ${tempDamageTaken ? 'damage-flash' : ''} ${tempHealed ? 'temp-flash' : ''}`} // ADDED: tempHealed for animation
+                                            className={`form-control hp-input text-center bg-dark text-light ${tempDamageTaken ? 'damage-flash' : ''} ${tempHealed ? 'temp-flash' : ''}`}
                                             min="0"
                                             style={{ fontSize: '1.5rem', height: '80px' }}
                                         />
@@ -237,12 +338,11 @@ export default function HitPoints() {
                                         onChange={(e) => setAmount(Math.max(1, parseInt(e.currentTarget.value) || 1))}
                                         className="form-control hp-input text-center bg-dark text-light"
                                         min="1"
-                                        style={{ fontSize: '1.5rem', height: '80px' }} // Adjusted height to match buttons
+                                        style={{ fontSize: '1.5rem', height: '80px' }}
                                     />
                                 </div>
-                                {/* Heal buttons */}
                                 <div className="d-flex flex-column align-items-center" style={{ width: '80px', height: '80px' }}>
-                                    
+
                                     <br />
                                     <div className="btn-group-vertical" style={{ width: '80px' }}>
                                         <button
@@ -272,9 +372,7 @@ export default function HitPoints() {
                             </div>
                         </div>
                     </div>
-                    {/* End HP Section */}
 
-                    {/* MP Section */}
                     <div className="mp-section d-flex flex-column align-items-sm-start">
                         <div className="d-flex justify-content-between align-items-center">
                             <h5 className="mb-3 text-secondary-emphasis">MANA POINTS (MP)</h5>
@@ -350,55 +448,18 @@ export default function HitPoints() {
                             </div>
                         </div>
                     </div>
-                    {/* End MP Section */}
 
-                    {/* Health Bar Section - Spanning the width of the left column */}
-                    <div className="row justify-content-center px-0 mb-1"> {/* px-0 to use full width of parent col */}
-                        <div className="col-12">
-                            <div className="progress" style={{ height: '16px' }}>
-                                <div
-                                    className="progress-bar progress-bar-striped bg-info"
-                                    style={{
-                                        width: `${tempHealthPercentage}%`,
-                                        transition: 'width 0.3s ease-in-out'
-                                    }}
-                                    role="progressbar"
-                                    aria-valuenow={safeTempHealth}
-                                    aria-valuemin={0}
-                                    aria-valuemax={safeMaxHealth}
-                                >
-                                    {safeTempHealth > 0 ? `${safeTempHealth} Temp` : ''}
-                                </div>
-                                <div
-                                    className="progress-bar bg-success"
-                                    style={{
-                                        width: `${healthPercentage}%`,
-                                        transition: 'width 0.3s ease-in-out'
-                                    }}
-                                    role="progressbar"
-                                    aria-valuenow={safeCurrentHealth}
-                                    aria-valuemin={0}
-                                    aria-valuemax={safeMaxHealth}
-                                >
-                                    {safeCurrentHealth > 0 ? `${safeCurrentHealth} HP` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* End Health Bar Section */}
+                    
+                
                 </div>
-                {/* End Left Column */}
 
-                {/* Right Column for Conditions Tracker */}
                 <div className="col-lg-4">
                     <div className="conditions-tracker-placeholder p-3 border rounded bg-dark-subtle">
                         <h5 className="text-secondary-emphasis">CONDITIONS TRACKER</h5>
                         <p className="text-muted">(Placeholder for future implementation)</p>
-                        {/* Future content for conditions will go here */}
                     </div>
                 </div>
-                {/* End Right Column */}
             </div>
-        </div >
-    );
+        </div>
+    )
 }

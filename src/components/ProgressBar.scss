@@ -1,0 +1,137 @@
+// --- Configuration Variables ---
+$progress-bar-height: 30px;
+$progress-bar-point-width: 20px; // Horizontal extent of the pointed ends
+$progress-bar-label-color: white;
+$progress-bar-font-size: 0.8rem;
+$progress-bar-bg-color: #2c2c2c; // Background color of the track
+
+// --- Mixin for the pointed shape ---
+@mixin pointed-shape($point-extent) {
+    clip-path: polygon(0% 50%, // Left point tip
+        #{$point-extent} 0%, // Top-left of central rectangle
+        calc(100% - #{$point-extent}) 0%, // Top-right of central rectangle
+        100% 50%, // Right point tip
+        calc(100% - #{$point-extent}) 100%, // Bottom-right of central rectangle
+        #{$point-extent} 100% // Bottom-left of central rectangle
+    );
+}
+
+// --- Main container for the progress bar ---
+.progress-bar-pointed-container {
+    position: relative;
+    height: $progress-bar-height;
+    background-color: $progress-bar-bg-color;
+    // Ensure there's enough width for points to be visible
+    min-width: calc(2 * #{$progress-bar-point-width} + 20px);
+    @include pointed-shape($progress-bar-point-width);
+    display: flex; // Helps with vertical alignment of potential direct children
+    align-items: center;
+
+    // Modifier for overlay bars to make their track transparent
+    &--overlay {
+        background-color: transparent;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+    text-shadow: 0 0 4px black;
+}
+
+// --- Filled portion of the progress bar ---
+.progress-bar-pointed__fill {
+    position: absolute; // Positioned relative to the container
+    left: 0;
+    top: 0;
+    height: 100%;
+    // background-color is set via inline style in JSX
+    @include pointed-shape($progress-bar-point-width);
+    // The clip-path applies to the fill's own dimensions.
+    // If width is very small, points might look distorted or disappear.
+
+    // Skyrim-inspired enhancements & animation
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.05)); // Subtle sheen
+    transition: width 0.35s ease-out; // Animate width changes
+    // Test with a hardcoded color for the glow
+    filter: drop-shadow(0 0 5px lime) drop-shadow(0 0 10px lime);
+    z-index: 2; // Above trail
+}
+
+// --- Trail portion of the progress bar (shows damage taken) ---
+.progress-bar-pointed__trail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    @include pointed-shape($progress-bar-point-width);
+    // background-color is set via inline style from trailColor prop
+    transition: width 0.7s ease-out 0.15s; // Slower animation, slightly delayed
+    z-index: 1; // Behind main fill
+    opacity: 0.6;
+}
+
+// --- Damage Flash Animation ---
+@keyframes progressBarFlashEffect {
+    0%, 100% { 
+        opacity: 1; 
+        filter: brightness(1) drop-shadow(0 0 5px lime) drop-shadow(0 0 10px lime); // Assuming lime glow
+    }
+    50% { 
+        opacity: 0.7; 
+        filter: brightness(1.8) drop-shadow(0 0 8px white) drop-shadow(0 0 15px white); // Brighter flash
+    }
+}
+
+// Apply flash to the fill when .progress-bar-damage-flash is on the container
+.progress-bar-pointed-container.progress-bar-damage-flash {
+    .progress-bar-pointed__fill {
+        animation: progressBarFlashEffect 0.2s ease-in-out;
+    }
+    // Optionally, flash the trail too, or give it a different flash
+    // .progress-bar-pointed__trail {
+    //     animation: progressBarFlashEffect 0.2s ease-in-out; // or a different animation
+    // }
+}
+
+// --- Common styles for labels ---
+.progress-bar-pointed__label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $progress-bar-label-color;
+    font-size: $progress-bar-font-size;
+    font-weight: bold;
+    white-space: nowrap;
+    z-index: 10; // Ensure labels are on top of fills
+    padding: 0 5px; // Basic horizontal padding for labels
+
+    // --- Left-aligned label (inside the container) ---
+    &--left {
+        left: $progress-bar-point-width; // Start after the left point's tip
+        max-width: calc(40% - #{$progress-bar-point-width}); // Prevent overlap with other labels
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    // --- Centre-aligned label (child of __fill, so relative to it) ---
+    &--center {
+        // Positioned within the rectangular part of its parent (__fill)
+        left: $progress-bar-point-width;
+        right: $progress-bar-point-width; // Constrains width to central rect
+        display: block; // Allows text-align to work
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        // z-index is relative to its stacking context (__fill)
+        z-index: 5; // Above its own fill color
+    }
+
+    // --- Right-aligned label (inside the container) ---
+    &--right {
+        right: $progress-bar-point-width; // End before the right point's tip
+        text-align: right; // Align text to the right of its box
+        max-width: calc(40% - #{$progress-bar-point-width}); // Prevent overlap
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
