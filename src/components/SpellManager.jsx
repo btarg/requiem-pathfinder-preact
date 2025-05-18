@@ -37,11 +37,28 @@ const SpellManager = () => {
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
 
     const [expandedSpellId, setExpandedSpellId] = useState(null);
-    const [drawMasteryEnabled, setDrawMasteryEnabled] = useState(false); // State for the mastery toggle
+    const [isCtrlPressed, setIsCtrlPressed] = useState(false);
 
-    const handleDrawMasteryToggle = (e) => {
-        setDrawMasteryEnabled(e.target.checked);
-    };
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Control') {
+                setIsCtrlPressed(true);
+            }
+        };
+        const handleKeyUp = (event) => {
+            if (event.key === 'Control') {
+                setIsCtrlPressed(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
 
     const spellIsMastered = (spellToDraw) => {
         if (!spellToDraw) {
@@ -56,10 +73,6 @@ const SpellManager = () => {
         }
         handleRollToDraw(spellIsMastered(spellToDraw));
     }
-    // Why is this even necessary?
-    const handleRollToDrawButton = () => {
-        handleRollToDraw(drawMasteryEnabled);
-    };
 
     const handleRollToDraw = (hasMastery) => {
 
@@ -327,33 +340,31 @@ const SpellManager = () => {
         openLinkModal(spell);
     };
 
-return (
+    return (
         <div className="spell-inventory" data-bs-theme="dark">
             <div className="container">
                 <DecorativeTitle title="SPELL INVENTORY" lineMaxWidth="50px" />
                 <div className="d-flex align-items-center justify-content-center mb-4">
-                    <div className="form-check form-switch me-3">
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            role="switch"
-                            id="drawMasteryToggle"
-                            checked={drawMasteryEnabled}
-                            onChange={handleDrawMasteryToggle} // Using extracted handler
-                            style={{ cursor: 'pointer' }}
-                        />
-                        <label className="form-check-label text-light" htmlFor="drawMasteryToggle" style={{ cursor: 'pointer' }}>
-                            Mastery
-                        </label>
-                    </div>
-                <button className="dark-btn dark-btn-secondary me-2" onClick={handleRollToDrawButton}>
-                    <i className="fas fa-dice me-2"></i> <span>Roll to Draw</span>
-                </button>
-                <button className="dark-btn dark-btn-primary" onClick={() => openEditModal()}>
-                    <i className="fas fa-plus me-2"></i> <span>Add Spell</span>
-                </button>
+
+                    <button
+                        className={`dark-btn me-2 ${isCtrlPressed ? 'gold-button' : 'dark-btn-secondary'}`}
+                        onClick={(event) => handleRollToDraw(event.ctrlKey)}
+                        style={{ width: '160px', height: '60px' }}
+                    >
+                        <div className="d-flex flex-column align-items-center">
+                            <div><i className="fas fa-dice me-2"></i> <span>Roll to Draw</span></div>
+                            <span style={{ fontSize: '0.7em' }}>hold Ctrl for mastery</span>
+                        </div>
+                    </button>
+                    <button 
+                        className="dark-btn dark-btn-primary" 
+                        onClick={() => openEditModal()}
+                        style={{ width: '160px', height: '60px' }}
+                    >
+                        <i className="fas fa-plus me-2"></i> <span>Add Spell</span>
+                    </button>
                 </div>
-                
+
                 {/* Spell list */}
                 <ul className="list-group">
                     {spells.map((spell, index) => (
@@ -377,7 +388,7 @@ return (
                                         }}>
                                             {getActionLabel(spell.actions)}
                                         </span>
-                                        
+
                                     </div>
 
                                 </div>

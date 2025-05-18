@@ -158,7 +158,7 @@ export default function HitPoints() {
                                     />
                                 </div>
 
-                                <div className="d-flex align-items-center justify-content-center" style={{ width: '40px', height: '80px' }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ width: '20px', height: '80px' }}>
                                     <span className="h4 mb-1 text-secondary">+</span>
                                 </div>
 
@@ -179,7 +179,7 @@ export default function HitPoints() {
                                     />
                                 </div>
 
-                                <div className="d-flex align-items-center justify-content-center" style={{ width: '40px', height: '80px' }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ width: '20px', height: '80px' }}>
                                     <span className="h4 mb-1 text-secondary">/</span>
                                 </div>
 
@@ -258,7 +258,7 @@ export default function HitPoints() {
                                     />
                                 </div>
 
-                                <div className="d-flex align-items-center justify-content-center" style={{ width: '40px', height: '80px' }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ width: '20px', height: '80px' }}>
                                     <span className="h4 mb-1 text-secondary">/</span>
                                 </div>
 
