@@ -3,7 +3,7 @@ import './ProgressBar.scss';
 const ProgressBar = ({
     value,
     maxValue,
-    color,
+    color, // Can now be a single color string or an object { from: string, to: string }
     labelLeft = null,
     labelCenter = null,
     labelRight = null,
@@ -19,6 +19,14 @@ const ProgressBar = ({
     // Calculate trailPercentage if trailingStartValue is present
     if (trailingStartValue !== null) {
         trailPercentage = Math.min(Math.max((trailingStartValue / maxValue) * 100, 0), 100);
+    }
+
+    // Determine background style for the fill
+    let fillBackgroundStyle = {};
+    if (typeof color === 'object' && color.from && color.to) {
+        fillBackgroundStyle.backgroundImage = `linear-gradient(to right, ${color.from}, ${color.to} 100%)`;
+    } else {
+        fillBackgroundStyle.backgroundColor = color;
     }
 
     return (
@@ -49,8 +57,7 @@ const ProgressBar = ({
                 class="progress-bar-pointed__fill"
                 style={{
                     width: `${percentage}%`,
-                    backgroundColor: color,
-                    '--progress-fill-color': color // Set CSS custom property for the glow
+                    ...fillBackgroundStyle, // Apply either gradient or solid color
                 }}
             >
                 {labelCenter && (

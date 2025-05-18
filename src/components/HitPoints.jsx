@@ -136,7 +136,7 @@ export default function HitPoints() {
         if (tempTookActualDamage) {
             setTimeout(() => setIsFlashingTempHP(false), 200); // Duration of flash animation
         }
-        
+
         // Short delay before updating actual health values in context.
         // This allows the flash to be perceived on the "old" health value state.
         // The main bar fill will then animate to the new (lower) health.
@@ -150,15 +150,15 @@ export default function HitPoints() {
 
             // After trail animations should complete, reset previous health states
             const trailAnimationClearDelay = 1000; // e.g., 0.7s (trail width) + 0.15s (trail delay) + buffer
-            
+
             // Always schedule main health trail to clear, as setPreviousMainHealth() was called.
             mainHealthTrailTimeoutRef.current = setTimeout(() => {
                 // Animate trail to current health instead of abruptly removing
-                setPreviousMainHealth(newCurrentHealth); 
+                setPreviousMainHealth(newCurrentHealth);
             }, trailAnimationClearDelay);
-            
+
             // Schedule temp health trail to clear if a trail was initiated for this damage event.
-            if (tempHpShouldTrailThisTime) { 
+            if (tempHpShouldTrailThisTime) {
                 tempHealthTrailTimeoutRef.current = setTimeout(() => {
                     // Animate trail to current temp health instead of abruptly removing
                     setPreviousTempHealth(newTempHealth);
@@ -231,13 +231,14 @@ export default function HitPoints() {
 
     return (
         <div className="mb-4">
-            <div className="row justify-content-between align-items-start px-3">
-
-                <div className="main-health-progress-container mb-4">
+            {/* Container for all Progress Bars - Placed at the top */}
+            <div className="mb-4"> {/* Add bottom margin to separate from controls */}
+                {/* HP and Temp HP Bar Group for Overlay */}
+                <div style={{ position: 'relative' }} className="mb-2"> {/* mb-2 for spacing before MP bar if needed */}
                     <ProgressBar
                         value={safeCurrentHealth}
                         maxValue={safeMaxHealth}
-                        color="var(--bs-danger)"
+                        color={{ from: '#ef4444', to: '#e11d48' }} // Tailwind red-500 to rose-600
                         labelRight={`${safeCurrentHealth} / ${safeMaxHealth}`}
                         trailingStartValue={previousMainHealth}
                         trailColor="rgba(200, 0, 0, 0.7)" // Darker red for trail
@@ -247,7 +248,7 @@ export default function HitPoints() {
                         <ProgressBar
                             value={safeTempHealth}
                             maxValue={safeMaxHealth}
-                            color="var(--bs-info)"
+                            color={{ from: '#21d2ec', to: '#14b8a7' }}
                             labelCenter={safeTempHealth > 0 ? `${safeTempHealth} Temp` : ""}
                             isOverlay={true}
                             className={`health-overlay-bar ${isFlashingTempHP ? 'progress-bar-damage-flash' : ''}`}
@@ -257,6 +258,21 @@ export default function HitPoints() {
                     )}
                 </div>
 
+                {/* MP Bar */}
+                <ProgressBar
+                    value={safeCurrentMp}
+                    maxValue={safeMaxMp}
+                    color={{ from: '#3c82f6', to: '#6366f1' }}
+                    labelRight={`${safeCurrentMp} / ${safeMaxMp}`}
+                    className={mpChanged ? 'progress-bar-damage-flash' : ''}
+                // Trailing for MP might not be desired, adjust as needed
+                // trailingStartValue={safeCurrentMp} 
+                // trailColor="rgba(0, 50, 200, 0.7)" 
+                />
+            </div>
+
+            {/* Row for HP/MP controls and Conditions Tracker */}
+            <div className="row">
                 <div className="col-lg-7">
                     <div className="hp-section d-flex flex-column align-items-sm-start mb-4">
                         <div className="d-flex justify-content-between align-items-center ">
@@ -448,9 +464,6 @@ export default function HitPoints() {
                             </div>
                         </div>
                     </div>
-
-                    
-                
                 </div>
 
                 <div className="col-lg-4">
@@ -459,7 +472,7 @@ export default function HitPoints() {
                         <p className="text-muted">(Placeholder for future implementation)</p>
                     </div>
                 </div>
-            </div>
+            </div> {/* End of row */}
         </div>
     )
 }
