@@ -30,11 +30,11 @@ const Footer = ({ buildDate }) => {
                     </div>
                     
                     {/* Right Section: Wiki Link */}
-                    <div className="col-4 text-end">
+                    <div className="col-4 d-flex align-items-center justify-content-end">
                         {wikiUrl && (
-                            <a href={wikiUrl} target="_blank" rel="noopener noreferrer" className="btn dark-btn-primary">
-                                <i className="fas fa-book me-1"></i>
-                                Open Wiki <small><i class="fa-solid fa-arrow-up-right-from-square"></i></small>
+                            <a href={wikiUrl} target="_blank" rel="noopener noreferrer" className="dark-btn dark-btn-primary">
+                                <i className="fas fa-book me-2"></i>
+                                <span className="me-2">Open Wiki</span><i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '0.75rem' }}></i>
                             </a>
                         )}
                     </div>

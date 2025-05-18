@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'preact/hooks';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import { CharacterContext } from '../context/CharacterContext';
 import { ElementType, AffinityType, getElementIcon } from '../config/enums';
 import './AffinityTracker.scss';
@@ -11,6 +11,7 @@ import healIconSvg from '../assets/heart-plus.svg'; // Import heal SVG for Absor
 
 const AffinityTracker = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
+    const [editingElement, setEditingElement] = useState(null); // State to track which element is being edited
 
     useEffect(() => {
         // Initialize or update affinities structure if it doesn't exist or is in old format
@@ -39,6 +40,10 @@ const AffinityTracker = () => {
             }));
         }
     }, [characterStats.affinities, setCharacterStats]);
+
+    const handleElementClick = (element) => {
+        setEditingElement(prev => prev === element ? null : element); // Toggle or switch editing element
+    };
 
     const updateAffinityType = (element, affinityTypeValue) => {
         setCharacterStats(prev => ({
@@ -111,19 +116,29 @@ const AffinityTracker = () => {
                 {Object.values(ElementType).map((element) => {
                     const currentAffinity = characterStats.affinities[element] || { type: AffinityType.NEUTRAL, mastered: false };
                     return (
-                        <div key={element} className={`element-item mb-3 ${currentAffinity.mastered ? 'gold-bg' : ''}`}>
+                        <div 
+                            key={element} 
+                            className={`element-item clickable-card mb-3 ${currentAffinity.mastered ? 'gold-bg' : ''} ${editingElement === element ? 'editing' : ''}`}
+                            onClick={() => handleElementClick(element)} // Add click handler to the item
+                        >
+                            {currentAffinity.mastered && (
+                                <div className="mastery-watermark">MASTERY</div>
+                            )}
                             <div className="element-header d-flex align-items-center justify-content-between mb-1">
                                 <div className="d-flex align-items-center">
                                     
                                     <span className="element-name">
-                                        {getElementIcon(element)} {element}:
+                                        {getElementIcon(element)} <span className="arsenal">{element}:</span>
                                     </span>
-                                    <span className={`ms-1 text-${getAffinityColor(currentAffinity.type)}`}>
+                                    <span className={`arsenal ms-1 text-${getAffinityColor(currentAffinity.type)}`}>
                                         {currentAffinity.type}
                                     </span>
                                 </div>
                                 <button
-                                    onClick={() => toggleMastery(element)}
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); // Prevent click from bubbling to element-item
+                                        toggleMastery(element);
+                                    }}
                                     title={currentAffinity.mastered ? "Disable Mastery" : "Enable Mastery"}
                                     style={{
                                         border: 'none',
@@ -137,21 +152,26 @@ const AffinityTracker = () => {
                                     <i className={`${currentAffinity.mastered ? 'fas fa-star' : 'fa-regular fa-star'}`}></i>
                                 </button>
                             </div>
-                            <div className="affinity-buttons btn-group d-flex flex-wrap">
-                                {Object.values(AffinityType).map(affinityValue => (
-                                    <button
-                                        key={affinityValue}
-                                        className={`btn btn-${currentAffinity.type === affinityValue
-                                            ? getAffinityColor(affinityValue)
-                                            : 'dark inactive-btn'
-                                            }`}
-                                        onClick={() => updateAffinityType(element, affinityValue)}
-                                        title={affinityValue}
-                                    >
-                                        {getAffinityIcon(affinityValue)}
-                                    </button>
-                                ))}
-                            </div>
+                            {editingElement === element && ( // Conditionally render buttons
+                                <div className="affinity-buttons btn-group d-flex flex-wrap mt-2">
+                                    {Object.values(AffinityType).map(affinityValue => (
+                                        <button
+                                            key={affinityValue}
+                                            className={`btn btn-${currentAffinity.type === affinityValue
+                                                ? getAffinityColor(affinityValue)
+                                                : 'dark inactive-btn'
+                                                }`}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent click from bubbling to element-item
+                                                updateAffinityType(element, affinityValue);
+                                            }}
+                                            title={affinityValue}
+                                        >
+                                            {getAffinityIcon(affinityValue)}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     );
                 })}

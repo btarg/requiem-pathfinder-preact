@@ -1,34 +1,102 @@
+import { useEffect } from 'preact/hooks';
 import DecorativeTitle from './DecorativeTitle.jsx';
-import QuickRolls from './QuickRolls.jsx';
 import { BASE_URL } from '../config/constants.js';
-import { useLocation } from 'preact-iso';
+import { useLocation } from 'preact-iso'; // Import route for navigation
+
+import LeftArrowIcon from '../assets/keyboard_arrow_left_outline.svg';
+import RightArrowIcon from '../assets/keyboard_arrow_right_outline.svg';
+
+const pageRoutes = [
+    { id: 'character', title: 'Character Sheet' },
+    { id: 'spells', title: 'Spells' },
+    // Add more pages here in the future, e.g.:
+    // { id: 'inventory', title: 'Inventory' },
+];
+
+const pages = pageRoutes.map(page => ({
+    title: page.title,
+    path: page.id === 'character' 
+        ? BASE_URL 
+        : `${BASE_URL.replace(/\/$/, '')}/${page.id}`
+}));
 
 export function Header() {
+    const { url, route } = useLocation();
 
-    const { url } = useLocation();
-    const characterSheetPath = BASE_URL;
-    const spellsPath = BASE_URL === '/' ? '/spells' : `${BASE_URL.replace(/\/$/, '')}/spells`;
+    const currentPageIndex = pages.findIndex(page => page.path === url);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'ArrowLeft') {
+                if (currentPageIndex > 0) {
+                    route(pages[currentPageIndex - 1].path);
+                }
+            } else if (event.key === 'ArrowRight') {
+                if (currentPageIndex < pages.length - 1) {
+                    route(pages[currentPageIndex + 1].path);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [url, currentPageIndex]);
+
+    const iconStyle = {
+        height: '48px',
+        verticalAlign: 'middle',
+        cursor: 'pointer',
+    };
+
+    const navigateTo = (path) => {
+        route(path);
+    };
 
     return (
         <header className="header mb-4">
             <div className="d-flex justify-content-center align-items-center p-3 border-bottom">
-                <div className="col-4 text-center">
+                <div className="col-md-8 col-lg-6 text-center">
                     <DecorativeTitle title="NAVIGATION" containerClassName='mb-3' />
-                    <nav className="btn-group" role="group" aria-label="Main navigation">
-                        <a
-                            className={`btn ${url === characterSheetPath ? 'dark-btn-secondary' : 'dark-btn'}`}
-                            href={characterSheetPath}
-                        >
-                            Character Sheet
-                        </a>
-                        <a
-                            className={`btn ${url === spellsPath ? 'dark-btn-secondary' : 'dark-btn'}`}
-                            href={spellsPath}
-                        >
-                            Spell Inventory
-                        </a>
+                    <nav className="btn-group gap-2" role="group" aria-label="Main navigation">
+                        <img
+                            src={LeftArrowIcon}
+                            alt="Navigate left"
+                            onClick={() => currentPageIndex > 0 && navigateTo(pages[currentPageIndex - 1].path)}
+                            style={{
+                                ...iconStyle,
+                                marginRight: '8px',
+                                filter: currentPageIndex > 0 ? 'none' : 'opacity(0.3)',
+                                cursor: currentPageIndex > 0 ? 'pointer' : 'default',
+                            }}
+                            aria-disabled={currentPageIndex <= 0}
+                        />
+                        {pages.map((page, index) => (
+                            <button
+                                key={page.path}
+                                className={`dark-btn dark-btn-primary ${url === page.path ? 'dark-btn-active' : ''}`}
+                                onClick={() => navigateTo(page.path)}
+                                data-bs-toggle="tooltip"
+                                title={`Navigate to ${page.title} (${index > 0 ? 'Left Arrow' : ''}${index > 0 && index < pages.length -1 ? ' / ' : ''}${index < pages.length - 1 ? 'Right Arrow' : ''})`}
+                            >
+                                <span>{page.title}</span>
+                            </button>
+                        ))}
+                        <img
+                            src={RightArrowIcon}
+                            alt="Navigate right"
+                            onClick={() => currentPageIndex < pages.length - 1 && navigateTo(pages[currentPageIndex + 1].path)}
+                            style={{
+                                ...iconStyle,
+                                marginLeft: '8px',
+                                filter: currentPageIndex < pages.length - 1 ? 'none' : 'opacity(0.3)',
+                                cursor: currentPageIndex < pages.length - 1 ? 'pointer' : 'default',
+                            }}
+                            aria-disabled={currentPageIndex >= pages.length - 1}
+                        />
                     </nav>
-
                 </div>
             </div>
         </header>

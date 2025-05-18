@@ -1,26 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import 'bootstrap';
 
 :root {
-	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-	line-height: 1.5;
-	font-weight: 400;
-
-	font-synthesis: none;
-	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-text-size-adjust: 100%;
-
+    
     --bs-body-bg: #18181b !important;
     --bs-bg-dark: #18181b !important;
-    
-}
 
+    --gray-900: #111111;
+    --gray-700: #2e2e2e;
+}
 
 @font-face {
     font-family: 'Pathfinder-Icons';
     src: url('/Pathfinder-Icons.ttf') format('truetype');
-
     font-weight: normal;
     font-style: normal;
 }
@@ -32,18 +24,22 @@ span.action {
 }
 
 #app {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     text-align: center;
 }
 
+.arsenal {
+    font-family: "Arsenal", sans-serif !important;
+    font-weight: bold;
+    font-style: italic;
+}
 
 main {
     flex: auto;
     display: flex;
     flex-direction: column;
-    /* Stack children vertically */
     align-items: stretch;
     max-width: 1280px;
     width: 100%;
@@ -51,58 +47,128 @@ main {
 }
 
 @media (max-width: 639px) {
-	main {
-		margin: 2rem;
-	}
+    main {
+        margin: 2rem;
+    }
 }
 
+/* Persona-style button styling - updated version */
 .dark-btn {
-    transition: all 0.2s ease-in-out; // Simplified transition
-    padding: 0.5rem 1rem;
-    background-color: #27272a;
-    // Add a default border to prevent layout shift if active adds one
-    border: 1px solid transparent;
+    position: relative;
+    display: inline-block;
+    color: #ffffff;
+    background-color: var(--bs-body-bg);
+    // font-family: "Impact", "Arial Black", "Franklin Gothic Medium", sans-serif;
+    text-transform: uppercase;
+    // letter-spacing: 1.5px;
+    // text-decoration: none;
+
+    padding: 0.5rem 0.5rem;
+
+    font-family: "Arsenal", sans-serif !important;
+        font-weight: bold;
+        font-style: italic;
+
+    border: none;
+    transform: skewX(-15deg);
+    outline: 2px solid transparent;
+    overflow: hidden;
+    z-index: 1;
+    transition: color 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
+                outline-color 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Text inside button */
+.dark-btn span,
+.dark-btn i,
+.dark-btn small {
+    display: inline-block;
+    transform: skewX(15deg);
+    position: relative;
+    z-index: 3;
+}
+
+
+/* The animated background fill */
+.dark-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-105%);
+    z-index: 2;
+    transition: transform 0.15s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 .dark-btn:hover {
-    background-color: #3f3f46;
+    outline-color: #ffffff;
 }
 
+.dark-btn:hover::before {
+    transform: translateX(0);
+}
 
+.dark-btn:active {
+    transform: skewX(-15deg) scale(0.96);
+    transition-duration: 0.08s;
+}
+
+/* --- Primary Persona Button (Red Accent) --- */
+.dark-btn-primary::before {
+    background-color: #ff003c;
+}
 .dark-btn-primary {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ff0026;
-    box-shadow: inset 0 0 10px 1px rgba(255, 0, 38, 0.5);
+    outline-color: #ff003c;
 }
 
-.dark-btn-primary:hover {
-    background-color: #5f04124b;
-    box-shadow: inset 0 0 16px 2px rgba(255, 50, 80, 0.7);
-    border-color: #ff335c; // Slightly brighter border on hover
-}
-
-.dark-btn-primary:active {
-    background-color: #4d030f !important;
-    border-color: #ff4d6a !important;
-    box-shadow: inset 0 0 12px 3px rgba(255, 80, 100, 0.85) !important;
-}
-
-.dark-btn-secondary {
-    padding: 0.5rem 1rem;
-    border: 1px solid #24aac2;
-    box-shadow: inset 0 0 10px 1px rgba(47, 227, 255, 0.5);
-}
-
+.dark-btn-primary:hover,
 .dark-btn-secondary:hover {
-    background-color: rgba(30, 56, 90, 0.25);
-    border-color: #3bbbf6;
-    box-shadow: inset 0 0 16px 2px rgba(56, 209, 255, 0.7);
+    color: #1a1a1a;
+}
+
+.dark-btn-primary:active::before {
+    background-color: #e00034;
+}
+
+/* --- Secondary Persona Button (Blue Accent) --- */
+.dark-btn-secondary::before {
+    background-color: #00d0ff;
+}
+.dark-btn-secondary {
+    outline-color: #00d0ff;
+}
+
+.dark-btn-secondary:active::before {
+    background-color: #00d0ff;
 }
 
 .dark-btn-secondary:active {
-    background-color: #1a485a !important;
-    border-color: #5c9dff !important;
-    box-shadow: inset 0 0 12px 3px rgba(70, 150, 255, 0.85) !important;
+    color: #f0f0f0;
+}
+
+/* --- Active Persona Button State --- */
+/* Add .dark-btn-active to a .dark-btn (e.g., .dark-btn.dark-btn-primary.dark-btn-active) 
+   to make it appear "on" or "current", drawing attention. */
+.dark-btn.dark-btn-active {
+    color: #1a1a1a; /* Dark text to contrast with the ::before fill, same as hover */
+    outline-color: #ffffff; /* Ensure outline is visible, same as hover */
+}
+
+.dark-btn.dark-btn-active::before {
+    transform: translateX(0); /* Make the ::before pseudo-element (the color fill) visible */
+    /* The existing transition on .dark-btn::before will cause this to animate in when the class is added.
+       If you want the active state to appear instantly without animation, you could add:
+       transition: none; 
+       or specifically target the transform property:
+       transition: transform 0s; */
+}
+
+/* Ensure hover on an active button doesn't revert text color if other rules conflict */
+.dark-btn.dark-btn-active:hover {
+    color: #1a1a1a; /* Maintain dark text on hover */
+    /* outline-color will be handled by .dark-btn:hover */
 }
 
 .form-control,
