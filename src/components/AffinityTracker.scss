@@ -8,6 +8,7 @@
     gap: 0.1rem;
     max-width: 100%;
     justify-self: center;
+    align-items: start;
 }
 
 .element-item {
@@ -15,13 +16,89 @@
     overflow: hidden;
     padding: 8px 10px;
     position: relative;
-    transition: background 0.3s ease;
+    transition: max-height 0.35s ease-in-out, 
+                border-left-color 0.4s ease-out 0.1s, 
+                background-position 0.4s ease-out;
+    max-height: 48px;
+    border-left: 3px solid transparent;
+
+    background-image: linear-gradient(90deg, rgba(255, 217, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
+    background-size: 200% 100%;
+    background-position: -140% 0;
+    background-repeat: no-repeat;
+}
+
+.element-item .element-header,
+.element-item .affinity-buttons {
+    position: relative;
+    z-index: 1;
+}
+
+.element-item.editing {
+    max-height: 130px;
+}
+
+.element-item.gold-bg {
+    border-left-color: gold;
+    background-position: 0 0;
+    text-shadow: 0 0 4px black;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.element-item.gold-bg .element-name {
+    color: gold;
+}
+
+.mastery-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: rgba(255, 215, 0, 0.15);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+    font-family: "Arsenal", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-15deg) scale(0.8);
+    transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+}
+
+.element-item.gold-bg .mastery-watermark {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(-15deg) scale(1);
+    animation: mastery-flash-anim 0.6s ease-out 0.4s;
+    transition-delay: 0.3s;
+}
+
+@keyframes mastery-flash-anim {
+    0% {
+        color: rgba(255, 215, 0, 0.15);
+        transform: translate(-50%, -50%) rotate(-15deg) scale(1);
+    }
+    50% {
+        color: rgba(255, 223, 50, 0.5);
+        transform: translate(-50%, -50%) rotate(-15deg) scale(1.05);
+    }
+    100% {
+        color: rgba(255, 215, 0, 0.15);
+        transform: translate(-50%, -50%) rotate(-15deg) scale(1);
+    }
+}
+
+.clickable-card {
+    cursor: pointer;
 }
 
 .affinity-buttons .btn {
     padding: 0.25rem 0.25rem;
     border-color: rgb(69, 69, 69);
 }
+
 .inactive-btn {
     background-color: var(--bs-bg-dark);
 }
@@ -31,19 +108,7 @@
     display: inline-block;
 }
 
-/* Improved gold background effect */
-.gold-bg {
-    background: linear-gradient(90deg, rgba(255, 217, 0, 0.5) 0%,
-        rgba(0, 0, 0, 0) 100%);
-    border-left: 3px solid gold;
-    border-radius: 8px;
-    overflow: hidden;
-    text-shadow: 0 0 4px black;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-}
-
-/* Subtle top border glow */
-.gold-bg::before {
+.element-item.gold-bg::before {
     content: "";
     position: absolute;
     top: 0;
@@ -51,10 +116,10 @@
     right: 0;
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
+    z-index: 2;
 }
 
-/* Subtle bottom border glow */
-.gold-bg::after {
+.element-item.gold-bg::after {
     content: "";
     position: absolute;
     bottom: 0;
@@ -62,8 +127,5 @@
     right: 0;
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
-}
-
-.gold-bg .element-name {
-    color: gold;
+    z-index: 2;
 }
