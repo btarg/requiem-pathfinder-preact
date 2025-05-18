@@ -7,8 +7,8 @@ import LeftArrowIcon from '../assets/keyboard_arrow_left_outline.svg';
 import RightArrowIcon from '../assets/keyboard_arrow_right_outline.svg';
 
 const pageRoutes = [
-    { id: 'character', title: 'Character Sheet' },
-    { id: 'spells', title: 'Spells' },
+    { id: 'character', title: 'Health' },
+    { id: 'spells', title: 'Spells and Stats' },
     // Add more pages here in the future, e.g.:
     // { id: 'inventory', title: 'Inventory' },
 ];
@@ -27,6 +27,15 @@ export function Header() {
 
     useEffect(() => {
         const handleKeyDown = (event) => {
+            // Check if the event target is an input, textarea, or contenteditable element
+            const targetTagName = event.target.tagName.toLowerCase();
+            const isContentEditable = event.target.isContentEditable;
+
+            if (targetTagName === 'input' || targetTagName === 'textarea' || isContentEditable) {
+                // If focused on an input, textarea, or contenteditable, do not navigate
+                return;
+            }
+
             if (event.key === 'ArrowLeft') {
                 if (currentPageIndex > 0) {
                     route(pages[currentPageIndex - 1].path);

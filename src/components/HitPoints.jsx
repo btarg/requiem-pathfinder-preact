@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext, useRef } from 'preact/hooks'
 import { CharacterContext } from '../context/CharacterContext'
+import { Tooltip } from 'bootstrap';
 import './HitPoints.scss'
 import DecorativeTitle from './DecorativeTitle'
 import ProgressBar from './ProgressBar'
@@ -7,7 +8,6 @@ import ProgressBar from './ProgressBar'
 export default function HitPoints() {
     const { characterStats, setCharacterStats } = useContext(CharacterContext)
     const [amount, setAmount] = useState(1)
-    const [mpAmount, setMpAmount] = useState(1)
     const [damageTaken, setDamageTaken] = useState(false)
     const [healed, setHealed] = useState(false)
     const [tempDamageTaken, setTempDamageTaken] = useState(false)
@@ -20,9 +20,31 @@ export default function HitPoints() {
     const [isFlashingHP, setIsFlashingHP] = useState(false);
     const [isFlashingTempHP, setIsFlashingTempHP] = useState(false);
 
+    const [isCtrlPressed, setIsCtrlPressed] = useState(false); // New state for Ctrl key
+
     // Refs for clearing timeouts
     const mainHealthTrailTimeoutRef = useRef(null);
     const tempHealthTrailTimeoutRef = useRef(null);
+
+    // Refs for double-click detection on progress bars
+    const hpBarClickTimeoutRef = useRef(null);
+    const mpBarClickTimeoutRef = useRef(null);
+    const DOUBLE_CLICK_DELAY = 300; // ms
+
+    // Tooltip initialization and management
+    useEffect(() => {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl));
+
+        // Cleanup function to destroy tooltips
+        return () => {
+            tooltipList.forEach(tooltip => {
+                if (tooltip && typeof tooltip.dispose === 'function') {
+                    tooltip.dispose();
+                }
+            });
+        };
+    }, [isCtrlPressed]); // Re-initialize if isCtrlPressed changes for dynamic titles
 
     // Animation effects
     useEffect(() => {
@@ -59,6 +81,29 @@ export default function HitPoints() {
             return () => clearTimeout(timer);
         }
     }, [tempHealed]);
+
+    // Effect for Ctrl key detection
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Control') {
+                setIsCtrlPressed(true);
+            }
+        };
+
+        const handleKeyUp = (event) => {
+            if (event.key === 'Control') {
+                setIsCtrlPressed(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
 
     // Health management functions
     const updateHealth = (updates) => {
@@ -186,37 +231,125 @@ export default function HitPoints() {
         setAmount(1);
     };
 
-    const handleMaxHealthChange = (e) => {
-        const newMax = Math.max(1, parseInt(e.currentTarget.value) || 1)
-        updateHealth({ maxHealth: newMax })
-        if (characterStats.currentHealth > newMax) {
-            updateHealth({ currentHealth: newMax })
+    const handleIncrementAmount = () => {
+        if (isCtrlPressed) {
+            setAmount(characterStats.maxHealth || 0);
+        } else {
+            setAmount(prev => Math.min(prev + 1, characterStats.maxHealth || Infinity));
         }
-    }
+    };
+
+    const handleDecrementAmount = () => {
+        if (isCtrlPressed) {
+            setAmount(0);
+        } else {
+            setAmount(prev => Math.max(0, prev - 1));
+        }
+    };
+
+    const handleMaxHealthChange = (e) => {
+        const target = e.currentTarget;
+        const newMax = Math.max(1, parseInt(target.value) || 1);
+        updateHealth({ maxHealth: newMax });
+        if (characterStats.currentHealth > newMax) {
+            updateHealth({ currentHealth: newMax });
+        }
+    };
 
     const handleUseMp = () => {
         setMpChanged(true)
         updateHealth({
-            currentMp: Math.max(0, characterStats.currentMp - mpAmount)
+            currentMp: Math.max(0, characterStats.currentMp - amount)
         })
-        setMpAmount(1)
+        setAmount(1)
     }
 
     const handleRestoreMp = () => {
         setMpChanged(true)
         updateHealth({
-            currentMp: Math.min(characterStats.maxMp, characterStats.currentMp + mpAmount)
+            currentMp: Math.min(characterStats.maxMp, characterStats.currentMp + amount)
         })
-        setMpAmount(1)
     }
 
     const handleMaxMpChange = (e) => {
-        const newMax = Math.max(1, parseInt(e.currentTarget.value) || 1)
-        updateHealth({ maxMp: newMax })
+        const target = e.currentTarget;
+        const newMax = Math.max(1, parseInt(target.value) || 1);
+        updateHealth({ maxMp: newMax });
         if (characterStats.currentMp > newMax) {
-            updateHealth({ currentMp: newMax })
+            updateHealth({ currentMp: newMax });
         }
-    }
+    };
+
+    const handleSetHp = () => {
+        const newHealth = Math.max(0, Math.min(characterStats.maxHealth, amount));
+        updateHealth({ currentHealth: newHealth });
+        setHealed(true); // Re-using heal flash for generic positive change
+        setAmount(1); // Reset amount input
+    };
+
+    const handleSetMp = () => {
+        const newMp = Math.max(0, Math.min(characterStats.maxMp, amount)); // Changed mpAmount to amount
+        updateHealth({ currentMp: newMp });
+        setMpChanged(true); // Re-using mpChanged flash for generic positive change
+        setAmount(1); // Reset amount input
+    };
+
+    const handleClearHp = () => {
+        updateHealth({ currentHealth: 0 }); // Keep tempHealth as is, or clear both like before?
+        setDamageTaken(true);
+    };
+
+    const handleClearTempHp = () => {
+        updateHealth({ tempHealth: 0 });
+        setTempDamageTaken(true);
+    };
+
+    const handleFullHeal = () => {
+        if (characterStats.maxHealth === undefined) return;
+        updateHealth({ currentHealth: characterStats.maxHealth });
+        setHealed(true);
+    };
+
+    const handleFullRestoreMp = () => {
+        if (characterStats.maxMp === undefined) return;
+        updateHealth({ currentMp: characterStats.maxMp });
+        setMpChanged(true);
+    };
+
+    const handleHpBarClick = () => {
+        if (hpBarClickTimeoutRef.current) { // Double click
+            clearTimeout(hpBarClickTimeoutRef.current);
+            hpBarClickTimeoutRef.current = null;
+            // Double click action:
+            handleFullHeal();
+            handleClearTempHp();
+            // Hide/Reset trails by setting them to the new state
+            setPreviousMainHealth(characterStats.maxHealth || safeMaxHealth);
+            setPreviousTempHealth(0);
+        } else { // First click
+            // Execute single click action immediately
+            handleSetHp();
+            // Then set timeout to detect if it's a double click
+            hpBarClickTimeoutRef.current = setTimeout(() => {
+                hpBarClickTimeoutRef.current = null;
+            }, DOUBLE_CLICK_DELAY);
+        }
+    };
+
+    const handleMpBarClick = () => {
+        if (mpBarClickTimeoutRef.current) { // Double click
+            clearTimeout(mpBarClickTimeoutRef.current);
+            mpBarClickTimeoutRef.current = null;
+            // Double click action:
+            handleFullRestoreMp();
+            // MP bar trail is simpler, its trailingStartValue is safeCurrentMp and will update naturally.
+        } else { // First click
+            handleSetMp();
+            mpBarClickTimeoutRef.current = setTimeout(() => {
+                mpBarClickTimeoutRef.current = null;
+            }, DOUBLE_CLICK_DELAY);
+        }
+    };
 
     const safeCurrentHealth = characterStats.currentHealth || 0;
     const safeMaxHealth = Math.max(1, characterStats.maxHealth || 0);
@@ -230,11 +363,82 @@ export default function HitPoints() {
     const mpPercentage = (safeCurrentMp / safeMaxMp) * 100;
 
     return (
-        <div className="mb-4">
-            {/* Container for all Progress Bars - Placed at the top */}
-            <div className="mb-4"> {/* Add bottom margin to separate from controls */}
+        <div className="hit-points-component-container container-fluid mb-4">
+
+            <div className="row align-items-center mb-3"> {/* MODIFIED: Removed justify-content-between */}
+                {/* Left Column: Character Stat values: speed, AC - Wrapped in col-auto */}
+                <div className="col-auto">
+                    <div className="d-flex gap-2"> {/* This div wraps the first group of inputs */}
+                        <div className="text-center">
+                            <small className="d-block mb-1 text-secondary">Speed</small>
+                            <input
+                                type="number"
+                                className="form-control form-control hp-input text-center bg-dark text-light"
+                                id="maxHealthInput" // Note: ID and bindings might need review for "Speed"
+                                value={characterStats.maxHealth || ''}
+                                onChange={handleMaxHealthChange}
+                                min="1"
+                                aria-label="Maximum Hit Points" // Note: Label might need review for "Speed"
+                            />
+                        </div>
+                        <div className="text-center">
+                            <small className="d-block mb-1 text-secondary">AC</small>
+                            <input
+                                type="number"
+                                className="form-control form-control hp-input text-center bg-dark text-light"
+                                id="maxMpInput" // Note: ID and bindings might need review for "AC"
+                                value={characterStats.maxMp || ''}
+                                onChange={handleMaxMpChange}
+                                min="1"
+                                aria-label="Maximum Mana Points" // Note: Label might need review for "AC"
+                            />
+                        </div>
+                    </div> {/* Closing tag for the first group of inputs */}
+                </div>
+
+                {/* Right Column: Max Values - Wrapped in col-auto ms-auto */}
+                <div className="col-auto ms-auto">
+                    <div className="d-flex gap-2"> {/* This div wraps the second group of inputs */}
+                        <div className="text-center">
+                            <small className="d-block mb-1 text-secondary">Max HP</small>
+                            <input
+                                type="number"
+                                className="form-control form-control hp-input text-center bg-dark text-light"
+                                id="maxHealthInput"
+                                value={characterStats.maxHealth || ''}
+                                onChange={handleMaxHealthChange}
+                                min="1"
+                                aria-label="Maximum Hit Points"
+                            />
+                        </div>
+                        <div className="text-center">
+                            <small className="d-block mb-1 text-secondary">Max MP</small>
+                            <input
+                                type="number"
+                                className="form-control form-control hp-input text-center bg-dark text-light"
+                                id="maxMpInput"
+                                value={characterStats.maxMp || ''}
+                                onChange={handleMaxMpChange}
+                                min="1"
+                                aria-label="Maximum Mana Points"
+                            />
+                        </div>
+                    </div> {/* Closing tag for the second group of inputs */}
+                </div>
+            </div>
+
+            {/* Progress Bars Section */}
+            <div className="mb-3">
                 {/* HP and Temp HP Bar Group for Overlay */}
-                <div style={{ position: 'relative' }} className="mb-2"> {/* mb-2 for spacing before MP bar if needed */}
+                <div
+                    style={{ position: 'relative', cursor: 'pointer' }}
+                    className="mb-2"
+                    onClick={handleHpBarClick}
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title={`Click to Set HP to Amount (currently ${amount}), Double-click to reset HP & Temp HP`}
+                    data-bs-original-title={`Click to Set HP to Amount (currently ${amount}), Double-click to reset HP & Temp HP`}
+                >
                     <ProgressBar
                         value={safeCurrentHealth}
                         maxValue={safeMaxHealth}
@@ -259,220 +463,120 @@ export default function HitPoints() {
                 </div>
 
                 {/* MP Bar */}
-                <ProgressBar
-                    value={safeCurrentMp}
-                    maxValue={safeMaxMp}
-                    color={{ from: '#3c82f6', to: '#6366f1' }}
-                    labelRight={`${safeCurrentMp} / ${safeMaxMp}`}
-                    className={mpChanged ? 'progress-bar-damage-flash' : ''}
-                // Trailing for MP might not be desired, adjust as needed
-                // trailingStartValue={safeCurrentMp} 
-                // trailColor="rgba(0, 50, 200, 0.7)" 
-                />
+                <div
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleMpBarClick}
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title={`Click to Set MP to Amount (currently ${amount}), Double-click to Full Restore MP`}
+                    data-bs-original-title={`Click to Set MP to Amount (currently ${amount}), Double-click to Full Restore MP`}
+                >
+                    <ProgressBar
+                        value={safeCurrentMp}
+                        maxValue={safeMaxMp}
+                        color={{ from: '#3c82f6', to: '#6366f1' }}
+                        labelRight={`${safeCurrentMp} / ${safeMaxMp}`}
+                        className={mpChanged ? 'progress-bar-damage-flash' : ''}
+                        trailingStartValue={safeCurrentMp} // MP trail will show previous value before change
+                        trailColor="rgba(0, 50, 200, 0.7)"
+                    />
+                </div>
             </div>
 
-            {/* Row for HP/MP controls and Conditions Tracker */}
-            <div className="row">
-                <div className="col-lg-7">
-                    <div className="hp-section d-flex flex-column align-items-sm-start mb-4">
-                        <div className="d-flex justify-content-between align-items-center ">
-                            <h5 className="mb-3 text-secondary-emphasis">HIT POINTS (HP)</h5>
-                        </div>
+            <div className="row align-items-center mb-3">
 
-                        <div className="d-flex gap-3 mb-3">
-                            <div>
-                                <div className="d-flex align-items-end gap-2">
-                                    <div className="text-center">
-                                        <small className="d-block mb-1 text-secondary">Temp</small>
-                                        <input
-                                            type="number"
-                                            value={characterStats.tempHealth}
-                                            onChange={(e) => updateHealth({
-                                                tempHealth: Math.max(0, parseInt(e.currentTarget.value) || 0)
-                                            })}
-                                            className={`form-control hp-input text-center bg-dark text-light ${tempDamageTaken ? 'damage-flash' : ''} ${tempHealed ? 'temp-flash' : ''}`}
-                                            min="0"
-                                            style={{ fontSize: '1.5rem', height: '80px' }}
-                                        />
-                                    </div>
+                <div className="d-flex flex-wrap justify-content-center align-items-center gap-2">
+                    <button
+                        onClick={handleUseMp}
+                        className="btn btn-outline-primary btn-icon-square"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Use MP"
+                    >
+                        <i className="fas fa-bolt-lightning" />
+                    </button>
+                    <button
+                        onClick={isCtrlPressed ? handleClearTempHp : handleDamage}
+                        className={`btn btn-icon-square ${isCtrlPressed ? 'btn-outline-warning' : 'btn-outline-danger'}`}
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title={isCtrlPressed ? "Clear Temporary HP" : "Damage HP"}
+                        data-bs-original-title={isCtrlPressed ? "Clear Temporary HP" : "Damage HP"}
+                    >
+                        {isCtrlPressed ? <i className="fas fa-times-circle" /> : <i className="fas fa-heart-circle-minus" />}
+                    </button>
 
-                                    <div className="d-flex align-items-center justify-content-center" style={{ width: '10px', height: '80px' }}>
-                                        <span className="h4 mb-1 text-secondary">+</span>
-                                    </div>
-
-                                    <div className="text-center">
-                                        <small className="d-block mb-1 text-secondary">Current</small>
-                                        <input
-                                            type="number"
-                                            value={characterStats.currentHealth}
-                                            onChange={(e) => updateHealth({
-                                                currentHealth: Math.max(0, Math.min(characterStats.maxHealth, parseInt(e.currentTarget.value) || 0))
-                                            })}
-                                            className={`form-control form-control-lg hp-input text-center bg-dark
-                                                ${damageTaken ? 'damage-flash' : ''}
-                                                ${healed ? 'heal-flash' : ''}
-                                                ${tempDamageTaken ? 'temp-flash' : ''}`}
-                                            min="0"
-                                            max={characterStats.maxHealth}
-                                        />
-                                    </div>
-
-                                    <div className="d-flex align-items-center justify-content-center" style={{ width: '10px', height: '80px' }}>
-                                        <span className="h4 mb-1 text-secondary">/</span>
-                                    </div>
-
-                                    <div className="text-center">
-                                        <small className="d-block mb-1 text-secondary">Max</small>
-                                        <input
-                                            type="number"
-                                            value={characterStats.maxHealth}
-                                            onChange={handleMaxHealthChange}
-                                            className="form-control form-control-lg hp-input text-center bg-dark"
-                                            min="1"
-                                        />
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div className="d-flex gap-2">
-                                <div className="text-center" style={{ width: '80px', height: '80px' }}>
-                                    <br />
-                                    <button
-                                        onClick={handleDamage}
-                                        className="btn btn-outline-danger flex-grow-1"
-                                        style={{ width: '80px', height: '80px' }}
-                                    >
-                                        <i className="fas fa-heart-circle-minus h3 mb-1" />
-                                        <span className="arsenal">Damage</span>
-                                    </button>
-                                </div>
-                                <div className="text-center" style={{ width: '80px', height: '80px' }}>
-                                    <small className="d-block mb-1 text-secondary">Amount</small>
-                                    <input
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(Math.max(1, parseInt(e.currentTarget.value) || 1))}
-                                        className="form-control hp-input text-center bg-dark text-light"
-                                        min="1"
-                                        style={{ fontSize: '1.5rem', height: '80px' }}
-                                    />
-                                </div>
-                                <div className="d-flex flex-column align-items-center" style={{ width: '80px', height: '80px' }}>
-
-                                    <br />
-                                    <div className="btn-group-vertical" style={{ width: '80px' }}>
-                                        <button
-                                            onClick={handleHeal}
-                                            className="btn btn-outline-success"
-                                            style={{ width: '80px', height: '40px' }}
-                                            title="Heal HP"
-                                        >
-                                            <div className="d-flex justify-content-between align-content-center arsenal">
-                                                <i className="fas fa-heart-circle-plus me-2" />
-                                                <small>Heal</small>
-                                            </div>
-                                        </button>
-                                        <button
-                                            onClick={handleTempHeal}
-                                            className="btn btn-outline-info"
-                                            style={{ width: '80px', height: '40px' }}
-                                            title="Heal Temporary HP"
-                                        >
-                                            <div className="d-flex justify-content-between align-content-center arsenal">
-                                                <i className="fas fa-heart-pulse me-2" />
-                                                <small>Temp</small>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    {/* Amount Input with Increment/Decrement Buttons */}
+                    <div className="input-group" style={{ width: 'auto', alignItems: 'center' }}>
+                        <button
+                            onClick={handleDecrementAmount}
+                            className="btn btn-outline-secondary btn-icon-square"
+                            type="button"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title={isCtrlPressed ? "Set to Min (0)" : "Decrease Amount"}
+                            data-bs-original-title={isCtrlPressed ? "Set to Min (0)" : "Decrease Amount"}
+                        >
+                            <i className="fas fa-minus" />
+                        </button>
+                        <input
+                            type="number"
+                            value={amount}
+                            onChange={(e) => setAmount(Math.max(0, parseInt((e.currentTarget).value) || 0))}
+                            className="form-control text-center bg-dark text-light"
+                            min="0"
+                            style={{ width: '70px', height: '40px' }}
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Enter amount"
+                            aria-label="Amount for HP/MP changes"
+                        />
+                        <button
+                            onClick={handleIncrementAmount}
+                            className="btn btn-outline-secondary btn-icon-square"
+                            type="button"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title={isCtrlPressed ? `Set to Max (${characterStats.maxHealth || 0})` : "Increase Amount"}
+                            data-bs-original-title={isCtrlPressed ? `Set to Max (${characterStats.maxHealth || 0})` : "Increase Amount"}
+                        >
+                            <i className="fas fa-plus" />
+                        </button>
                     </div>
 
-                    <div className="mp-section d-flex flex-column align-items-sm-start">
-                        <div className="d-flex justify-content-between align-items-center">
-                            <h5 className="mb-3 text-secondary-emphasis">MANA POINTS (MP)</h5>
-                        </div>
-
-                        <div className="d-flex gap-3 mb-3">
-                            <div>
-                                <div className="d-flex align-items-end gap-2">
-                                    <div className="text-center">
-                                        <small className="d-block mb-1 text-secondary">Current</small>
-                                        <input
-                                            type="number"
-                                            value={characterStats.currentMp}
-                                            onChange={(e) => updateHealth({
-                                                currentMp: Math.max(0, Math.min(characterStats.maxMp, parseInt(e.currentTarget.value) || 0))
-                                            })}
-                                            className={`form-control form-control-lg hp-input text-center bg-dark text-light ${mpChanged ? 'mp-flash' : ''}`}
-                                            min="0"
-                                            max={characterStats.maxMp}
-                                        />
-                                    </div>
-
-                                    <div className="d-flex align-items-center justify-content-center" style={{ width: '10px', height: '80px' }}>
-                                        <span className="h4 mb-1 text-secondary">/</span>
-                                    </div>
-
-                                    <div className="text-center">
-                                        <small className="d-block mb-1 text-secondary">Max</small>
-                                        <input
-                                            type="number"
-                                            value={characterStats.maxMp}
-                                            onChange={handleMaxMpChange}
-                                            className="form-control form-control-lg hp-input text-center bg-dark text-light"
-                                            min="1"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="d-flex gap-2">
-                                <div className="text-center" style={{ width: '80px', height: '80px' }}>
-                                    <br />
-                                    <button
-                                        onClick={handleUseMp}
-                                        className="btn btn-outline-primary flex-grow-1"
-                                        style={{ width: '80px', height: '80px' }}
-                                    >
-                                        <i className="fas fa-bolt-lightning h3 mb-1" />
-                                        <span className="d-block arsenal">Use</span>
-                                    </button>
-                                </div>
-                                <div className="text-center" style={{ width: '80px', height: '80px' }}>
-                                    <small className="d-block mb-1 text-secondary">Amount</small>
-                                    <input
-                                        type="number"
-                                        value={mpAmount}
-                                        onChange={(e) => setMpAmount(Math.max(1, parseInt(e.currentTarget.value) || 1))}
-                                        className="form-control hp-input text-center bg-dark text-light"
-                                        min="1"
-                                        style={{ fontSize: '1.5rem', height: '100%' }}
-                                    />
-                                </div>
-                                <div className="text-center" style={{ width: '80px', height: '80px' }}>
-                                    <br />
-                                    <button
-                                        onClick={handleRestoreMp}
-                                        className="btn btn-outline-info flex-grow-1"
-                                        style={{ width: '80px', height: '80px' }}
-                                    >
-                                        <i className="fas fa-droplet h3 mb-1" />
-                                        <span className="d-block arsenal">Restore</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <button
+                        onClick={isCtrlPressed ? handleTempHeal : handleHeal}
+                        className={`btn btn-icon-square ${isCtrlPressed ? 'btn-outline-info' : 'btn-outline-success'}`}
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title={isCtrlPressed ? "Heal Temporary HP" : "Heal HP"}
+                        data-bs-original-title={isCtrlPressed ? "Heal Temporary HP" : "Heal HP"}
+                    >
+                        {isCtrlPressed ? <i className="fas fa-heart-pulse" /> : <i className="fas fa-heart-circle-plus" />}
+                    </button>
+                    <button
+                        onClick={handleRestoreMp}
+                        className="btn btn-outline-info btn-icon-square"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Restore MP"
+                        data-bs-original-title="Restore MP"
+                    >
+                        <i className="fas fa-droplet" />
+                    </button>
                 </div>
+            </div>
 
-                <div className="col-lg-4">
+            {/* Conditions Tracker Row */}
+            <div className="row mt-4">
+                <div className="col-12">
+                    <DecorativeTitle title="CONDITIONS" />
                     <div className="conditions-tracker-placeholder p-3 border rounded bg-dark-subtle">
                         <h5 className="text-secondary-emphasis">CONDITIONS TRACKER</h5>
                         <p className="text-muted">(Placeholder for future implementation)</p>
                     </div>
                 </div>
-            </div> {/* End of row */}
+            </div>
         </div>
     )
 }
