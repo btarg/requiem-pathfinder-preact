@@ -4,9 +4,13 @@ import { Tooltip } from 'bootstrap';
 import './HitPoints.scss'
 import DecorativeTitle from './DecorativeTitle'
 import ProgressBar from './ProgressBar'
+import { getLinkStatBonus } from '../utils/diceHelpers';
+import { useSpellContext } from '../context/SpellContext';
 
 export default function HitPoints() {
     const { characterStats, setCharacterStats } = useContext(CharacterContext)
+    const { spells } = useSpellContext();
+
     const [amount, setAmount] = useState(1)
     const [damageTaken, setDamageTaken] = useState(false)
     const [healed, setHealed] = useState(false)
@@ -351,6 +355,10 @@ export default function HitPoints() {
         }
     };
 
+    const getSpeed = () => {
+        return (characterStats.speed || 0) + getLinkStatBonus(spells, 'speed');
+    }
+
     const safeCurrentHealth = characterStats.currentHealth || 0;
     const safeMaxHealth = Math.max(1, characterStats.maxHealth || 0);
     const safeTempHealth = characterStats.tempHealth || 0;
@@ -365,35 +373,33 @@ export default function HitPoints() {
     return (
         <div className="hit-points-component-container container-fluid mb-4">
 
-            <div className="row align-items-center mb-3"> {/* MODIFIED: Removed justify-content-between */}
+            <div className="row align-items-center mb-3">
                 {/* Left Column: Character Stat values: speed, AC - Wrapped in col-auto */}
                 <div className="col-auto">
-                    <div className="d-flex gap-2"> {/* This div wraps the first group of inputs */}
+                    <div className="d-flex gap-2">
                         <div className="text-center">
                             <small className="d-block mb-1 text-secondary">Speed</small>
                             <input
                                 type="number"
-                                className="form-control form-control hp-input text-center bg-dark text-light"
-                                id="maxHealthInput" // Note: ID and bindings might need review for "Speed"
-                                value={characterStats.maxHealth || ''}
-                                onChange={handleMaxHealthChange}
-                                min="1"
-                                aria-label="Maximum Hit Points" // Note: Label might need review for "Speed"
+                                className="form-control form-control box-no-input text-center bg-dark text-light"
+                                id="speedInput"
+                                value={getSpeed() + 30} // Display speed
+                                readOnly // Make read-only
+                                aria-label="Speed"
                             />
                         </div>
                         <div className="text-center">
                             <small className="d-block mb-1 text-secondary">AC</small>
                             <input
                                 type="number"
-                                className="form-control form-control hp-input text-center bg-dark text-light"
-                                id="maxMpInput" // Note: ID and bindings might need review for "AC"
-                                value={characterStats.maxMp || ''}
-                                onChange={handleMaxMpChange}
-                                min="1"
-                                aria-label="Maximum Mana Points" // Note: Label might need review for "AC"
+                                className="form-control box-no-input text-center bg-dark text-light"
+                                id="acInput"
+                                value={characterStats.AC || 0} // Display AC
+                                readOnly // Make read-only
+                                aria-label="Armor Class"
                             />
                         </div>
-                    </div> {/* Closing tag for the first group of inputs */}
+                    </div>
                 </div>
 
                 {/* Right Column: Max Values - Wrapped in col-auto ms-auto */}
