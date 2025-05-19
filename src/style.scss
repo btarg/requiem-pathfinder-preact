@@ -46,14 +46,6 @@ main {
     margin: 0 auto;
 }
 
-@media (max-width: 639px) {
-    main {
-        margin: 2rem;
-    }
-}
-
-/* === Simplified Skewed Button System === */
-
 // --- Base Skewed Button ---
 .dark-btn {
     position: relative;

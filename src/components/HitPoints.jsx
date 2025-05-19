@@ -30,10 +30,15 @@ export default function HitPoints() {
     const mainHealthTrailTimeoutRef = useRef(null);
     const tempHealthTrailTimeoutRef = useRef(null);
 
-    // Refs for double-click detection on progress bars
+    // Refs for click detection on progress bars
     const hpBarClickTimeoutRef = useRef(null);
     const mpBarClickTimeoutRef = useRef(null);
+    const longPressTimeoutRef = useRef(null);
     const DOUBLE_CLICK_DELAY = 300; // ms
+    const LONG_PRESS_DELAY = 600; // ms for long press/hold
+
+    // Track if we're in the middle of a press
+    const [isPressing, setIsPressing] = useState(false);
 
     // Tooltip initialization and management
     useEffect(() => {
@@ -317,40 +322,114 @@ export default function HitPoints() {
         if (characterStats.maxMp === undefined) return;
         updateHealth({ currentMp: characterStats.maxMp });
         setMpChanged(true);
-    };
-
-    const handleHpBarClick = () => {
-        if (hpBarClickTimeoutRef.current) { // Double click
-            clearTimeout(hpBarClickTimeoutRef.current);
-            hpBarClickTimeoutRef.current = null;
-            // Double click action:
+    };    // Handle HP bar mouse down - start the long press timer
+    const handleHpBarMouseDown = (e) => {
+        // Prevent default behavior for touch events to stop context menu
+        if (e.type === 'touchstart') {
+            e.preventDefault();
+        }
+        
+        setIsPressing(true);
+        longPressTimeoutRef.current = setTimeout(() => {
+            // Long press action (same as double click)
             handleFullHeal();
             handleClearTempHp();
             // Hide/Reset trails by setting them to the new state
             setPreviousMainHealth(characterStats.maxHealth || safeMaxHealth);
             setPreviousTempHealth(0);
-        } else { // First click
-            // Execute single click action immediately
-            handleSetHp();
-            // Then set timeout to detect if it's a double click
-            hpBarClickTimeoutRef.current = setTimeout(() => {
+            setIsPressing(false); // Reset pressing state
+            // Clear any click timeout to prevent normal click action
+            if (hpBarClickTimeoutRef.current) {
+                clearTimeout(hpBarClickTimeoutRef.current);
                 hpBarClickTimeoutRef.current = null;
-            }, DOUBLE_CLICK_DELAY);
+            }
+        }, LONG_PRESS_DELAY);
+    };
+
+    // Handle MP bar mouse down - start the long press timer
+    const handleMpBarMouseDown = (e) => {
+        // Prevent default behavior for touch events to stop context menu
+        if (e.type === 'touchstart') {
+            e.preventDefault();
+        }
+        
+        setIsPressing(true);
+        longPressTimeoutRef.current = setTimeout(() => {
+            // Long press action (same as double click)
+            handleFullRestoreMp();
+            setIsPressing(false); // Reset pressing state
+            // Clear any click timeout to prevent normal click action
+            if (mpBarClickTimeoutRef.current) {
+                clearTimeout(mpBarClickTimeoutRef.current);
+                mpBarClickTimeoutRef.current = null;
+            }
+        }, LONG_PRESS_DELAY);
+    };    // Handle mouse up - clear the long press timer
+    const handleMouseUp = (e) => {
+        if (longPressTimeoutRef.current) {
+            clearTimeout(longPressTimeoutRef.current);
+            longPressTimeoutRef.current = null;
+            
+            // If this was a short tap/click (not a long press), process it as a click
+            if (isPressing && e.type === 'touchend') {
+                const targetType = e.currentTarget.getAttribute('data-bar-type');
+                if (targetType === 'hp') {
+                    handleHpBarClick();
+                } else if (targetType === 'mp') {
+                    handleMpBarClick();
+                }
+            }
+        }
+        setIsPressing(false);
+    };
+
+    // Handle mouse leave - also clear the timer
+    const handleMouseLeave = () => {
+        if (longPressTimeoutRef.current) {
+            clearTimeout(longPressTimeoutRef.current);
+            longPressTimeoutRef.current = null;
+        }
+        setIsPressing(false);
+    };
+
+    const handleHpBarClick = () => {
+        // Only process click if we're not in the middle of a long press
+        if (!isPressing) {
+            if (hpBarClickTimeoutRef.current) { // Double click
+                clearTimeout(hpBarClickTimeoutRef.current);
+                hpBarClickTimeoutRef.current = null;
+                // Double click action:
+                handleFullHeal();
+                handleClearTempHp();
+                // Hide/Reset trails by setting them to the new state
+                setPreviousMainHealth(characterStats.maxHealth || safeMaxHealth);
+                setPreviousTempHealth(0);
+            } else { // First click
+                // Execute single click action immediately
+                handleSetHp();
+                // Then set timeout to detect if it's a double click
+                hpBarClickTimeoutRef.current = setTimeout(() => {
+                    hpBarClickTimeoutRef.current = null;
+                }, DOUBLE_CLICK_DELAY);
+            }
         }
     };
 
     const handleMpBarClick = () => {
-        if (mpBarClickTimeoutRef.current) { // Double click
-            clearTimeout(mpBarClickTimeoutRef.current);
-            mpBarClickTimeoutRef.current = null;
-            // Double click action:
-            handleFullRestoreMp();
-            // MP bar trail is simpler, its trailingStartValue is safeCurrentMp and will update naturally.
-        } else { // First click
-            handleSetMp();
-            mpBarClickTimeoutRef.current = setTimeout(() => {
+        // Only process click if we're not in the middle of a long press
+        if (!isPressing) {
+            if (mpBarClickTimeoutRef.current) { // Double click
+                clearTimeout(mpBarClickTimeoutRef.current);
                 mpBarClickTimeoutRef.current = null;
-            }, DOUBLE_CLICK_DELAY);
+                // Double click action:
+                handleFullRestoreMp();
+                // MP bar trail is simpler, its trailingStartValue is safeCurrentMp and will update naturally.
+            } else { // First click
+                handleSetMp();
+                mpBarClickTimeoutRef.current = setTimeout(() => {
+                    mpBarClickTimeoutRef.current = null;
+                }, DOUBLE_CLICK_DELAY);
+            }
         }
     };
 
@@ -375,7 +454,7 @@ export default function HitPoints() {
             {/* HP and MP Controls */}
             <div className="row align-items-center mb-3">
 
-                <div className="d-flex flex-wrap justify-content-center align-items-center gap-2">
+                <div className="d-flex justify-content-center align-items-center gap-2">
                     <button
                         onClick={handleUseMp}
                         className="btn btn-outline-primary btn-icon-square"
@@ -459,15 +538,27 @@ export default function HitPoints() {
 
             {/* Progress Bars Section */}
             <div className="mb-3">
-                {/* HP and Temp HP Bar Group for Overlay */}
-                <div
+                {/* HP and Temp HP Bar Group for Overlay */}                <div
                     style={{ position: 'relative', cursor: 'pointer' }}
                     className="mb-2"
-                    onClick={handleHpBarClick}
+                    onClick={(e) => {
+                        // Only handle click for mouse events, not touch
+                        if (e.type !== 'touchend') {
+                            handleHpBarClick();
+                        }
+                    }}
+                    onMouseDown={handleHpBarMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseLeave}
+                    onTouchStart={handleHpBarMouseDown}
+                    onTouchEnd={handleMouseUp}
+                    onTouchCancel={handleMouseLeave}
+                    onContextMenu={(e) => e.preventDefault()}
+                    data-bar-type="hp"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title={`Click to Set HP to Amount (currently ${amount}), Double-click to reset HP & Temp HP`}
-                    data-bs-original-title={`Click to Set HP to Amount (currently ${amount}), Double-click to reset HP & Temp HP`}
+                    title={`Click to Set HP to Amount (currently ${amount}), Long press to reset HP & Temp HP`}
+                    data-bs-original-title={`Click to Set HP to Amount (currently ${amount}), Long press to reset HP & Temp HP`}
                 >
                     <ProgressBar
                         value={safeCurrentHealth}
@@ -492,14 +583,26 @@ export default function HitPoints() {
                     )}
                 </div>
 
-                {/* MP Bar */}
-                <div
+                {/* MP Bar */}                <div
                     style={{ cursor: 'pointer' }}
-                    onClick={handleMpBarClick}
+                    onClick={(e) => {
+                        // Only handle click for mouse events, not touch
+                        if (e.type !== 'touchend') {
+                            handleMpBarClick();
+                        }
+                    }}
+                    onMouseDown={handleMpBarMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseLeave}
+                    onTouchStart={handleMpBarMouseDown}
+                    onTouchEnd={handleMouseUp}
+                    onTouchCancel={handleMouseLeave}
+                    onContextMenu={(e) => e.preventDefault()}
+                    data-bar-type="mp"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title={`Click to Set MP to Amount (currently ${amount}), Double-click to Full Restore MP`}
-                    data-bs-original-title={`Click to Set MP to Amount (currently ${amount}), Double-click to Full Restore MP`}
+                    title={`Click to Set MP to Amount (currently ${amount}), Long press to Full Restore MP`}
+                    data-bs-original-title={`Click to Set MP to Amount (currently ${amount}), Long press to Full Restore MP`}
                 >
                     <ProgressBar
                         value={safeCurrentMp}

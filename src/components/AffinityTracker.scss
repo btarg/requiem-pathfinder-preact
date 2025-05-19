@@ -8,7 +8,7 @@
 }
 
 /* Media query for smaller screens - switch to 2 columns */
-@media (max-width: 1200px) {
+@media (max-width: 900px) {
     .element-grid {
         grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
     }
