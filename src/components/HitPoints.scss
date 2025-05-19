@@ -121,6 +121,22 @@
     }
 }
 
+// Hide increment/decrement buttons on very small screens
+@media (max-width: 480px) {
+    .amount-control-btn {
+        display: none;
+    }
+    
+    // Make input take full width when buttons are hidden
+    .amount-input-container {
+        flex: 1;
+        
+        input {
+            width: 100% !important;
+        }
+    }
+}
+
 .hit-points-component-container {
     flex-flow: nowrap;
 }

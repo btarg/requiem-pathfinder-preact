@@ -3,7 +3,6 @@ import { useSpellContext } from '../context/SpellContext';
 import { getLinkStatBonus } from '../utils/diceHelpers';
 import { capitalizeFirstLetter } from '../utils/commonUtils';
 import { STATS_CONFIG } from '../config/stats';
-import DecorativeTitle from './DecorativeTitle';
 
 const QuickRolls = () => {
     const { showToast } = ToastManager();
@@ -66,7 +65,6 @@ const QuickRolls = () => {
 
             </div>
 
-            <DecorativeTitle title="QUICK ROLLS" containerClassName='mt-3' />
         </div>
     );
 };

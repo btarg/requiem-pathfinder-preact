@@ -366,6 +366,11 @@ const SpellManager = () => {
                 </div>
 
                 {/* Spell list */}
+                {spells.length === 0 && (
+                    <span className={"text-muted text-center d-flex flex-column align-items-center justify-content-center" + (window.innerWidth <= 750 ? " mt-4" : "")}>
+                        [ Inventory Empty ]
+                    </span>
+                )}
                 <ul className="list-group">
                     {spells.map((spell, index) => (
                         <li key={spell.id} className={`list-group-item spell-item ${flashingSpellId === spell.id ? 'quantity-flash' : ''}`}>

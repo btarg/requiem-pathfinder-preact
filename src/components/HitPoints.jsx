@@ -255,24 +255,6 @@ export default function HitPoints() {
         }
     };
 
-    const handleMaxHealthChange = (e) => {
-        const target = e.currentTarget;
-        const newMax = Math.max(1, parseInt(target.value) || 1);
-        updateHealth({ maxHealth: newMax });
-        if (characterStats.currentHealth > newMax) {
-            updateHealth({ currentHealth: newMax });
-        }
-    };
-
-    const handleMaxMpChange = (e) => {
-        const target = e.currentTarget;
-        const newMax = Math.max(1, parseInt(target.value) || 1);
-        updateHealth({ maxMp: newMax });
-        if (characterStats.currentMp > newMax) {
-            updateHealth({ currentMp: newMax });
-        }
-    };
-
     const handleUseMp = () => {
         setMpChanged(true)
         updateHealth({
@@ -328,7 +310,7 @@ export default function HitPoints() {
         if (e.type === 'touchstart') {
             e.preventDefault();
         }
-        
+
         setIsPressing(true);
         longPressTimeoutRef.current = setTimeout(() => {
             // Long press action (same as double click)
@@ -352,7 +334,7 @@ export default function HitPoints() {
         if (e.type === 'touchstart') {
             e.preventDefault();
         }
-        
+
         setIsPressing(true);
         longPressTimeoutRef.current = setTimeout(() => {
             // Long press action (same as double click)
@@ -369,7 +351,7 @@ export default function HitPoints() {
         if (longPressTimeoutRef.current) {
             clearTimeout(longPressTimeoutRef.current);
             longPressTimeoutRef.current = null;
-            
+
             // If this was a short tap/click (not a long press), process it as a click
             if (isPressing && e.type === 'touchend') {
                 const targetType = e.currentTarget.getAttribute('data-bar-type');
@@ -441,9 +423,6 @@ export default function HitPoints() {
     const safeMaxHealth = Math.max(1, characterStats.maxHealth || 0);
     const safeTempHealth = characterStats.tempHealth || 0;
 
-    const healthPercentage = (safeCurrentHealth / safeMaxHealth) * 100;
-    const tempHealthPercentage = (safeTempHealth / safeMaxHealth) * 100;
-
     const safeCurrentMp = characterStats.currentMp || 0;
     const safeMaxMp = Math.max(1, characterStats.maxMp || 0);
     const mpPercentage = (safeCurrentMp / safeMaxMp) * 100;
@@ -454,7 +433,7 @@ export default function HitPoints() {
             {/* HP and MP Controls */}
             <div className="row align-items-center mb-3">
 
-                <div className="d-flex justify-content-center align-items-center gap-2">
+                <div className="d-flex justify-content-center align-items-center gap-1">
                     <button
                         onClick={handleUseMp}
                         className="btn btn-outline-primary btn-icon-square"
@@ -465,21 +444,29 @@ export default function HitPoints() {
                         <i className="fas fa-bolt-lightning" />
                     </button>
                     <button
-                        onClick={isCtrlPressed ? handleClearTempHp : handleDamage}
-                        className={`btn btn-icon-square ${isCtrlPressed ? 'btn-outline-warning' : 'btn-outline-danger'}`}
+                        onClick={handleClearTempHp}
+                        className="btn btn-icon-square btn-outline-warning"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        title={isCtrlPressed ? "Clear Temporary HP" : "Damage HP"}
-                        data-bs-original-title={isCtrlPressed ? "Clear Temporary HP" : "Damage HP"}
+                        title="Clear Temporary HP"
+                        data-bs-original-title="Clear Temporary HP"
                     >
-                        {isCtrlPressed ? <i className="fas fa-times-circle" /> : <i className="fas fa-heart-circle-minus" />}
+                        <i className="fas fa-times-circle" />
                     </button>
-
-                    {/* Amount Input with Increment/Decrement Buttons */}
-                    <div className="input-group" style={{ width: 'auto', alignItems: 'center' }}>
+                    <button
+                        onClick={handleDamage}
+                        className="btn btn-icon-square btn-outline-danger"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Damage HP"
+                        data-bs-original-title="Damage HP"
+                    >
+                        <i className="fas fa-heart-circle-minus" />
+                    </button>
+                    <div className="input-group amount-input-container" style={{ width: 'auto', alignItems: 'center' }}>
                         <button
                             onClick={handleDecrementAmount}
-                            className="btn btn-outline-secondary btn-icon-square"
+                            className="btn btn-outline-secondary btn-icon-square amount-control-btn"
                             type="button"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
@@ -502,7 +489,7 @@ export default function HitPoints() {
                         />
                         <button
                             onClick={handleIncrementAmount}
-                            className="btn btn-outline-secondary btn-icon-square"
+                            className="btn btn-outline-secondary btn-icon-square amount-control-btn"
                             type="button"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
@@ -514,15 +501,27 @@ export default function HitPoints() {
                     </div>
 
                     <button
-                        onClick={isCtrlPressed ? handleTempHeal : handleHeal}
-                        className={`btn btn-icon-square ${isCtrlPressed ? 'btn-outline-info' : 'btn-outline-success'}`}
+                        onClick={handleHeal}
+                        className="btn btn-icon-square btn-outline-success"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        title={isCtrlPressed ? "Heal Temporary HP" : "Heal HP"}
-                        data-bs-original-title={isCtrlPressed ? "Heal Temporary HP" : "Heal HP"}
+                        title="Heal HP"
+                        data-bs-original-title="Heal HP"
                     >
-                        {isCtrlPressed ? <i className="fas fa-heart-pulse" /> : <i className="fas fa-heart-circle-plus" />}
+                        <i className="fas fa-heart-circle-plus" />
                     </button>
+
+                    <button
+                        onClick={handleTempHeal}
+                        className="btn btn-icon-square btn-outline-info"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Heal Temporary HP"
+                        data-bs-original-title="Heal Temporary HP"
+                    >
+                        <i className="fas fa-heart-pulse" />
+                    </button>
+
                     <button
                         onClick={handleRestoreMp}
                         className="btn btn-outline-info btn-icon-square"
