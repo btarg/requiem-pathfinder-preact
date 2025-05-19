@@ -9,9 +9,21 @@ import reflectIconSvg from '../assets/shield-reflect.svg'; // Import reflect SVG
 import weakIconSvg from '../assets/achilles-heel.svg'; // Import weak SVG
 import healIconSvg from '../assets/heart-plus.svg'; // Import heal SVG for Absorb
 
-const AffinityTracker = () => {
+
+function AffinityTracker() {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
     const [editingElement, setEditingElement] = useState(null); // State to track which element is being edited
+
+    // Width state for responsive design
+    const [width, setWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1024);
+
+    useEffect(() => {
+        const onResize = () => setWidth(window.innerWidth);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
+    let isSmallScreen = width < 768; // Adjust this value based on your design breakpoints
 
     useEffect(() => {
         // Initialize or update affinities structure if it doesn't exist or is in old format
@@ -121,26 +133,25 @@ const AffinityTracker = () => {
                             <div
                                 key={element}
                                 className={`element-item clickable-card mb-3 ${currentAffinity.mastered ? 'gold-bg' : ''} ${editingElement === element ? 'editing' : ''}`}
-                                onClick={() => handleElementClick(element)} // Add click handler to the item
+                                onClick={() => handleElementClick(element)}
                             >
                                 {currentAffinity.mastered && (
                                     <div className="mastery-watermark">MASTERY</div>
-                                )}                            <div className="element-header d-flex align-items-center justify-content-between mb-1">
+                                )}
+                                <div className="element-header d-flex align-items-center justify-content-between mb-1">
                                     <div className="d-flex align-items-center element-info">
                                         <span className="element-icon">{getElementIcon(element)}</span>
-                                        <div className="element-names">
-                                            <span className="arsenal element-fullname">{element}:</span>
-                                            <span className="arsenal element-shortname">{getElementShortName(element)}:</span>
-                                        </div>
-                                        <div className={`arsenal ms-1 affinity-names text-${getAffinityColor(currentAffinity.type)}`}>
-                                            <span className="affinity-fullname">{currentAffinity.type}</span>
-                                            <span className="affinity-shortname">{getAffinityShortName(currentAffinity.type)}</span>
-                                        </div>
+                                        <span className="arsenal element-name">
+                                            {isSmallScreen ? getElementShortName(element) : element}:
+                                        </span>
+                                        <span className={`arsenal ms-1 affinity-name text-${getAffinityColor(currentAffinity.type)}`}>
+                                            {isSmallScreen ? getAffinityShortName(currentAffinity.type) : currentAffinity.type}
+                                        </span>
                                     </div>
                                     <button
                                         className={`mastery-toggle-button ${currentAffinity.mastered ? 'mastered' : ''}`}
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Prevent click from bubbling to element-item
+                                            e.stopPropagation();
                                             toggleMastery(element);
                                         }}
                                         title={currentAffinity.mastered ? "Disable Mastery" : "Enable Mastery"}
