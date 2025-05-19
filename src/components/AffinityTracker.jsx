@@ -137,19 +137,12 @@ const AffinityTracker = () => {
                                     </span>
                                 </div>
                                 <button
+                                    className={`mastery-toggle-button ${currentAffinity.mastered ? 'mastered' : ''}`}
                                     onClick={(e) => { 
                                         e.stopPropagation(); // Prevent click from bubbling to element-item
                                         toggleMastery(element);
                                     }}
                                     title={currentAffinity.mastered ? "Disable Mastery" : "Enable Mastery"}
-                                    style={{
-                                        border: 'none',
-                                        padding: 0,
-                                        background: 'none',
-                                        color: currentAffinity.mastered ? 'gold' : 'currentColor',
-                                        cursor: 'pointer',
-                                        fontSize: '1rem'
-                                    }}
                                 >
                                     <i className={`${currentAffinity.mastered ? 'fas fa-star' : 'fa-regular fa-star'}`}></i>
                                 </button>

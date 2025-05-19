@@ -25,7 +25,7 @@
     background-color: var(--bs-bg-dark);
     // Static grey gradient for default cards
     background-image: linear-gradient(to right, rgb(50, 50, 50), transparent);
-    text-shadow: 0 0 12px rgba(0, 0, 0, 1), 0 0 16px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 0 4px rgba(0, 0, 0, 1), 0 0 12px rgba(0, 0, 0, 0.9);
 }
 
 .element-item .element-header,
@@ -49,16 +49,16 @@
 
 .element-item.gold-bg {
     border-left-color: gold;
-    background-image: linear-gradient(90deg, rgba(255, 217, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%) !important;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    background-image: linear-gradient(90deg, rgba(255, 217, 0, 0.45) 0%, transparent 70%) !important;
+    // box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
     background-size: 200% 100%;
     // background-position is handled by the animation
     animation: sweep-in-and-stay 0.4s ease-out forwards;
 }
 
-.element-item.gold-bg .element-name {
-    color: gold;
-}
+// .element-item.gold-bg .element-name {
+//     color: gold;
+// }
 
 .mastery-watermark {
     position: absolute;
@@ -66,7 +66,7 @@
     left: 50%;
     font-size: 2.8rem;
     font-weight: bold;
-    color: rgba(255, 215, 0, 0.15);
+    color: rgba(255, 215, 0, 0.1);
     pointer-events: none;
     white-space: nowrap;
     z-index: 0;
@@ -98,7 +98,7 @@
 
 @keyframes mastery-flash-anim {
     0% {
-        color: rgba(255, 215, 0, 0.15);
+        color: rgba(255, 215, 0, 0.1);
         transform: translate(-50%, -50%) rotate(-15deg) scale(1);
     }
     50% {
@@ -106,13 +106,32 @@
         transform: translate(-50%, -50%) rotate(-15deg) scale(1.05);
     }
     100% {
-        color: rgba(255, 215, 0, 0.15);
+        color: rgba(255, 215, 0, 0.1);
         transform: translate(-50%, -50%) rotate(-15deg) scale(1);
     }
 }
 
 .clickable-card {
     cursor: pointer;
+}
+
+.mastery-toggle-button {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: currentColor; /* Default color */
+}
+
+.element-item:hover .mastery-toggle-button {
+    opacity: 1;
+}
+
+.mastery-toggle-button.mastered {
+    color: gold; /* Color when mastered */
 }
 
 .affinity-buttons .btn {
