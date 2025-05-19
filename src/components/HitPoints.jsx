@@ -556,8 +556,8 @@ export default function HitPoints() {
                     data-bar-type="hp"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title={`Click to Set HP to Amount (currently ${amount}), Long press to reset HP & Temp HP`}
-                    data-bs-original-title={`Click to Set HP to Amount (currently ${amount}), Long press to reset HP & Temp HP`}
+                    title={`Click to Set HP to ${amount}, Long press/double click to reset HP & Temp HP`}
+                    data-bs-original-title={`Click to Set HP to ${amount}, Long press/double click to reset HP & Temp HP`}
                 >
                     <ProgressBar
                         value={safeCurrentHealth}
@@ -600,8 +600,8 @@ export default function HitPoints() {
                     data-bar-type="mp"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title={`Click to Set MP to Amount (currently ${amount}), Long press to Full Restore MP`}
-                    data-bs-original-title={`Click to Set MP to Amount (currently ${amount}), Long press to Full Restore MP`}
+                    title={`Click to Set MP to ${amount}, Long press/double click to Full Restore MP`}
+                    data-bs-original-title={`Click to Set MP to ${amount}, Long press/double click to Full Restore MP`}
                 >
                     <ProgressBar
                         value={safeCurrentMp}
