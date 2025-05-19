@@ -1,14 +1,17 @@
-.affinity-tracker {
-    margin-top: 1rem;
-}
-
 .element-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* 3 columns by default */
     gap: 0.1rem;
     max-width: 100%;
     justify-self: center;
     align-items: start;
+}
+
+/* Media query for smaller screens - switch to 2 columns */
+@media (max-width: 1200px) {
+    .element-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
+    }
 }
 
 .element-item {
@@ -25,7 +28,7 @@
     background-color: var(--bs-bg-dark);
     // Static grey gradient for default cards
     background-image: linear-gradient(to right, rgb(50, 50, 50), transparent);
-    text-shadow: 0 0 4px rgba(0, 0, 0, 1), 0 0 12px rgba(0, 0, 0, 0.9);
+    text-shadow: 0 0 4px rgba(0, 0, 0, 1), 0 0 8px rgba(0, 0, 0, 0.9);
 }
 
 .element-item .element-header,
@@ -56,9 +59,25 @@
     animation: sweep-in-and-stay 0.4s ease-out forwards;
 }
 
-// .element-item.gold-bg .element-name {
-//     color: gold;
-// }
+.element-info {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+}
+
+.element-name {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.element-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-right: 3px;
+}
 
 .mastery-watermark {
     position: absolute;
@@ -134,6 +153,24 @@
     color: gold; /* Color when mastered */
 }
 
+.affinity-buttons {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    width: 100%;
+    -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+    
+    &::-webkit-scrollbar {
+        display: none; /* Hide scrollbar in Chrome/Safari */
+    }
+    
+    .btn {
+        flex: 0 0 auto;
+        min-width: auto;
+    }
+}
+
 .affinity-buttons .btn {
     padding: 0.25rem 0.25rem;
     border-color: rgb(69, 69, 69);
@@ -168,4 +205,25 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
     z-index: 2;
+}
+
+.element-names, .affinity-names {
+    display: inline-block;
+}
+
+.element-fullname, .affinity-fullname {
+    display: inline;
+}
+
+.element-shortname, .affinity-shortname {
+    display: none;
+}
+
+@media (width: 180px) {
+    .element-fullname, .affinity-fullname {
+        display: none;
+    }
+    .element-shortname, .affinity-shortname {
+        display: inline;
+    }
 }

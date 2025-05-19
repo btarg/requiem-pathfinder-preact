@@ -16,7 +16,6 @@
 
 .box-no-input {
     @extend .hp-input; // Inherit styles from .hp-input
-    -webkit-appearance: none; // Remove webkit arrows
     margin: 0; // Remove default margin for number inputs in some browsers
     pointer-events: none; // Make it behave as if disabled for clicks
     background-color: var(--bs-secondary-bg); // Visually indicate disabled state

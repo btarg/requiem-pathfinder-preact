@@ -109,7 +109,6 @@ export default function HitPoints() {
         };
     }, []);
 
-    // Health management functions
     const updateHealth = (updates) => {
         setCharacterStats(prev => ({
             ...prev,
@@ -260,6 +259,15 @@ export default function HitPoints() {
         }
     };
 
+    const handleMaxMpChange = (e) => {
+        const target = e.currentTarget;
+        const newMax = Math.max(1, parseInt(target.value) || 1);
+        updateHealth({ maxMp: newMax });
+        if (characterStats.currentMp > newMax) {
+            updateHealth({ currentMp: newMax });
+        }
+    };
+
     const handleUseMp = () => {
         setMpChanged(true)
         updateHealth({
@@ -274,15 +282,6 @@ export default function HitPoints() {
             currentMp: Math.min(characterStats.maxMp, characterStats.currentMp + amount)
         })
     }
-
-    const handleMaxMpChange = (e) => {
-        const target = e.currentTarget;
-        const newMax = Math.max(1, parseInt(target.value) || 1);
-        updateHealth({ maxMp: newMax });
-        if (characterStats.currentMp > newMax) {
-            updateHealth({ currentMp: newMax });
-        }
-    };
 
     const handleSetHp = () => {
         const newHealth = Math.max(0, Math.min(characterStats.maxHealth, amount));
@@ -373,122 +372,7 @@ export default function HitPoints() {
     return (
         <div className="hit-points-component-container container-fluid mb-4">
 
-            <div className="row align-items-center mb-3">
-                {/* Left Column: Character Stat values: speed, AC - Wrapped in col-auto */}
-                <div className="col-auto">
-                    <div className="d-flex gap-2">
-                        <div className="text-center">
-                            <small className="d-block mb-1 text-secondary">Speed</small>
-                            <input
-                                type="number"
-                                className="form-control form-control box-no-input text-center bg-dark text-light"
-                                id="speedInput"
-                                value={getSpeed() + 30} // Display speed
-                                readOnly // Make read-only
-                                aria-label="Speed"
-                            />
-                        </div>
-                        <div className="text-center">
-                            <small className="d-block mb-1 text-secondary">AC</small>
-                            <input
-                                type="number"
-                                className="form-control box-no-input text-center bg-dark text-light"
-                                id="acInput"
-                                value={characterStats.AC || 0} // Display AC
-                                readOnly // Make read-only
-                                aria-label="Armor Class"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Column: Max Values - Wrapped in col-auto ms-auto */}
-                <div className="col-auto ms-auto">
-                    <div className="d-flex gap-2"> {/* This div wraps the second group of inputs */}
-                        <div className="text-center">
-                            <small className="d-block mb-1 text-secondary">Max HP</small>
-                            <input
-                                type="number"
-                                className="form-control form-control hp-input text-center bg-dark text-light"
-                                id="maxHealthInput"
-                                value={characterStats.maxHealth || ''}
-                                onChange={handleMaxHealthChange}
-                                min="1"
-                                aria-label="Maximum Hit Points"
-                            />
-                        </div>
-                        <div className="text-center">
-                            <small className="d-block mb-1 text-secondary">Max MP</small>
-                            <input
-                                type="number"
-                                className="form-control form-control hp-input text-center bg-dark text-light"
-                                id="maxMpInput"
-                                value={characterStats.maxMp || ''}
-                                onChange={handleMaxMpChange}
-                                min="1"
-                                aria-label="Maximum Mana Points"
-                            />
-                        </div>
-                    </div> {/* Closing tag for the second group of inputs */}
-                </div>
-            </div>
-
-            {/* Progress Bars Section */}
-            <div className="mb-3">
-                {/* HP and Temp HP Bar Group for Overlay */}
-                <div
-                    style={{ position: 'relative', cursor: 'pointer' }}
-                    className="mb-2"
-                    onClick={handleHpBarClick}
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title={`Click to Set HP to Amount (currently ${amount}), Double-click to reset HP & Temp HP`}
-                    data-bs-original-title={`Click to Set HP to Amount (currently ${amount}), Double-click to reset HP & Temp HP`}
-                >
-                    <ProgressBar
-                        value={safeCurrentHealth}
-                        maxValue={safeMaxHealth}
-                        color={{ from: '#ef4444', to: '#e11d48' }} // Tailwind red-500 to rose-600
-                        labelRight={`${safeCurrentHealth} / ${safeMaxHealth}`}
-                        trailingStartValue={previousMainHealth}
-                        trailColor="rgba(200, 0, 0, 0.7)" // Darker red for trail
-                        className={isFlashingHP ? 'progress-bar-damage-flash' : ''}
-                    />
-                    {(safeTempHealth > 0 || previousTempHealth !== null) && (
-                        <ProgressBar
-                            value={safeTempHealth}
-                            maxValue={safeMaxHealth}
-                            color={{ from: '#21d2ec', to: '#14b8a7' }}
-                            labelCenter={safeTempHealth > 0 ? `${safeTempHealth} Temp` : ""}
-                            isOverlay={true}
-                            className={`health-overlay-bar ${isFlashingTempHP ? 'progress-bar-damage-flash' : ''}`}
-                            trailingStartValue={previousTempHealth}
-                            trailColor="rgba(0, 50, 200, 0.7)" // Darker blue for trail
-                        />
-                    )}
-                </div>
-
-                {/* MP Bar */}
-                <div
-                    style={{ cursor: 'pointer' }}
-                    onClick={handleMpBarClick}
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title={`Click to Set MP to Amount (currently ${amount}), Double-click to Full Restore MP`}
-                    data-bs-original-title={`Click to Set MP to Amount (currently ${amount}), Double-click to Full Restore MP`}
-                >
-                    <ProgressBar
-                        value={safeCurrentMp}
-                        maxValue={safeMaxMp}
-                        color={{ from: '#3c82f6', to: '#6366f1' }}
-                        labelRight={`${safeCurrentMp} / ${safeMaxMp}`}
-                        className={mpChanged ? 'progress-bar-damage-flash' : ''}
-                        trailingStartValue={safeCurrentMp} // MP trail will show previous value before change
-                        trailColor="rgba(0, 50, 200, 0.7)"
-                    />
-                </div>
-            </div>
-
+            {/* HP and MP Controls */}
             <div className="row align-items-center mb-3">
 
                 <div className="d-flex flex-wrap justify-content-center align-items-center gap-2">
@@ -573,16 +457,63 @@ export default function HitPoints() {
                 </div>
             </div>
 
-            {/* Conditions Tracker Row */}
-            <div className="row mt-4">
-                <div className="col-12">
-                    <DecorativeTitle title="CONDITIONS" />
-                    <div className="conditions-tracker-placeholder p-3 border rounded bg-dark-subtle">
-                        <h5 className="text-secondary-emphasis">CONDITIONS TRACKER</h5>
-                        <p className="text-muted">(Placeholder for future implementation)</p>
-                    </div>
+            {/* Progress Bars Section */}
+            <div className="mb-3">
+                {/* HP and Temp HP Bar Group for Overlay */}
+                <div
+                    style={{ position: 'relative', cursor: 'pointer' }}
+                    className="mb-2"
+                    onClick={handleHpBarClick}
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title={`Click to Set HP to Amount (currently ${amount}), Double-click to reset HP & Temp HP`}
+                    data-bs-original-title={`Click to Set HP to Amount (currently ${amount}), Double-click to reset HP & Temp HP`}
+                >
+                    <ProgressBar
+                        value={safeCurrentHealth}
+                        maxValue={safeMaxHealth}
+                        color={{ from: '#ef4444', to: '#e11d48' }} // Tailwind red-500 to rose-600
+                        labelRight={`${safeCurrentHealth} / ${safeMaxHealth}`}
+                        trailingStartValue={previousMainHealth}
+                        trailColor="rgba(200, 0, 0, 0.7)" // Darker red for trail
+                        className={isFlashingHP ? 'progress-bar-damage-flash' : ''}
+                    />
+                    {(safeTempHealth > 0 || previousTempHealth !== null) && (
+                        <ProgressBar
+                            value={safeTempHealth}
+                            maxValue={safeMaxHealth}
+                            color={{ from: '#21d2ec', to: '#14b8a7' }}
+                            labelCenter={safeTempHealth > 0 ? `${safeTempHealth} Temp` : ""}
+                            isOverlay={true}
+                            className={`health-overlay-bar ${isFlashingTempHP ? 'progress-bar-damage-flash' : ''}`}
+                            trailingStartValue={previousTempHealth}
+                            trailColor="rgba(0, 50, 200, 0.7)" // Darker blue for trail
+                        />
+                    )}
+                </div>
+
+                {/* MP Bar */}
+                <div
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleMpBarClick}
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title={`Click to Set MP to Amount (currently ${amount}), Double-click to Full Restore MP`}
+                    data-bs-original-title={`Click to Set MP to Amount (currently ${amount}), Double-click to Full Restore MP`}
+                >
+                    <ProgressBar
+                        value={safeCurrentMp}
+                        maxValue={safeMaxMp}
+                        color={{ from: '#3c82f6', to: '#6366f1' }}
+                        labelRight={`${safeCurrentMp} / ${safeMaxMp}`}
+                        className={mpChanged ? 'progress-bar-damage-flash' : ''}
+                        trailingStartValue={safeCurrentMp} // MP trail will show previous value before change
+                        trailColor="rgba(0, 50, 200, 0.7)"
+                    />
                 </div>
             </div>
+
+
         </div>
     )
 }
