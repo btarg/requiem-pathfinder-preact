@@ -7,8 +7,8 @@ import LeftArrowIcon from '../assets/keyboard_arrow_left_outline.svg';
 import RightArrowIcon from '../assets/keyboard_arrow_right_outline.svg';
 
 const pageRoutes = [
-    { id: 'character', title: 'Character Sheet' },
-    { id: 'spells', title: 'Spells' },
+    { id: 'character', title: 'Health' },
+    { id: 'spells', title: 'Spells and Stats' },
     // Add more pages here in the future, e.g.:
     // { id: 'inventory', title: 'Inventory' },
 ];
@@ -27,6 +27,15 @@ export function Header() {
 
     useEffect(() => {
         const handleKeyDown = (event) => {
+            // Check if the event target is an input, textarea, or contenteditable element
+            const targetTagName = event.target.tagName.toLowerCase();
+            const isContentEditable = event.target.isContentEditable;
+
+            if (targetTagName === 'input' || targetTagName === 'textarea' || isContentEditable) {
+                // If focused on an input, textarea, or contenteditable, do not navigate
+                return;
+            }
+
             if (event.key === 'ArrowLeft') {
                 if (currentPageIndex > 0) {
                     route(pages[currentPageIndex - 1].path);
@@ -73,17 +82,23 @@ export function Header() {
                             }}
                             aria-disabled={currentPageIndex <= 0}
                         />
-                        {pages.map((page, index) => (
-                            <button
-                                key={page.path}
-                                className={`dark-btn dark-btn-primary ${url === page.path ? 'dark-btn-active' : ''}`}
-                                onClick={() => navigateTo(page.path)}
-                                data-bs-toggle="tooltip"
-                                title={`Navigate to ${page.title} (${index > 0 ? 'Left Arrow' : ''}${index > 0 && index < pages.length -1 ? ' / ' : ''}${index < pages.length - 1 ? 'Right Arrow' : ''})`}
-                            >
-                                <span>{page.title}</span>
-                            </button>
-                        ))}
+                        {pages.map((page, index) => {
+                            let buttonClasses = `dark-btn dark-btn-primary`; // Base classes
+                            if (url === page.path) {
+                                buttonClasses += '-active'; // Add active class separately
+                            }
+                            return (
+                                <button
+                                    key={page.path}
+                                    className={buttonClasses}
+                                    onClick={() => navigateTo(page.path)}
+                                    data-bs-toggle="tooltip"
+                                    title={`Navigate to ${page.title} (${index > 0 ? 'Left Arrow' : ''}${index > 0 && index < pages.length -1 ? ' / ' : ''}${index < pages.length - 1 ? 'Right Arrow' : ''})`}
+                                >
+                                    <span>{page.title}</span>
+                                </button>
+                            );
+                        })}
                         <img
                             src={RightArrowIcon}
                             alt="Navigate right"

@@ -46,129 +46,137 @@ main {
     margin: 0 auto;
 }
 
-@media (max-width: 639px) {
-    main {
-        margin: 2rem;
-    }
-}
-
-/* Persona-style button styling - updated version */
+// --- Base Skewed Button ---
 .dark-btn {
     position: relative;
     display: inline-block;
-    color: #ffffff;
-    background-color: var(--bs-body-bg);
-    // font-family: "Impact", "Arial Black", "Franklin Gothic Medium", sans-serif;
-    text-transform: uppercase;
-    // letter-spacing: 1.5px;
-    // text-decoration: none;
-
-    padding: 0.5rem 0.5rem;
-
     font-family: "Arsenal", sans-serif !important;
-        font-weight: bold;
-        font-style: italic;
-
-    border: none;
+    font-weight: bold;
+    font-style: italic;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.5rem 0.5rem;
+    background-color: var(--bs-body-bg); // Transparent background, fill comes from ::before
+    border: 2px solid; // Border color set by variants
     transform: skewX(-15deg);
-    outline: 2px solid transparent;
+    outline: none;
     overflow: hidden;
     z-index: 1;
-    transition: color 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
-                outline-color 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    // Transitions for properties that change on hover/active for the button itself
+    transition: color 0.2s ease-out,
+                border-color 0.2s ease-out,
+                transform 0.08s ease-out; // For active state scale
+
+    span, i, small {
+        display: inline-block;
+        transform: skewX(15deg);
+        position: relative;
+        z-index: 3; // Above the ::before fill
+    }
+
+    &::before { // The animated background fill
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        // background-color is set by variants
+        transform: translateX(-105%);
+        z-index: 2; // Below text, above button's own background
+        transition: transform 0.15s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    &:hover {
+        // border-color and color (text) are set by variants
+        &::before {
+            transform: translateX(0);
+        }
+    }
+
+    &:active {
+        transform: skewX(-15deg) scale(0.96);
+        // border-color and color (text) should persist from hover or be explicitly set by variants
+    }
+
+    // Modifier for "active" state (e.g., current tab)
+    &.dark-btn--active {
+        // border-color and color (text) are set by variants
+        &::before {
+            transform: translateX(0);
+        }
+    }
 }
 
-/* Text inside button */
-.dark-btn span,
-.dark-btn i,
-.dark-btn small {
-    display: inline-block;
-    transform: skewX(15deg);
-    position: relative;
-    z-index: 3;
-}
+// --- Color Variants --- 
 
-
-/* The animated background fill */
-.dark-btn::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transform: translateX(-105%);
-    z-index: 2;
-    transition: transform 0.15s cubic-bezier(0.77, 0, 0.175, 1);
-}
-
-.dark-btn:hover {
-    outline-color: #ffffff;
-}
-
-.dark-btn:hover::before {
-    transform: translateX(0);
-}
-
-.dark-btn:active {
-    transform: skewX(-15deg) scale(0.96);
-    transition-duration: 0.08s;
-}
-
-/* --- Primary Persona Button (Red Accent) --- */
-.dark-btn-primary::before {
-    background-color: #ff003c;
-}
+// Primary (Red)
 .dark-btn-primary {
-    outline-color: #ff003c;
+    @extend .dark-btn;
+    color: var(--bs-danger);
+    border-color: var(--bs-danger);
+
+    &::before {
+        background-color: var(--bs-danger);
+    }
+
+    &:hover,
+    &:active {
+        color: #1a1a1a; // Dark text for light fill
+        border-color: #ffffff; // White border on hover/active
+    }
+    
+    &:active {
+        &::before {
+            background-color: #e00034; // Darker red fill on active press
+        }
+    }
 }
 
-.dark-btn-primary:hover,
-.dark-btn-secondary:hover {
-    color: #1a1a1a;
-}
-
-.dark-btn-primary:active::before {
-    background-color: #e00034;
-}
-
-/* --- Secondary Persona Button (Blue Accent) --- */
-.dark-btn-secondary::before {
-    background-color: #00d0ff;
-}
+// Secondary (Blue)
 .dark-btn-secondary {
-    outline-color: #00d0ff;
+    @extend .dark-btn;
+    color: #00d0ff; // Initial text color
+    border-color: var(--bs-info); // Initial border color
+
+    &::before {
+        background-color: var(--bs-info);
+    }
+
+    &:hover,
+    &:active {
+        color: #1a1a1a; // Dark text for light fill
+        border-color: #ffffff; // White border on hover/active
+    }
+
+    &:active {
+        &::before {
+            background-color: #00b8e6; // Slightly darker blue on active press
+        }
+    }
 }
 
-.dark-btn-secondary:active::before {
-    background-color: #00d0ff;
-}
+// Gold
+.gold-button {
+    @extend .dark-btn;
+    color: #FFD700; // Initial text color
+    border-color: #FFD700; // Initial border color
 
-.dark-btn-secondary:active {
-    color: #f0f0f0;
-}
+    &::before {
+        background-color: #eac700; // Fill color
+    }
 
-/* --- Active Persona Button State --- */
-/* Add .dark-btn-active to a .dark-btn (e.g., .dark-btn.dark-btn-primary.dark-btn-active) 
-   to make it appear "on" or "current", drawing attention. */
-.dark-btn.dark-btn-active {
-    color: #1a1a1a; /* Dark text to contrast with the ::before fill, same as hover */
-    outline-color: #ffffff; /* Ensure outline is visible, same as hover */
-}
-
-.dark-btn.dark-btn-active::before {
-    transform: translateX(0); /* Make the ::before pseudo-element (the color fill) visible */
-    /* The existing transition on .dark-btn::before will cause this to animate in when the class is added.
-       If you want the active state to appear instantly without animation, you could add:
-       transition: none; 
-       or specifically target the transform property:
-       transition: transform 0s; */
-}
-
-/* Ensure hover on an active button doesn't revert text color if other rules conflict */
-.dark-btn.dark-btn-active:hover {
-    color: #1a1a1a; /* Maintain dark text on hover */
-    /* outline-color will be handled by .dark-btn:hover */
+    &:hover,
+    &:active {
+        color: var(--bs-body-bg); // Dark text for gold fill
+        border-color: #fffb00; // Brighter gold/white border
+    }
+    
+    &:active {
+        &::before {
+            background-color: #d4af00; // Darker gold fill on active press
+        }
+    }
 }
 
 .form-control,

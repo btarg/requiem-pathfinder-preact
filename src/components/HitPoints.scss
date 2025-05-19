@@ -7,17 +7,46 @@
     width: 80px !important;
 }
 
-
-.form-control:focus {
-    box-shadow: none;
-    border-color: var(--bs-primary);
-}
-
 .hp-input::-webkit-inner-spin-button,
 .hp-input::-webkit-outer-spin-button {
     opacity: 1;
     margin: 0;
     height: 80px;
+}
+
+.box-no-input {
+    @extend .hp-input; // Inherit styles from .hp-input
+    margin: 0; // Remove default margin for number inputs in some browsers
+    pointer-events: none; // Make it behave as if disabled for clicks
+    background-color: var(--bs-secondary-bg); // Visually indicate disabled state
+    opacity: 0.7; // Further visual indication of disabled state
+}
+
+.box-no-input::-webkit-inner-spin-button,
+.box-no-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    display: none; // Ensure they are not displayed
+}
+
+.hp-input-sm {
+    font-size: 1rem !important; /* Smaller font */
+    height: 40px !important;    /* Matches button height */
+    padding: 0.25rem !important;
+    font-weight: bold !important;
+    width: 60px !important;     /* Smaller width */
+}
+
+.hp-input-sm::-webkit-inner-spin-button,
+.hp-input-sm::-webkit-outer-spin-button {
+    opacity: 1;
+    margin: 0;
+    height: 80px; /* Matches input height */
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--bs-primary);
 }
 
 .damage-flash,
@@ -76,4 +105,38 @@
     to {
         border-color: var(--bs-secondary);
     }
+}
+
+.btn-icon-square {
+    width: 40px; 
+    height: 40px; 
+    padding: 0.25rem; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem; // Adjust icon size within button
+
+    i {
+        margin: 0; 
+    }
+}
+
+// Hide increment/decrement buttons on very small screens
+@media (max-width: 480px) {
+    .amount-control-btn {
+        display: none;
+    }
+    
+    // Make input take full width when buttons are hidden
+    .amount-input-container {
+        flex: 1;
+        
+        input {
+            width: 100% !important;
+        }
+    }
+}
+
+.hit-points-component-container {
+    flex-flow: nowrap;
 }

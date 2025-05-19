@@ -352,7 +352,7 @@ const SpellManager = () => {
                         style={{ width: '160px', height: '60px' }}
                     >
                         <div className="d-flex flex-column align-items-center">
-                            <div><i className="fas fa-dice me-2"></i> <span>Roll to Draw</span></div>
+                            <div><i className="fas fa-dice me-2"></i> <span>Stock Roll</span></div>
                             <span style={{ fontSize: '0.7em' }}>hold Ctrl for mastery</span>
                         </div>
                     </button>
@@ -366,6 +366,11 @@ const SpellManager = () => {
                 </div>
 
                 {/* Spell list */}
+                {spells.length === 0 && (
+                    <span className={"text-muted text-center d-flex flex-column align-items-center justify-content-center" + (window.innerWidth <= 750 ? " mt-4" : "")}>
+                        [ Inventory Empty ]
+                    </span>
+                )}
                 <ul className="list-group">
                     {spells.map((spell, index) => (
                         <li key={spell.id} className={`list-group-item spell-item ${flashingSpellId === spell.id ? 'quantity-flash' : ''}`}>
@@ -441,11 +446,11 @@ const SpellManager = () => {
                                         onClick={(e) => { e.stopPropagation(); handleRollToDrawSpecificSpell(spell); }}
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        title={`Click to copy the Draw command for ${spell.name} (${spell.element} - ${spellIsMastered(spell) ? "mastery" : "normal"})`}
+                                        title={`Click to copy the Stock roll command for ${spell.name} (${spell.element} - ${spellIsMastered(spell) ? "mastery" : "normal"})`}
                                         style={{ flexShrink: 0 }}
                                     >
                                         <i className="fas fa-hand-sparkles"></i>
-                                        <span className="ms-1 hide-when-small">Draw</span>
+                                        <span className="ms-1 hide-when-small">Stock</span>
                                     </button>
 
                                     {/* Quantity controls */}
