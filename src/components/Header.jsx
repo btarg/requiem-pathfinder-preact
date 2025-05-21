@@ -78,15 +78,14 @@ export function Header() {
                             style={{
                                 ...iconStyle,
                                 marginRight: '8px',
-                                filter: currentPageIndex > 0 ? 'none' : 'opacity(0.3)',
-                                cursor: currentPageIndex > 0 ? 'pointer' : 'default',
+                                filter: currentPageIndex > 0 ? 'opacity(0.75)' : 'opacity(0.3)',
+                                cursor: currentPageIndex > 0 ? 'pointer' : '',
                             }}
                             aria-disabled={currentPageIndex <= 0}
-                        />
-                        {pages.map((page, index) => {
+                        />                        {pages.map((page, index) => {
                             let buttonClasses = `dark-btn dark-btn-secondary`; // Base classes
                             if (url === page.path) {
-                                buttonClasses += '-active';
+                                buttonClasses += ' dark-btn--active';
                             }
                             return (
                                 <button
@@ -105,8 +104,8 @@ export function Header() {
                             style={{
                                 ...iconStyle,
                                 marginLeft: '8px',
-                                filter: currentPageIndex < pages.length - 1 ? 'none' : 'opacity(0.3)',
-                                cursor: currentPageIndex < pages.length - 1 ? 'pointer' : 'default',
+                                filter: currentPageIndex < pages.length - 1 ? 'opacity(0.75)' : 'opacity(0.3)',
+                                cursor: currentPageIndex < pages.length - 1 ? 'pointer' : '',
                             }}
                             aria-disabled={currentPageIndex >= pages.length - 1}
                         />

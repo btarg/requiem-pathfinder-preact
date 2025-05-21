@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import 'bootstrap';
 
+
+$primary: #db7535;
+$primary-darker: #db7535; // same for now
+$secondary: #888888;
+
 :root {
     
     --bs-body-bg: #18181b !important;
@@ -21,6 +26,13 @@ span.action {
     font-family: 'Pathfinder-Icons';
     font-variant: normal;
     font-weight: normal;
+}
+
+.grey-text {
+    color: $secondary;
+}
+.border-top {
+    border-color: var(--gray-700) !important;
 }
 
 #app {
@@ -97,14 +109,13 @@ main {
     &:active {
         transform: skewX(-15deg) scale(0.96);
         // border-color and color (text) should persist from hover or be explicitly set by variants
-    }
-
-    // Modifier for "active" state (e.g., current tab)
+    }    // Modifier for "active" state (e.g., current tab)
     &.dark-btn--active {
         // border-color and color (text) are set by variants
         &::before {
             transform: translateX(0);
         }
+        border-color: $secondary;
     }
 }
 
@@ -113,45 +124,53 @@ main {
 // Primary (Red)
 .dark-btn-primary {
     @extend .dark-btn;
-    color: var(--bs-danger);
-    border-color: var(--bs-danger);
+    color: $primary;
+    border-color: $primary;
 
     &::before {
-        background-color: var(--bs-danger);
+        background-color: $primary;
     }
 
     &:hover,
     &:active {
         color: #1a1a1a; // Dark text for light fill
-        border-color: #ffffff; // White border on hover/active
+        border-color: $secondary; // White border on hover/active
     }
     
     &:active {
         &::before {
-            background-color: #e00034; // Darker red fill on active press
+            background-color: $primary-darker; // Darker fill on active press
         }
     }
 }
 
-// Secondary (Blue)
+// Secondary (Grey)
 .dark-btn-secondary {
     @extend .dark-btn;
-    color: #6c757d; // Initial text color
-    border-color: #343a40; // Initial border color
+    color: $secondary;
+    border-color: $secondary; 
 
     &::before {
-        background-color: var(--bs-info);
+        background-color: $secondary;
     }
 
     &:hover,
     &:active {
-        color: #1a1a1a; // Dark text for light fill
-        border-color: #ffffff; // White border on hover/active
+        color: #1a1a1a !important; // Dark text for light fill
     }
 
     &:active {
         &::before {
-            background-color: #00b8e6; // Slightly darker blue on active press
+            background-color: $secondary;
+        }
+    }
+    
+    &.dark-btn--active {
+        color: #1a1a1a !important;
+        
+        &::before {
+            transform: translateX(0);
+            background-color: $secondary;
         }
     }
 }

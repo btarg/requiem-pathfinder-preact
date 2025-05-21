@@ -32,8 +32,6 @@ const QuickRolls = () => {
     return (
         <div className="save-rolls">
 
-            {/* <DecorativeTitle title="QUICK ROLLS" /> */}
-
             <div className="d-flex flex-wrap gap-2 align-items-center justify-content-center">
                 {saveRolls.map((roll) => (
                     <button

@@ -1,7 +1,7 @@
 const DecorativeTitle = ({
     title,
-    titleClassName = "text-danger",
-    lineColor = "var(--bs-danger)",
+    titleClassName = "grey-text",
+    lineColor = "#8888",
     lineThickness = "1px",
     containerClassName = "mb-3",
     lineMaxWidth = "none" // New prop: 'none' for full grow, or e.g., "50px", "30%"

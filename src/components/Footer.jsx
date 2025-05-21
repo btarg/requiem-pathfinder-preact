@@ -26,8 +26,8 @@ const Footer = ({ buildDate }) => {
                     </div>
                      
                     <div className="col-4 text-center">
+                        <DecorativeTitle title="QUICK ROLLS" containerClassName='mb-3' />
                         <QuickRolls />
-                        <DecorativeTitle title="QUICK ROLLS" containerClassName='mt-3' />
                     </div>
                     
                     {/* Right Section: Wiki Link */}
