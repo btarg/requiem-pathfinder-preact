@@ -73,7 +73,7 @@ export function CharacterSheet() {
                                             type="number"
                                             className="form-control box-no-input text-center bg-dark text-light"
                                             id="acInput"
-                                            value={characterStats.AC || 0} // Display AC
+                                            value={characterStats.AC || 10} // Display AC
                                             readOnly // Make read-only
                                             aria-label="Armor Class"
                                         />
