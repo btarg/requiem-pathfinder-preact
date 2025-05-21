@@ -16,8 +16,8 @@ const pageRoutes = [
 
 const pages = pageRoutes.map(page => ({
     title: page.title,
-    path: page.id === 'character' 
-        ? BASE_URL 
+    path: page.id === 'character'
+        ? BASE_URL
         : `${BASE_URL.replace(/\/$/, '')}/${page.id}`
 }));
 
@@ -69,7 +69,7 @@ export function Header() {
         <header className="header mb-4">
             <div className="d-flex justify-content-center align-items-center p-3 border-bottom">
                 <div className="col-md-8 col-lg-6 text-center">
-                    <DecorativeTitle title="NAVIGATION" containerClassName='mb-3' />
+                    {/* <DecorativeTitle title="NAVIGATION" containerClassName='mb-3' /> */}
                     <nav className="btn-group gap-2" role="group" aria-label="Main navigation">
                         <img
                             src={LeftArrowIcon}
@@ -93,8 +93,6 @@ export function Header() {
                                     key={page.path}
                                     className={buttonClasses}
                                     onClick={() => navigateTo(page.path)}
-                                    data-bs-toggle="tooltip"
-                                    title={`Navigate to ${page.title} (${index > 0 ? 'Left Arrow' : ''}${index > 0 && index < pages.length -1 ? ' / ' : ''}${index < pages.length - 1 ? 'Right Arrow' : ''})`}
                                 >
                                     <span>{page.title}</span>
                                 </button>
