@@ -444,7 +444,7 @@ const AbilitiesList = () => {
 
     return (
         <div className="abilities-list-container">
-            <DecorativeTitle title="ABILITIES & ATTACKS" lineMaxWidth="50px" />
+            <DecorativeTitle title="ABILITIES & ATTACKS" />
             <div className="d-flex flex-column justify-content-between align-items-center mb-4">
                 <button
                     className="dark-btn dark-btn-primary mt-2 mt-md-0"
