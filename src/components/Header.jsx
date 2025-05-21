@@ -84,9 +84,9 @@ export function Header() {
                             aria-disabled={currentPageIndex <= 0}
                         />
                         {pages.map((page, index) => {
-                            let buttonClasses = `dark-btn dark-btn-primary`; // Base classes
+                            let buttonClasses = `dark-btn dark-btn-secondary`; // Base classes
                             if (url === page.path) {
-                                buttonClasses += '-active'; // Add active class separately
+                                buttonClasses += '-active';
                             }
                             return (
                                 <button

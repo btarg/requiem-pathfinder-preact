@@ -136,8 +136,8 @@ main {
 // Secondary (Blue)
 .dark-btn-secondary {
     @extend .dark-btn;
-    color: #00d0ff; // Initial text color
-    border-color: var(--bs-info); // Initial border color
+    color: #6c757d; // Initial text color
+    border-color: #343a40; // Initial border color
 
     &::before {
         background-color: var(--bs-info);

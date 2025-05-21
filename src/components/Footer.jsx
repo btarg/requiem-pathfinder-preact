@@ -33,7 +33,7 @@ const Footer = ({ buildDate }) => {
                     {/* Right Section: Wiki Link */}
                     <div className="col-4 d-flex align-items-center justify-content-end">
                         {wikiUrl && (
-                            <a href={wikiUrl} target="_blank" rel="noopener noreferrer" className="dark-btn dark-btn-primary">
+                            <a href={wikiUrl} target="_blank" rel="noopener noreferrer" className="dark-btn dark-btn-secondary">
                                 <i className="fas fa-book me-2"></i>
                                 <span className="me-2">Open Wiki</span><i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '0.75rem' }}></i>
                             </a>
