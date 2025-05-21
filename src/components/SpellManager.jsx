@@ -211,6 +211,8 @@ const SpellManager = () => {
 
             if (isLinkModalOpen)
                 closeLinkModal();
+
+            console.log("Spell saved:", currentSpell);
         }
     };
 
@@ -450,7 +452,6 @@ const SpellManager = () => {
                                         style={{ flexShrink: 0 }}
                                     >
                                         <i className="fas fa-hand-sparkles"></i>
-                                        <span className="ms-1 hide-when-small">Stock</span>
                                     </button>
 
                                     {/* Quantity controls */}

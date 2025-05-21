@@ -1,13 +1,11 @@
 import { useContext, useEffect, useState } from 'preact/hooks';
-import { CharacterContext } from '../context/CharacterContext';
-import { ElementType, AffinityType, getElementIcon, getElementShortName, getAffinityShortName } from '../config/enums';
+import { CharacterContext } from '../../context/CharacterContext';
+import { ElementType, AffinityType, getElementIcon, getElementShortName, getAffinityShortName } from '../../config/enums';
 import './AffinityTracker.scss';
-import DecorativeTitle from './DecorativeTitle';
-import reflectIconSvg from '../assets/shield-reflect.svg'; // Import reflect SVG
-// import reflectIconSvg from '../assets/divert.svg';
-
-import weakIconSvg from '../assets/achilles-heel.svg'; // Import weak SVG
-import healIconSvg from '../assets/heart-plus.svg'; // Import heal SVG for Absorb
+import DecorativeTitle from '../DecorativeTitle';
+import reflectIconSvg from '../../assets/shield-reflect.svg';
+import weakIconSvg from '../../assets/achilles-heel.svg'; // Import weak SVG
+import healIconSvg from '../../assets/heart-plus.svg'; // Import heal SVG for Absorb
 
 
 function AffinityTracker() {

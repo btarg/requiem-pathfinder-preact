@@ -1,15 +1,12 @@
 import { useEffect, useState, useContext, useRef } from 'preact/hooks'
-import { CharacterContext } from '../context/CharacterContext'
 import { Tooltip } from 'bootstrap';
 import './HitPoints.scss'
-import DecorativeTitle from './DecorativeTitle'
-import ProgressBar from './ProgressBar'
-import { getLinkStatBonus } from '../utils/diceHelpers';
-import { useSpellContext } from '../context/SpellContext';
+import { CharacterContext } from '../../context/CharacterContext';
+import ProgressBar from './ProgressBar';
+import DecorativeTitle from '../DecorativeTitle';
 
 export default function HitPoints() {
     const { characterStats, setCharacterStats } = useContext(CharacterContext)
-    const { spells } = useSpellContext();
 
     const [amount, setAmount] = useState(1)
     const [damageTaken, setDamageTaken] = useState(false)
@@ -428,7 +425,7 @@ export default function HitPoints() {
 
             {/* HP and MP Controls */}
             <div className="row align-items-center mb-3">
-
+                <DecorativeTitle title="HEALTH AND MANA" containerClassName='mb-3' />
                 <div className="d-flex justify-content-center align-items-center gap-1">
                     <button
                         onClick={handleUseMp}

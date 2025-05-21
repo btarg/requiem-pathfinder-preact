@@ -183,3 +183,48 @@ main {
 .input-group-text {
     background-color: var(--bs-body-bg) !important;
 }
+
+// List Group
+ul>li {
+    background-color: var(--bs-bg-dark) !important;
+}
+
+ul>li:hover {
+    background-color: var(--gray-700) !important;
+}
+
+.list-group-item {
+    padding: 0.25rem !important;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: #18181b;
+    }
+}
+
+.list-group-item .text-truncate {
+    max-width: 200px;
+    min-width: 0;
+}
+
+.list-group-item .roll-button {
+    width: 100px !important;
+    padding: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.list-group-item .input-group {
+    width: 90px !important;
+    flex-wrap: nowrap;
+}
+
+.list-group-item .input-group .form-control {
+    width: 3rem;
+    padding: 0.25rem;
+    text-align: center;
+}
+
+.list-group-item .btn-sm {
+    padding: 0.25rem;
+    font-size: small;
+}

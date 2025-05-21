@@ -1,3 +1,7 @@
+export const AbilityType = Object.freeze({
+    WEAPON: "Weapon",
+    GENERIC: "Generic"
+});
 export const ElementType = Object.freeze({
     PHYS: "Physical",
     FIRE: "Fire",

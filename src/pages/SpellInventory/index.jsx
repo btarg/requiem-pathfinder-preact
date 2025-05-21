@@ -1,6 +1,6 @@
-import './style.scss';
+import CharacterStats from '../../components/CharacterSheet/CharacterStats';
 import SpellManager from '../../components/SpellManager';
-import CharacterStats from '../../components/CharacterStats';
+import './style.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 export function SpellsPage() {
     return (

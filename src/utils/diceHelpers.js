@@ -20,6 +20,7 @@ export const getLinkStatBonus = (spellsList, statKey) => {
     return linkedSpell ? calculateStatBonus(linkedSpell.quantity, linkedSpell.rank) : 0;
 };
 
+// NOTE: "spells" here can also be a list of abilities/attacks, because they have the same structure
 export const replaceDiceStats = (spells, diceString, stats, friendly_name = false) => {
     return diceString.replace(/\[(\w+)\]/g, (match, statKey) => {
         const value = stats[statKey] || 0;

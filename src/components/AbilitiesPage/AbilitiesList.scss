@@ -1,0 +1,105 @@
+.abilities-list-container {
+    .card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background-color: var(--bs-body-bg);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1rem;
+    }
+
+    .card-header {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section-title {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 1.1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .list-group-item {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-color: rgba(255, 255, 255, 0.05);
+        transition: background-color 0.2s;
+        
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .ability-details {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, 0.05);
+        margin-top: 0.5rem;
+    }
+
+    .additional-attacks {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+    }
+
+    .btn-group {
+        .btn {
+            padding: 0.25rem 0.5rem;
+        }
+    }
+
+    // Individual attack roll buttons
+    .attack-roll-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin-top: 0.5rem;
+        
+        .btn {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+        }
+    }
+
+    // Quantity badge
+    .ability-badge {
+        background-color: whitesmoke;
+        color: #212529;
+        min-width: 2.5rem;
+        text-align: center;
+    }
+
+    // Improve text truncation
+    .text-truncate {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    // Small screen adjustments
+    @media screen and (max-width: 768px) {
+        .btn-group .btn {
+            padding: 0.25rem;
+            font-size: 0.8rem;
+        }
+        
+        small {
+            font-size: 0.7rem;
+        }
+        
+        .ability-details {
+            font-size: 0.8rem;
+        }
+
+        .list-group-item {
+            padding: 0.5rem;
+        }
+
+        .text-truncate {
+            max-width: 120px;
+        }
+    }
+}

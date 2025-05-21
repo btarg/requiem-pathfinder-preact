@@ -1,11 +1,11 @@
 import './style.scss';
-import HitPoints from '../../components/HitPoints';
-import AffinityTracker from '../../components/AffinityTracker';
-import DecorativeTitle from '../../components/DecorativeTitle';
+import AffinityTracker from '../../components/CharacterSheet/AffinityTracker';
 import { getLinkStatBonus } from '../../utils/diceHelpers';
 import { useContext } from 'preact/hooks';
-import { CharacterContext } from '../../context/CharacterContext';
 import { useSpellContext } from '../../context/SpellContext';
+import { CharacterContext } from '../../context/CharacterContext';
+import DecorativeTitle from '../../components/DecorativeTitle';
+import HitPoints from '../../components/CharacterSheet/HitPoints';
 
 export function CharacterSheet() {
 

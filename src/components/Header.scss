@@ -1,0 +1,8 @@
+nav {
+    @media (max-width: 420px) {
+        // Only hide images inside nav
+        img {
+            display: none;
+        }
+    }
+}

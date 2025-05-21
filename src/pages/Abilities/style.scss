@@ -1,0 +1,27 @@
+.abilities-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+
+    .abilities-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .abilities-column {
+        flex: 1;
+        min-width: 300px;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .abilities-page {
+        padding: 0.5rem;
+
+        .abilities-container {
+            flex-direction: column;
+        }
+    }
+}

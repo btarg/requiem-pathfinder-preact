@@ -6,11 +6,12 @@ import { useLocation } from 'preact-iso'; // Import route for navigation
 import LeftArrowIcon from '../assets/keyboard_arrow_left_outline.svg';
 import RightArrowIcon from '../assets/keyboard_arrow_right_outline.svg';
 
+import './Header.scss';
+
 const pageRoutes = [
     { id: 'character', title: 'Health' },
     { id: 'spells', title: 'Spells and Stats' },
-    // Add more pages here in the future, e.g.:
-    // { id: 'inventory', title: 'Inventory' },
+    { id: 'abilities', title: 'Abilities' },
 ];
 
 const pages = pageRoutes.map(page => ({

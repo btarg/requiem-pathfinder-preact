@@ -1,12 +1,12 @@
 import { useContext } from 'preact/hooks';
-import { CharacterContext } from '../context/CharacterContext';
-import { STATS_CONFIG } from '../config/stats';
-import { STAT_CATEGORIES } from '../types/statTypes';
-import { useSpellContext } from '../context/SpellContext';
-import { getLinkStatBonus } from '../utils/diceHelpers';
-import DecorativeTitle from './DecorativeTitle';
-import ToastManager from './ToastManager';
-import { capitalizeFirstLetter } from '../utils/commonUtils';
+import { CharacterContext } from '../../context/CharacterContext';
+import { useSpellContext } from '../../context/SpellContext';
+import ToastManager from '../ToastManager';
+import { STAT_CATEGORIES } from '../../types/statTypes';
+import { STATS_CONFIG } from '../../config/stats';
+import { getLinkStatBonus } from '../../utils/diceHelpers';
+import { capitalizeFirstLetter } from '../../utils/commonUtils';
+import DecorativeTitle from '../DecorativeTitle';
 const CharacterStats = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
     const { spells } = useSpellContext();

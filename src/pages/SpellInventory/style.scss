@@ -22,41 +22,6 @@
     border-radius: 4px;
 }
 
-.spell-item {
-    padding: 0.25rem !important;
-    transition: background-color 0.3s;
-
-    &:hover {
-        background-color: #18181b;
-    }
-}
-
-.spell-item .text-truncate {
-    max-width: 200px;
-    min-width: 0;
-}
-
-.spell-item .roll-button {
-    width: 100px !important;
-    padding: 0.25rem;
-    font-size: 0.875rem;
-}
-
-.spell-item .input-group {
-    width: 90px !important;
-    flex-wrap: nowrap;
-}
-
-.spell-item .input-group .form-control {
-    width: 3rem;
-    padding: 0.25rem;
-    text-align: center;
-}
-
-.spell-item .btn-sm {
-    padding: 0.25rem;
-    font-size: small;
-}
 
 .quantity-badge {
     background-color: whitesmoke;
@@ -107,67 +72,67 @@
     }
 
     /* Prioritize name and roll button */
-    .spell-item .d-flex.align-items-center {
+    .list-group-item .d-flex.align-items-center {
         gap: 0.25rem !important;
     }
 
     /* Make name take less space on mobile */
-    .spell-item .text-truncate {
+    .list-group-item .text-truncate {
         max-width: 150px;
         flex: 0 1 auto;
     }
 
     /* Keep controls on the right */
-    .spell-item .d-flex.justify-content-between {
+    .list-group-item .d-flex.justify-content-between {
         justify-content: space-between !important;
     }
 
     /* Right-aligned controls container */
-    .spell-item .d-flex.align-items-center.ms-auto {
+    .list-group-item .d-flex.align-items-center.ms-auto {
         margin-left: auto !important;
         flex-shrink: 0;
     }
 
     /* Hide quantity input on mobile */
-    .spell-item .input-group .form-control {
+    .list-group-item .input-group .form-control {
         display: none;
     }
 
     /* Keep edit button small */
-    .spell-item .fa-edit {
+    .list-group-item .fa-edit {
         font-size: 0.875rem;
     }
 
     /* Ensure roll button stays visible */
-    .spell-item .roll-button {
+    .list-group-item .roll-button {
         width: auto !important;
         padding: 0.25rem 0.5rem;
     }
 
     /* Make badges more compact */
-    .spell-item .badge {
+    .list-group-item .badge {
         font-size: 0.75rem;
         padding: 0.25rem 0.5rem;
     }
 
     /* Adjust quantity badge */
-    .spell-item .badge.bg-primary {
+    .list-group-item .badge.bg-primary {
         width: 2rem !important;
         padding: 0.25rem !important;
     }
 
     /* Make expanded content more compact */
-    .spell-item .mt-3 {
+    .list-group-item .mt-3 {
         margin-top: 0.5rem !important;
     }
 
     /* Compact buttons */
-    .spell-item .btn-sm {
+    .list-group-item .btn-sm {
         padding: 0.25rem;
     }
 
     /* Adjust input group width */
-    .spell-item .input-group {
+    .list-group-item .input-group {
         width: auto !important;
     }
 }
@@ -175,13 +140,6 @@
 .stat-text {
     font-size: 0.75rem;
     font-weight: bold;
-}
-
-ul > li {
-    background-color: var(--bs-bg-dark) !important;
-}
-ul>li:hover {
-    background-color: var(--gray-700) !important;
 }
 
 .action-label {
