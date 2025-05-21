@@ -16,7 +16,7 @@ const Footer = ({ buildDate }) => {
             <div className="container-fluid">
                 <div className="row">
                     {/* Left Section: Build Date and GitHub */}
-                    <div className="col-4 text-start d-flex align-items-center">
+                    <div className="col-4 text-start text-truncate d-flex align-items-center">
                         <span className="me-2">Build Date: {buildDate}</span>
                         {githubUrl && (
                             <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="text-light" title="GitHub Repository">
