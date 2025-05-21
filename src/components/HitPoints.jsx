@@ -415,10 +415,6 @@ export default function HitPoints() {
         }
     };
 
-    const getSpeed = () => {
-        return (characterStats.speed || 0) + getLinkStatBonus(spells, 'speed');
-    }
-
     const safeCurrentHealth = characterStats.currentHealth || 0;
     const safeMaxHealth = Math.max(1, characterStats.maxHealth || 0);
     const safeTempHealth = characterStats.tempHealth || 0;

@@ -23,7 +23,7 @@ function AffinityTracker() {
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
-    let isSmallScreen = width < 768; // Adjust this value based on your design breakpoints
+    let isSmallScreen = width < 1080;
 
     useEffect(() => {
         // Initialize or update affinities structure if it doesn't exist or is in old format
