@@ -10,23 +10,10 @@ const ConditionsTracker = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
 
     // Initialize conditions if they don't exist - store as {conditionName: value} where value is the stack level
-    const activeConditions = characterStats.conditions || {};
-
-    const toggleCondition = (condition) => {
-        const maxStack = CONDITIONS_CONFIG[condition].maxStack;
+    const activeConditions = characterStats.conditions || {};    const toggleCondition = (condition) => {
         const currentValue = activeConditions[condition] || 0;
-
-        let newValue;
-        if (currentValue === 0) {
-            // If not active, set to 1
-            newValue = 1;
-        } else if (maxStack === 1) {
-            // If max stack is 1, toggle off
-            newValue = 0;
-        } else {
-            // If stackable, cycle through values or remove
-            newValue = currentValue >= maxStack ? 0 : currentValue + 1;
-        }
+        
+        const newValue = currentValue > 0 ? 0 : 1;
 
         setCharacterStats(prev => ({
             ...prev,
@@ -95,14 +82,12 @@ const ConditionsTracker = () => {
                             </div>
 
                             {isActive && isStackable && (
-                                <div className="condition-controls">
-                                    <button
+                                <div className="condition-controls">                                    <button
                                         className="btn btn-sm condition-btn decrease"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             adjustConditionValue(condition, -1);
                                         }}
-
                                         title="Decrease value"
                                     >
                                         <i className="fas fa-minus"></i>
