@@ -1,5 +1,6 @@
 import './style.scss';
 import AffinityTracker from '../../components/CharacterSheet/AffinityTracker';
+import ConditionsTracker from '../../components/CharacterSheet/ConditionsTracker';
 import { getLinkStatBonus } from '../../utils/diceHelpers';
 import { useContext } from 'preact/hooks';
 import { useSpellContext } from '../../context/SpellContext';
@@ -49,9 +50,7 @@ export function CharacterSheet() {
                 <div className="row justify-content-between mt-4">
                     <div className="col-md-7">
                         <AffinityTracker />
-                    </div>
-                    <div className="col-md-5 p-3">
-                        <DecorativeTitle title="PLAYER CONDITION" />
+                    </div>                    <div className="col-md-5 p-3">
                         <div className="row align-items-center mb-3">
                             {/* Left Column: Character Stat values: speed, AC - Wrapped in col-auto */}
                             <div className="col-auto">
@@ -111,10 +110,7 @@ export function CharacterSheet() {
                                 </div>
                             </div>
                         </div>
-                        <div className="conditions-tracker-placeholder p-3 border rounded bg-dark-subtle">
-                            <h5 className="text-secondary-emphasis">CONDITIONS TRACKER</h5>
-                            <p className="text-muted">(Placeholder for future implementation)</p>
-                        </div>
+                        <ConditionsTracker />
                     </div>
                 </div>
 
