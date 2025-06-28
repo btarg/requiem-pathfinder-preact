@@ -10,9 +10,9 @@ const ConditionsTracker = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
 
     // Initialize conditions if they don't exist - store as {conditionName: value} where value is the stack level
-    const activeConditions = characterStats.conditions || {};    const toggleCondition = (condition) => {
+    const activeConditions = characterStats.conditions || {}; const toggleCondition = (condition) => {
         const currentValue = activeConditions[condition] || 0;
-        
+
         const newValue = currentValue > 0 ? 0 : 1;
 
         setCharacterStats(prev => ({
@@ -67,9 +67,11 @@ const ConditionsTracker = () => {
                         <div
                             key={condition}
                             className={`condition-item ${isActive ? 'active' : ''} ${isStackable ? 'stackable' : ''}`}
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            title={`${condition}${isStackable ? ` (max ${maxStack})` : ''}`}
+                            // {...(isStackable && {
+                            //     'data-bs-toggle': 'tooltip',
+                            //     'data-bs-placement': 'top',
+                            //     title: `(max ${maxStack})`
+                            // })}
                         >
                             <div className="condition-main" onClick={() => toggleCondition(condition)}>
                                 <div className="condition-checkbox">
@@ -77,12 +79,13 @@ const ConditionsTracker = () => {
                                 </div>
                                 <span className="condition-label">
                                     {condition}
-                                    {isActive && isStackable && <span className="condition-value"> {currentValue}</span>}
+                                    {isActive && isStackable && <span className="condition-value"> {currentValue}/{maxStack}</span>}
                                 </span>
                             </div>
 
                             {isActive && isStackable && (
-                                <div className="condition-controls">                                    <button
+                                <div className="condition-controls">
+                                    <button
                                         className="btn btn-sm condition-btn decrease"
                                         onClick={(e) => {
                                             e.stopPropagation();
