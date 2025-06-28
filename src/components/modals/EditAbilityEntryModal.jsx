@@ -74,9 +74,7 @@ const EditAbilityEntryModal = ({
                                 <option value="4">Reaction</option>
                                 <option value="0">Free Action</option>
                             </select>
-                        </div>
-
-                        <label className="form-label">Element</label>
+                        </div>                        <label className="form-label">Element</label>
                         <div className="input-group mb-2">
                             <span className="input-group-text">
                                 {getElementIcon(currentAbility.element)}
@@ -97,6 +95,26 @@ const EditAbilityEntryModal = ({
                             </select>
                         </div>
 
+                        <label className="form-label">Range</label>
+                        <div className="input-group mb-2">
+                            <span className="input-group-text">
+                                <i className="fas fa-crosshairs"></i>
+                            </span>
+                            <input
+                                type="number"
+                                className="form-control"
+                                placeholder="Range in metres (0 = infinite)"
+                                value={currentAbility.range || 0}
+                                min="0"
+                                onInput={(e) => setCurrentAbility({
+                                    ...currentAbility,
+                                    range: parseInt(e.currentTarget.value) || 0
+                                })}
+                            />
+                            <span className="input-group-text">
+                                {(currentAbility.range || 0) === 0 ? 'Infinite' : 'm'}
+                            </span>
+                        </div>
                         
                         <label className="form-label">{currentAbility.type === AbilityType.WEAPON ? 'Attack Roll' : 'Dice Roll'}</label>
                         <div className="input-group mb-2">

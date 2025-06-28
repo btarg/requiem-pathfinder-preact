@@ -13,9 +13,7 @@ import './AbilitiesList.scss';
 const AbilitiesList = () => {
     const { abilities, setAbilities } = useAbilityContext();
     const { characterStats } = useContext(CharacterContext);
-    const { showToast } = ToastManager();
-
-    const defaultAbility = {
+    const { showToast } = ToastManager();    const defaultAbility = {
         id: null,
         name: "",
         type: AbilityType.GENERIC,
@@ -23,7 +21,8 @@ const AbilitiesList = () => {
         dice: "",
         actions: 1,
         element: "Physical",
-        additionalAttacks: []
+        additionalAttacks: [],
+        range: 0
     };
 
     const [expandedAbilityId, setExpandedAbilityId] = useState(null);
@@ -321,24 +320,31 @@ const AbilitiesList = () => {
                     {/* Badges for weapon info */}                    <div className="d-flex flex-wrap mb-2 justify-content-center gap-1">
                         {weapon.element && (
                             <span className="badge bg-dark border"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-placement="top"
-                                  title={`${weapon.element} damage type`}>
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title={`${weapon.element} damage type`}>
                                 {getElementIcon(weapon.element)} {weapon.element}
                             </span>
                         )}
                         <span className="badge bg-dark border"
-                              data-bs-toggle="tooltip"
-                              data-bs-placement="top"
-                              title={`Takes ${weapon.actions} action${weapon.actions !== 1 ? 's' : ''} to use`}>
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title={`Takes ${weapon.actions} action${weapon.actions !== 1 ? 's' : ''} to use`}>
                             {getActionLabel(weapon.actions)} {weapon.actions === 4 ? 'Reaction' : `${weapon.actions} Action${weapon.actions !== 1 ? 's' : ''}`}
                         </span>
                         {weapon.additionalAttacks && weapon.additionalAttacks.length > 0 && (
                             <span className="badge bg-dark border"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title={`Can make ${weapon.additionalAttacks.length + 1} attacks in total`}>
+                                <i className="fas fa-hand-fist"></i> {weapon.additionalAttacks.length + 1} Attacks
+                            </span>
+                        )}                        {weapon.range > 0 && (
+                            <span className="badge bg-dark border"
                                   data-bs-toggle="tooltip"
                                   data-bs-placement="top"
-                                  title={`Can make ${weapon.additionalAttacks.length + 1} attacks in total`}>
-                                <i className="fas fa-crosshairs"></i> {weapon.additionalAttacks.length + 1} Attacks
+                                  title={`Can be used up to ${weapon.range || 0} metres away`}>
+                                <i className="fas fa-crosshairs"></i> {weapon.range || 0} m
                             </span>
                         )}
                     </div>
@@ -408,25 +414,33 @@ const AbilitiesList = () => {
                 <div className="ability-details mt-2">
                     {/* Badges for ability info */}                    <div className="d-flex flex-wrap mb-2 justify-content-center gap-1">
                         <span className="badge bg-dark border"
-                              data-bs-toggle="tooltip"
-                              data-bs-placement="top"
-                              title={`Takes ${ability.actions} action${ability.actions !== 1 ? 's' : ''} to use`}>
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title={`Takes ${ability.actions} action${ability.actions !== 1 ? 's' : ''} to use`}>
                             {getActionLabel(ability.actions)} {ability.actions === 4 ? 'Reaction' : `${ability.actions} Action${ability.actions !== 1 ? 's' : ''}`}
                         </span>
                         {ability.element && (
                             <span className="badge bg-dark border"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-placement="top"
-                                  title={`${ability.element} element type`}>
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title={`${ability.element} element type`}>
                                 {getElementIcon(ability.element)} {ability.element}
                             </span>
                         )}
                         {ability.dice && (
                             <span className="badge bg-dark border"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-placement="top"
-                                  title="Dice formula for this ability">
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="Dice formula for this ability">
                                 <i className="fas fa-dice-d20"></i> {ability.dice}
+                            </span>
+                        )}
+                        {ability.range > 0 && (
+                            <span className="badge bg-dark border"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title={`Can be cast up to ${ability.range || 0} metres away`}>
+                                <i className="fas fa-crosshairs"></i> {ability.range || 0} m
                             </span>
                         )}
                     </div>
