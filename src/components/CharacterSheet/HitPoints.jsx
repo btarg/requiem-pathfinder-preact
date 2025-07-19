@@ -425,48 +425,31 @@ export default function HitPoints() {
 
             {/* HP and MP Controls */}
             <div className="row align-items-center mb-3">
-                <DecorativeTitle title="HEALTH AND MANA" containerClassName='mb-3' />
-                <div className="d-flex justify-content-center align-items-center gap-1">
-                    <button
-                        onClick={handleUseMp}
-                        className="btn btn-outline-primary btn-icon-square"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Use MP"
-                    >
-                        <i className="fas fa-bolt-lightning" />
-                    </button>
-                    <button
-                        onClick={handleClearTempHp}
-                        className="btn btn-icon-square btn-outline-warning"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Clear Temporary HP"
-                        data-bs-original-title="Clear Temporary HP"
-                    >
-                        <i className="fas fa-times-circle" />
-                    </button>
-                    <button
-                        onClick={handleDamage}
-                        className="btn btn-icon-square btn-outline-danger"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Damage HP"
-                        data-bs-original-title="Damage HP"
-                    >
-                        <i className="fas fa-heart-circle-minus" />
-                    </button>
-                    <div className="input-group amount-input-container" style={{ width: 'auto', alignItems: 'center' }}>
+                <DecorativeTitle title="VITALS" containerClassName='mb-3' />
+                <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+                    {/* Main HP and MP Controls (Left) */}
+                    <div className="input-group amount-input-container d-flex" style={{ width: 'auto', alignItems: 'center', flexWrap: 'nowrap' }}>
                         <button
-                            onClick={handleDecrementAmount}
-                            className="btn btn-outline-secondary btn-icon-square amount-control-btn"
-                            type="button"
+                            onClick={handleUseMp}
+                            className="btn btn-outline-primary btn-icon-square d-flex flex-column align-items-center justify-content-center"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
-                            title={isCtrlPressed ? "Set to Min (0)" : "Decrease Amount"}
-                            data-bs-original-title={isCtrlPressed ? "Set to Min (0)" : "Decrease Amount"}
+                            title="Use MP"
+                            style={{ width: '50px', height: '50px' }}
                         >
-                            <i className="fas fa-minus" />
+                            <i className="fas fa-bolt-lightning" />
+                            <span style={{ fontSize: '0.5em' }}>MP</span>
+                        </button>
+                        <button
+                            onClick={handleDamage}
+                            className="btn btn-icon-square btn-outline-danger"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Damage HP"
+                            data-bs-original-title="Damage HP"
+                            style={{ width: '50px', height: '50px' }}
+                        >
+                            <i className="fas fa-heart-circle-minus" />
                         </button>
                         <input
                             type="number"
@@ -474,63 +457,69 @@ export default function HitPoints() {
                             onChange={(e) => setAmount(Math.max(0, parseInt((e.currentTarget).value) || 0))}
                             className="form-control text-center bg-dark text-light"
                             min="0"
-                            style={{ width: '70px', height: '40px' }}
+                            style={{ width: '50px', height: '50px' }}
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
-                            title="Enter amount"
+                            title="Enter amount to heal or damage"
                             aria-label="Amount for HP/MP changes"
                         />
                         <button
-                            onClick={handleIncrementAmount}
-                            className="btn btn-outline-secondary btn-icon-square amount-control-btn"
-                            type="button"
+                            onClick={handleHeal}
+                            className="btn btn-icon-square btn-outline-success"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
-                            title={isCtrlPressed ? `Set to Max (${characterStats.maxHealth || 0})` : "Increase Amount"}
-                            data-bs-original-title={isCtrlPressed ? `Set to Max (${characterStats.maxHealth || 0})` : "Increase Amount"}
+                            title="Heal HP"
+                            data-bs-original-title="Heal HP"
+                            style={{ width: '50px', height: '50px' }}
                         >
-                            <i className="fas fa-plus" />
+                            <i className="fas fa-heart-circle-plus" />
+                        </button>
+                        <button
+                            onClick={handleRestoreMp}
+                            className="btn btn-outline-info btn-icon-square d-flex flex-column align-items-center justify-content-center"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Restore MP"
+                            data-bs-original-title="Restore MP"
+                            style={{ width: '50px', height: '50px' }}
+                        >
+                            <i className="fas fa-droplet" />
+                            <span style={{ fontSize: '0.5em' }}>MP</span>
                         </button>
                     </div>
 
-                    <button
-                        onClick={handleHeal}
-                        className="btn btn-icon-square btn-outline-success"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Heal HP"
-                        data-bs-original-title="Heal HP"
-                    >
-                        <i className="fas fa-heart-circle-plus" />
-                    </button>
-
-                    <button
-                        onClick={handleTempHeal}
-                        className="btn btn-icon-square btn-outline-info"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Heal Temporary HP"
-                        data-bs-original-title="Heal Temporary HP"
-                    >
-                        <i className="fas fa-heart-pulse" />
-                    </button>
-
-                    <button
-                        onClick={handleRestoreMp}
-                        className="btn btn-outline-info btn-icon-square"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Restore MP"
-                        data-bs-original-title="Restore MP"
-                    >
-                        <i className="fas fa-droplet" />
-                    </button>
+                    {/* Temporary HP Controls (Right) */}
+                    <div className="d-flex gap-2 align-items-center">
+                        <button
+                            onClick={handleClearTempHp}
+                            className="dark-btn dark-btn-secondary d-flex align-items-center gap-2"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Clear Temporary HP"
+                            data-bs-original-title="Clear Temporary HP"
+                        >
+                            <span>Clear Temp</span>
+                            <i className="fas fa-times-circle" />
+                        </button>
+                        <button
+                            onClick={handleTempHeal}
+                            className="dark-btn dark-btn-primary d-flex align-items-center gap-2"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Heal Temporary HP"
+                            data-bs-original-title="Heal Temporary HP"
+                        >
+                            <span>Heal Temp</span>
+                            <i className="fas fa-heart-pulse" />
+                        </button>
+                    </div>
                 </div>
             </div>
 
             {/* Progress Bars Section */}
             <div className="mb-3">
-                {/* HP and Temp HP Bar Group for Overlay */}                <div
+                {/* HP and Temp HP Bar Group for Overlay */}
+                <div
                     style={{ position: 'relative', cursor: 'pointer' }}
                     className="mb-2"
                     onClick={(e) => {

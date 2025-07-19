@@ -13,7 +13,14 @@ export function CharacterProvider({ children }) {
         if (savedStats) {
             return JSON.parse(savedStats);
         } else {
-            const defaultStats = {};
+            const defaultStats = {
+                speed: 15,
+                AC: 10,
+                maxHealth: 35,
+                maxMp: 1,
+                currentHealth: 35,
+                currentMp: 1
+            };
             for (const statKey in STATS_CONFIG) {
                 defaultStats[statKey] = STATS_CONFIG[statKey].defaultValue || 0;
             }

@@ -51,7 +51,7 @@ const ConditionsTracker = () => {
         <div className="conditions-tracker">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <DecorativeTitle
-                    title="PLAYER CONDITION"
+                    title="CONDITIONS"
                     containerClassName="mb-0 flex-grow-1"
                     lineMaxWidth="30px"
                 />
@@ -67,11 +67,6 @@ const ConditionsTracker = () => {
                         <div
                             key={condition}
                             className={`condition-item ${isActive ? 'active' : ''} ${isStackable ? 'stackable' : ''}`}
-                            // {...(isStackable && {
-                            //     'data-bs-toggle': 'tooltip',
-                            //     'data-bs-placement': 'top',
-                            //     title: `(max ${maxStack})`
-                            // })}
                         >
                             <div className="condition-main" onClick={() => toggleCondition(condition)}>
                                 <div className="condition-checkbox">
@@ -79,7 +74,6 @@ const ConditionsTracker = () => {
                                 </div>
                                 <span className="condition-label">
                                     {condition}
-                                    {isActive && isStackable && <span className="condition-value"> {currentValue}/{maxStack}</span>}
                                 </span>
                             </div>
 
@@ -95,6 +89,7 @@ const ConditionsTracker = () => {
                                     >
                                         <i className="fas fa-minus"></i>
                                     </button>
+                                    <span className="condition-value">{currentValue}/{maxStack}</span>
                                     <button
                                         className="btn btn-sm condition-btn increase"
                                         onClick={(e) => {
