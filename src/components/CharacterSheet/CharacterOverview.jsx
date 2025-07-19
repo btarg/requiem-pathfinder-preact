@@ -2,7 +2,7 @@ import { useContext } from 'preact/hooks';
 import { useSpellContext } from '../../context/SpellContext';
 import { CharacterContext } from '../../context/CharacterContext';
 import { getLinkStatBonus } from '../../utils/diceHelpers';
-import { calculateConditionEffects } from '../../config/conditions';
+import { calculateConditionEffects, getDrainedHPReduction } from '../../config/conditions';
 import { BASE_AC, BASE_HP, BASE_SPD } from '../../config/constants';
 
 export default function CharacterOverview() {
@@ -69,6 +69,18 @@ export default function CharacterOverview() {
             ...prev,
             speed: newSpeed
         }));
+    };
+
+    const handleLevelChange = (e) => {
+        const target = e.currentTarget;
+        const newLevel = Math.max(1, parseInt(target.value) || 1);
+        updateCharacterStats({ level: newLevel });
+    };
+
+    const getEffectiveMaxHealth = () => {
+        const baseMaxHealth = characterStats.maxHealth || BASE_HP;
+        const drainedReduction = getDrainedHPReduction(characterStats.conditions, characterStats.level || 1);
+        return Math.max(1, baseMaxHealth - drainedReduction);
     };
 
     return (
@@ -142,6 +154,18 @@ export default function CharacterOverview() {
                                 onChange={handleBaseSpeedChange}
                                 min="0"
                                 aria-label="Base Speed"
+                            />
+                        </div>
+                        <div className="text-center">
+                            <small className="d-block mb-1 text-secondary">Level</small>
+                            <input
+                                type="number"
+                                className="form-control form-control hp-input text-center bg-dark text-light"
+                                id="levelInput"
+                                value={characterStats.level || 1}
+                                onChange={handleLevelChange}
+                                min="1"
+                                aria-label="Character Level"
                             />
                         </div>
                         <div className="text-center">
@@ -246,7 +270,21 @@ export default function CharacterOverview() {
 
                 {/* Max Values Row */}
                 <div className="row">
-                    <div className="col-6">
+                    <div className="col-4">
+                        <div className="text-center">
+                            <small className="d-block mb-1 text-secondary">Level</small>
+                            <input
+                                type="number"
+                                className="form-control text-center bg-dark text-light"
+                                value={characterStats.level || 1}
+                                onChange={handleLevelChange}
+                                min="1"
+                                aria-label="Character Level"
+                                style={{ fontSize: '1.1rem', padding: '0.75rem' }}
+                            />
+                        </div>
+                    </div>
+                    <div className="col-4">
                         <div className="text-center">
                             <small className="d-block mb-1 text-secondary">Max HP</small>
                             <input
@@ -260,7 +298,7 @@ export default function CharacterOverview() {
                             />
                         </div>
                     </div>
-                    <div className="col-6">
+                    <div className="col-4">
                         <div className="text-center">
                             <small className="d-block mb-1 text-secondary">Max MP</small>
                             <input

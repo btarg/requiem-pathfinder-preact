@@ -6,7 +6,11 @@ export const CONDITIONS_CONFIG = {
     'Broken': { maxStack: 1 }, // Equipment condition, no mechanical effect on character
     'Clumsy': { 
         maxStack: 4,
-        effects: { ac: -1, savingThrow: -1 } // -1 AC, attack rolls, Reflex saves, Dex-based checks per stack
+        effects: { 
+            ac: -1, 
+            statPenalties: { speed: -1 }, // -1 to Dex-based checks per stack
+            savingThrowPenalties: { 'Reflex Save': -1 } // -1 to Reflex saves per stack
+        }
     },
     'Concealed': { maxStack: 1 }, // Others have flat check when targeting you
     'Confused': { maxStack: 1 }, // Random actions, no direct stat penalties
@@ -19,16 +23,25 @@ export const CONDITIONS_CONFIG = {
     },
     'Drained': { 
         maxStack: 4,
-        effects: { ac: -1, savingThrow: -1 } // -1 to Constitution-based checks, Fortitude saves, and max HP per stack
+        effects: { 
+            statPenalties: { vitality: -1 }, // -1 to Constitution (Vitality)-based checks per stack
+            savingThrowPenalties: { 'Fortitude Save': -1 } // -1 to Fortitude saves per stack
+        }
     },
     'Dying': { maxStack: 4 }, // Recovery checks, no direct stat penalties when stable
     'Encumbered': { 
         maxStack: 1,
-        effects: { speed: -10, ac: -1, savingThrow: -1 } // -10 ft speed, -1 penalty to attack rolls, AC, and Dex-based saves
+        effects: { 
+            speed: -10, 
+            ac: -1, 
+            savingThrowPenalties: { 'Reflex Save': -1 } // -1 penalty to Dex-based saves
+        }
     },
     'Enfeebled': { 
         maxStack: 4,
-        effects: { savingThrow: -1 } // -1 to Strength-based checks, attack rolls, damage rolls per stack
+        effects: { 
+            statPenalties: { strength: -1 } // -1 to Strength-based checks, attack rolls, damage rolls per stack
+        }
     },
     'Fascinated': { maxStack: 1 }, // -2 to Perception and skill checks not related to fascination source
     'Fatigued': { 
@@ -61,7 +74,11 @@ export const CONDITIONS_CONFIG = {
     },
     'Paralyzed': { 
         maxStack: 1,
-        effects: { ac: -2, speed: 0, savingThrow: -2 } // Flat-footed, can't act, -2 to Reflex saves
+        effects: { 
+            ac: -2, 
+            speed: 0, 
+            savingThrowPenalties: { 'Reflex Save': -2 } // -2 to Reflex saves
+        }
     },
     'Persistent Damage': { maxStack: 1 }, // Damage at end of turn, no direct stat penalties
     'Petrified': { 
@@ -75,7 +92,11 @@ export const CONDITIONS_CONFIG = {
     'Quickened': { maxStack: 1 }, // Gain extra action with restrictions, no penalties
     'Restrained': { 
         maxStack: 1,
-        effects: { ac: -2, speed: 0, savingThrow: -2 } // Flat-footed, can't move, -2 to attack rolls and Reflex saves
+        effects: { 
+            ac: -2, 
+            speed: 0, 
+            savingThrowPenalties: { 'Reflex Save': -2 } // -2 to attack rolls and Reflex saves
+        }
     },
     'Sickened': { 
         maxStack: 4,
@@ -88,11 +109,17 @@ export const CONDITIONS_CONFIG = {
     },
     'Stupefied': { 
         maxStack: 4,
-        effects: { savingThrow: -1 } // -1 to Intelligence, Wisdom, Charisma checks and DCs per stack
+        effects: { 
+            statPenalties: { intelligence: -1, wisdom: -1, charisma: -1 } // -1 to Int, Wis, Cha checks and DCs per stack
+        }
     },
     'Unconscious': { 
         maxStack: 1,
-        effects: { ac: -4, speed: 0, savingThrow: -4 } // Flat-footed, can't act, blinded, -4 to AC, Reflex saves
+        effects: { 
+            ac: -4, 
+            speed: 0, 
+            savingThrowPenalties: { 'Reflex Save': -4 } // -4 to Reflex saves
+        }
     },
     'Undetected': { maxStack: 1 }, // Others don't know your location
     'Unnoticed': { maxStack: 1 }, // Others don't know you exist
@@ -101,12 +128,21 @@ export const CONDITIONS_CONFIG = {
 
 // Helper function to calculate condition effects
 export const calculateConditionEffects = (conditions) => {
-    if (!conditions) return { acModifier: 0, speedModifier: 0, speedOverride: null, savingThrowModifier: 0 };
+    if (!conditions) return { 
+        acModifier: 0, 
+        speedModifier: 0, 
+        speedOverride: null, 
+        savingThrowModifier: 0,
+        statPenalties: {},
+        savingThrowPenalties: {}
+    };
     
     let acModifier = 0;
     let speedModifier = 0;
     let speedOverride = null;
-    let savingThrowModifier = 0;
+    let savingThrowModifier = 0; // General saving throw modifier (for backwards compatibility)
+    let statPenalties = {};
+    let savingThrowPenalties = {};
     
     Object.entries(conditions).forEach(([conditionName, value]) => {
         if (value > 0 && CONDITIONS_CONFIG[conditionName]?.effects) {
@@ -127,12 +163,64 @@ export const calculateConditionEffects = (conditions) => {
                 }
             }
 
-            // Saving throw modifiers
+            // General saving throw modifiers (backwards compatibility)
             if (effects.savingThrow !== undefined) {
                 savingThrowModifier += effects.savingThrow * stackValue;
+            }
+
+            // Stat-specific penalties
+            if (effects.statPenalties) {
+                Object.entries(effects.statPenalties).forEach(([stat, penalty]) => {
+                    if (!statPenalties[stat]) {
+                        statPenalties[stat] = 0;
+                    }
+                    statPenalties[stat] += penalty * stackValue;
+                });
+            }
+
+            // Saving throw-specific penalties
+            if (effects.savingThrowPenalties) {
+                Object.entries(effects.savingThrowPenalties).forEach(([saveType, penalty]) => {
+                    if (!savingThrowPenalties[saveType]) {
+                        savingThrowPenalties[saveType] = 0;
+                    }
+                    savingThrowPenalties[saveType] += penalty * stackValue;
+                });
             }
         }
     });
     
-    return { acModifier, speedModifier, speedOverride, savingThrowModifier };
+    return { 
+        acModifier, 
+        speedModifier, 
+        speedOverride, 
+        savingThrowModifier,
+        statPenalties,
+        savingThrowPenalties
+    };
+};
+
+// Helper function to get condition modifiers for a specific stat
+export const getStatConditionModifier = (conditions, stat) => {
+    if (!conditions) return 0;
+    
+    const effects = calculateConditionEffects(conditions);
+    return effects.statPenalties[stat] || 0;
+};
+
+// Helper function to get condition modifiers for a specific saving throw
+export const getSavingThrowConditionModifier = (conditions, saveType) => {
+    if (!conditions) return 0;
+    
+    const effects = calculateConditionEffects(conditions);
+    // Return specific saving throw penalty plus general saving throw modifier
+    return (effects.savingThrowPenalties[saveType] || 0) + effects.savingThrowModifier;
+};
+
+// Helper function to calculate HP reduction from Drained condition
+export const getDrainedHPReduction = (conditions, characterLevel = 1) => {
+    if (!conditions || !conditions['Drained']) return 0;
+    
+    const drainedValue = conditions['Drained'] || 0;
+    return drainedValue * Math.max(1, characterLevel);
 };

@@ -2,6 +2,7 @@ import { useEffect, useState, useContext, useRef } from 'preact/hooks'
 import { Tooltip } from 'bootstrap';
 import './HitPoints.scss'
 import { CharacterContext } from '../../context/CharacterContext';
+import { getDrainedHPReduction } from '../../config/conditions';
 import ProgressBar from './ProgressBar';
 import DecorativeTitle from '../DecorativeTitle';
 
@@ -222,8 +223,9 @@ export default function HitPoints() {
 
     const handleHeal = () => {
         setHealed(true)
+        const effectiveMaxHealth = Math.max(1, (characterStats.maxHealth || 0) - getDrainedHPReduction(characterStats.conditions, characterStats.level || 1));
         updateHealth({
-            currentHealth: Math.min(characterStats.maxHealth, characterStats.currentHealth + amount)
+            currentHealth: Math.min(effectiveMaxHealth, characterStats.currentHealth + amount)
         })
         setAmount(1)
     }
@@ -238,9 +240,11 @@ export default function HitPoints() {
 
     const handleIncrementAmount = () => {
         if (isCtrlPressed) {
-            setAmount(characterStats.maxHealth || 0);
+            const effectiveMaxHealth = Math.max(1, (characterStats.maxHealth || 0) - getDrainedHPReduction(characterStats.conditions, characterStats.level || 1));
+            setAmount(effectiveMaxHealth);
         } else {
-            setAmount(prev => Math.min(prev + 1, characterStats.maxHealth || Infinity));
+            const effectiveMaxHealth = Math.max(1, (characterStats.maxHealth || 0) - getDrainedHPReduction(characterStats.conditions, characterStats.level || 1));
+            setAmount(prev => Math.min(prev + 1, effectiveMaxHealth));
         }
     };
 
@@ -268,7 +272,8 @@ export default function HitPoints() {
     }
 
     const handleSetHp = () => {
-        const newHealth = Math.max(0, Math.min(characterStats.maxHealth, amount));
+        const effectiveMaxHealth = Math.max(1, (characterStats.maxHealth || 0) - getDrainedHPReduction(characterStats.conditions, characterStats.level || 1));
+        const newHealth = Math.max(0, Math.min(effectiveMaxHealth, amount));
         updateHealth({ currentHealth: newHealth });
         setHealed(true); // Re-using heal flash for generic positive change
         setAmount(1); // Reset amount input
@@ -293,7 +298,8 @@ export default function HitPoints() {
 
     const handleFullHeal = () => {
         if (characterStats.maxHealth === undefined) return;
-        updateHealth({ currentHealth: characterStats.maxHealth });
+        const effectiveMaxHealth = Math.max(1, (characterStats.maxHealth || 0) - getDrainedHPReduction(characterStats.conditions, characterStats.level || 1));
+        updateHealth({ currentHealth: effectiveMaxHealth });
         setHealed(true);
     };
 
@@ -413,7 +419,9 @@ export default function HitPoints() {
     };
 
     const safeCurrentHealth = characterStats.currentHealth || 0;
-    const safeMaxHealth = Math.max(1, characterStats.maxHealth || 0);
+    const baseMaxHealth = characterStats.maxHealth || 0;
+    const drainedReduction = getDrainedHPReduction(characterStats.conditions, characterStats.level || 1);
+    const safeMaxHealth = Math.max(1, baseMaxHealth - drainedReduction);
     const safeTempHealth = characterStats.tempHealth || 0;
 
     const safeCurrentMp = characterStats.currentMp || 0;
@@ -545,7 +553,13 @@ export default function HitPoints() {
                         value={safeCurrentHealth}
                         maxValue={safeMaxHealth}
                         color={{ from: '#ef4444', to: '#e11d48' }} // Tailwind red-500 to rose-600
-                        labelRight={`${safeCurrentHealth} / ${safeMaxHealth}`}
+                        labelRight={(() => {
+                            const baseMaxHealth = characterStats.maxHealth || 0;
+                            if (drainedReduction > 0) {
+                                return `${safeCurrentHealth} / ${safeMaxHealth} (${baseMaxHealth} - ${drainedReduction})`;
+                            }
+                            return `${safeCurrentHealth} / ${safeMaxHealth}`;
+                        })()}
                         trailingStartValue={previousMainHealth}
                         trailColor="rgba(200, 0, 0, 0.7)" // Darker red for trail
                         className={isFlashingHP ? 'progress-bar-damage-flash' : ''}

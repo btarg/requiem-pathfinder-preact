@@ -3,7 +3,7 @@ import { useSpellContext } from '../context/SpellContext';
 import { getLinkStatBonus } from '../utils/diceHelpers';
 import { capitalizeFirstLetter } from '../utils/commonUtils';
 import { STATS_CONFIG } from '../config/stats';
-import { calculateConditionEffects } from '../config/conditions';
+import { getSavingThrowConditionModifier } from '../config/conditions';
 import { useContext } from 'preact/hooks';
 import { CharacterContext } from '../context/CharacterContext';
 
@@ -12,14 +12,10 @@ const QuickRolls = () => {
     const { spells } = useSpellContext();
     const { characterStats } = useContext(CharacterContext);
 
-    const getPlayerConditionsModifier = (rollType) => {
-        const effects = calculateConditionEffects(characterStats.conditions);
-        return effects.saveModifier || 0;
-    }
 
     const copyRollToClipboard = (rollType, stat) => {
         const statBonus = getLinkStatBonus(spells, stat);
-        const conditionModifier = getPlayerConditionsModifier(rollType);
+        const conditionModifier = getSavingThrowConditionModifier(characterStats.conditions, rollType);
         const totalModifier = statBonus + conditionModifier;
         
         let roll = "[[1d20+" + totalModifier;
@@ -29,7 +25,11 @@ const QuickRolls = () => {
         roll += "]]";
         roll = roll.replace("+-", "-"); // Fix any double negatives
 
-        const command = `&{template:default} {{name=${rollType}}}\{{Roll=${roll}}}\{{Stat Bonus=[[${statBonus}]] from ${capitalizeFirstLetter(stat)}}}\{{Condition Modifier=[[${conditionModifier}]]}}`;
+        let command = `&{template:default} {{name=${rollType}}}\{{Roll=${roll}}}\{{Stat Bonus=[[${statBonus}]] from ${capitalizeFirstLetter(stat)}}}`;
+        
+        if (conditionModifier !== 0) {
+            command += `\{{Condition Modifier=[[${conditionModifier}]]}}`;
+        }
 
         navigator.clipboard.writeText(command);
         showToast(rollType + " roll command copied! Paste it into the text chat on Roll20.", 'clipboard', 'success', 'Copied to clipboard');

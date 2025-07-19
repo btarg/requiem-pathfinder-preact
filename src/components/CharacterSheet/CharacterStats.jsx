@@ -6,6 +6,7 @@ import { STAT_CATEGORIES } from '../../types/statTypes';
 import { STATS_CONFIG } from '../../config/stats';
 import { getLinkStatBonus } from '../../utils/diceHelpers';
 import { capitalizeFirstLetter } from '../../utils/commonUtils';
+import { getStatConditionModifier } from '../../config/conditions';
 import DecorativeTitle from '../DecorativeTitle';
 const CharacterStats = () => {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
@@ -35,18 +36,21 @@ const CharacterStats = () => {
         const dcValue = Math.max(0, parseInt(dc, 10));
         
         // Base roll calculation with the bonus
-        const bonus = (characterStats[stat] || 0) + getLinkStatBonus(spells, stat);
+        const statBonus = (characterStats[stat] || 0) + getLinkStatBonus(spells, stat);
+        const conditionModifier = getStatConditionModifier(characterStats.conditions, stat);
+        const totalBonus = statBonus + conditionModifier;
         const statConfig = STATS_CONFIG[stat];
         
         // Build the roll command
-        let roll = `1d20+${bonus}`;
+        let roll = `1d20+${totalBonus}`;
         if (dcValue > 1) {
             roll = `${roll}cs>=${dcValue}cf<${dcValue}`;
         }
         const checkString = dcValue ? `check vs DC ${dcValue}` : 'check';
         const command = `&{template:default} {{name=${capitalizeFirstLetter(stat)} ${checkString}}}` +
                        `{{Roll=[[${roll}]]}}` +
-                       `{{Stat Bonus=[[${bonus}]] from ${statConfig.shortName}}}`;
+                       `{{Stat Bonus=[[${statBonus}]] from ${statConfig.shortName}}}` +
+                       (conditionModifier !== 0 ? `{{Condition Modifier=[[${conditionModifier}]]}}` : '');
         
         // Copy to clipboard and show confirmation
         navigator.clipboard.writeText(command);
@@ -98,17 +102,36 @@ const CharacterStats = () => {
                                 // style={{ borderColor: `var(--bs-${config.color}) !important` }}
                                 >
                                     <i className={`fas ${getLinkStatBonus(spells, statKey) ? '' : 'fa-link-slash'} text-muted`}></i>
-                                    {getLinkStatBonus(spells, statKey) > 0 && (
-                                        <div>
-                                            <span className="text-secondary ms-1">
-                                                +{getLinkStatBonus(spells, statKey)} =
-                                            </span>
-                                            <span className="text-muted ms-1">
-                                                {characterStats[statKey] + getLinkStatBonus(spells, statKey)}
-                                            </span>
-                                        </div>
-                                    )}
-
+                                    {(() => {
+                                        const spellBonus = getLinkStatBonus(spells, statKey);
+                                        const conditionModifier = getStatConditionModifier(characterStats.conditions, statKey);
+                                        const totalModifier = spellBonus + conditionModifier;
+                                        
+                                        if (totalModifier > 0) {
+                                            return (
+                                                <div>
+                                                    <span className="text-secondary ms-1">
+                                                        +{totalModifier} =
+                                                    </span>
+                                                    <span className="text-muted ms-1">
+                                                        {characterStats[statKey] + totalModifier}
+                                                    </span>
+                                                </div>
+                                            );
+                                        } else if (totalModifier < 0) {
+                                            return (
+                                                <div>
+                                                    <span className="text-danger ms-1">
+                                                        {totalModifier} =
+                                                    </span>
+                                                    <span className="text-muted ms-1">
+                                                        {characterStats[statKey] + totalModifier}
+                                                    </span>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    })()}
                                 </span>
                             </div>
                         </div>

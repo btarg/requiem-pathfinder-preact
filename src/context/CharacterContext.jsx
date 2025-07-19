@@ -19,7 +19,8 @@ export function CharacterProvider({ children }) {
                 maxHealth: 35,
                 maxMp: 1,
                 currentHealth: 35,
-                currentMp: 1
+                currentMp: 1,
+                level: 1 // Add character level
             };
             for (const statKey in STATS_CONFIG) {
                 defaultStats[statKey] = STATS_CONFIG[statKey].defaultValue || 0;
