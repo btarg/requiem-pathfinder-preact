@@ -3,19 +3,33 @@ import { useSpellContext } from '../context/SpellContext';
 import { getLinkStatBonus } from '../utils/diceHelpers';
 import { capitalizeFirstLetter } from '../utils/commonUtils';
 import { STATS_CONFIG } from '../config/stats';
+import { calculateConditionEffects } from '../config/conditions';
+import { useContext } from 'preact/hooks';
+import { CharacterContext } from '../context/CharacterContext';
 
 const QuickRolls = () => {
     const { showToast } = ToastManager();
     const { spells } = useSpellContext();
+    const { characterStats } = useContext(CharacterContext);
+
+    const getPlayerConditionsModifier = (rollType) => {
+        const effects = calculateConditionEffects(characterStats.conditions);
+        return effects.saveModifier || 0;
+    }
 
     const copyRollToClipboard = (rollType, stat) => {
-        let roll = "[[1d20+" + getLinkStatBonus(spells, stat);
+        const statBonus = getLinkStatBonus(spells, stat);
+        const conditionModifier = getPlayerConditionsModifier(rollType);
+        const totalModifier = statBonus + conditionModifier;
+        
+        let roll = "[[1d20+" + totalModifier;
         if (rollType === 'Initiative') {
             roll += "&{tracker}";
         }
         roll += "]]";
+        roll = roll.replace("+-", "-"); // Fix any double negatives
 
-        const command = `&{template:default} {{name=${rollType}}}\{{Roll=${roll}}}\{{Stat Bonus=[[${getLinkStatBonus(spells, stat)}]] from ${capitalizeFirstLetter(stat)}}}`;
+        const command = `&{template:default} {{name=${rollType}}}\{{Roll=${roll}}}\{{Stat Bonus=[[${statBonus}]] from ${capitalizeFirstLetter(stat)}}}\{{Condition Modifier=[[${conditionModifier}]]}}`;
 
         navigator.clipboard.writeText(command);
         showToast(rollType + " roll command copied! Paste it into the text chat on Roll20.", 'clipboard', 'success', 'Copied to clipboard');

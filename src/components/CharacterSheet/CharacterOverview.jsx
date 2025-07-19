@@ -10,7 +10,7 @@ export default function CharacterOverview() {
     const { characterStats, setCharacterStats } = useContext(CharacterContext);
 
     const getSpeed = () => {
-        const baseSpeed = (characterStats.speed || 15) + getLinkStatBonus(spells, 'speed');
+        const baseSpeed = (characterStats.speed || BASE_SPD) + getLinkStatBonus(spells, 'speed');
         const conditionEffects = calculateConditionEffects(characterStats.conditions);
 
         // If any condition sets speed to 0, return 0
@@ -83,8 +83,8 @@ export default function CharacterOverview() {
                             <input
                                 type="number"
                                 className={`form-control form-control box-no-input text-center bg-dark ${calculateConditionEffects(characterStats.conditions).speedModifier !== 0 ||
-                                        calculateConditionEffects(characterStats.conditions).speedOverride === 0
-                                        ? 'text-warning' : 'text-light'
+                                    calculateConditionEffects(characterStats.conditions).speedOverride === 0
+                                    ? 'text-warning' : 'text-light'
                                     }`}
                                 id="speedInput"
                                 value={getSpeed()}
@@ -102,7 +102,7 @@ export default function CharacterOverview() {
                             <input
                                 type="number"
                                 className={`form-control box-no-input text-center bg-dark ${calculateConditionEffects(characterStats.conditions).acModifier !== 0
-                                        ? 'text-warning' : 'text-light'
+                                    ? 'text-warning' : 'text-light'
                                     }`}
                                 id="acInput"
                                 value={getAC()}
@@ -179,11 +179,11 @@ export default function CharacterOverview() {
                     <div className="col-6">
                         <div className="text-center p-2 border rounded bg-dark">
                             <small className="d-block mb-2 text-secondary fw-bold">SPEED</small>
-                            <div 
+                            <div
                                 className={`fs-4 fw-bold ${calculateConditionEffects(characterStats.conditions).speedModifier !== 0 ||
                                     calculateConditionEffects(characterStats.conditions).speedOverride === 0
                                     ? 'text-warning' : 'text-light'
-                                }`}
+                                    }`}
                                 title={
                                     calculateConditionEffects(characterStats.conditions).speedModifier !== 0 ||
                                         calculateConditionEffects(characterStats.conditions).speedOverride === 0
@@ -197,10 +197,10 @@ export default function CharacterOverview() {
                     <div className="col-6">
                         <div className="text-center p-2 border rounded bg-dark">
                             <small className="d-block mb-2 text-secondary fw-bold">AC</small>
-                            <div 
+                            <div
                                 className={`fs-4 fw-bold ${calculateConditionEffects(characterStats.conditions).acModifier !== 0
                                     ? 'text-warning' : 'text-light'
-                                }`}
+                                    }`}
                                 title={
                                     calculateConditionEffects(characterStats.conditions).acModifier !== 0
                                         ? 'AC modified by conditions' : 'Armor Class'
