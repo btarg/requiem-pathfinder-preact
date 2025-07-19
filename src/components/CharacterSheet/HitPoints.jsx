@@ -457,7 +457,7 @@ export default function HitPoints() {
                             onChange={(e) => setAmount(Math.max(0, parseInt((e.currentTarget).value) || 0))}
                             className="form-control text-center bg-dark text-light"
                             min="0"
-                            style={{ width: '50px', height: '50px' }}
+                            style={{ width: '75px', height: '50px' }}
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
                             title="Enter amount to heal or damage"
